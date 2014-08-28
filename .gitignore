@@ -1,0 +1,6 @@
+.classpath
+.project
+.settings/
+datanucleus.log
+/target/
+nb-configuration.xml

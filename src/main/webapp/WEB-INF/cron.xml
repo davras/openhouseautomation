@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/ReadingServletMR</url>
+    <description>MapReduce datastore to the archives</description>
+    <schedule>every day 00:00</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+  <cron>
+    <url>/cron/datastorelogtruncator</url>
+    <description>Remove old log entries from the Datastore</description>
+    <schedule>every day 01:00</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+  <cron>
+    <url>/cron/getforecast?zipcode=95376</url>
+    <description>Gets the forecast for the supplied zip code</description>
+    <schedule>every 1 hours</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+</cronentries>

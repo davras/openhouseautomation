@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>gAutoArd</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- gAutoArd core CSS -->
+    <link href="/css/main.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      #slider { margin: 10px; }
+    </style>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization112578578() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_112578578",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=112578578',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Highest Outside Wind Speed',
+            "colors": ['blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "###.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization112578578);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization3130021022() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_3130021022",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=3130021022',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Outside Temperature High and Low',
+            "colors": ['red', 'blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization3130021022);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization3885021817() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_3885021817",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=3885021817',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Outside Total Light',
+            "colors": ['green'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.00"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization3885021817);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization4251563943() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_4251563943",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=4251563943',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Outside Humidity High and Low',
+            "colors": ['red', 'blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.00"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization4251563943);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization3829498030() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_3829498030",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=3829498030',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Office Temperature High and Low',
+            "colors": ['red', 'blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.00"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization3829498030);
+    </script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">gAutoArd</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li>Overview</li>
+            <li class="divider"></li>
+            <li class="nav-header">Sensors</li>
+            <li class="divider"></li>
+            <li class="nav-header">Controllers</li>
+            <li class="divider"></li>
+            <li class="nav-header">Readings</li>
+            <li><a href="/status.jsp">Current</a></li>
+            <li><a href="/charts/weekly.html">Weekly</a></li>
+            <li class="active"><a href="/charts/archived.html">Archived</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1>Cloud Measurements</h1>
+          <h3>Highest Outside Wind Speed</h3>
+          <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Temperature High and Low</h3>
+          <div id="visualization_div_3130021022" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Total Light</h3>
+          <div id="visualization_div_3885021817" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Humidity High and Low</h3>
+          <div id="visualization_div_4251563943" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Office Temperature High and Low</h3>
+          <div id="visualization_div_3829498030" style="width: 90%; height: 200px;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  </body>
+</html>
