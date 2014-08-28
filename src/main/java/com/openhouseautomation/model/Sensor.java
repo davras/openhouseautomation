@@ -43,6 +43,7 @@ public class Sensor {
   String unit; // F, C, millibars, etc.
   String lastReading; // "89" for 89F
   Date lastReadingDate; // Date lastReading was last updated
+  String secret; // the password for this sensor, used in SipHash
   //TODO: add boolean privacy flag (if true, requires auth)
 
   /**
@@ -192,6 +193,13 @@ public class Sensor {
     this.lastReadingDate = lastReadingDate;
   }
 
+  public void setSecret(String secret) {
+    this.secret = secret;
+  }
+  
+  public String getSecret() {
+    return secret;
+  }
   @Override
   public int hashCode() {
     return Objects.hashCode(id,

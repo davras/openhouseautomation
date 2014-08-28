@@ -39,7 +39,7 @@ public class SensorServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
     // handles sensor reads
     response.setContentType("text/plain;charset=UTF-8");
     try (PrintWriter out = response.getWriter()) {
@@ -74,22 +74,17 @@ public class SensorServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
-    try (PrintWriter out = response.getWriter()) {
-      String auth = request.getParameter("auth");
-      if (!"test".equals(auth)) {
-        // with hashkey
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
-        return;
-        // TODO: move auth to filter servlet
-      }
-      log.info("1. authorization checked");
-      final String sensorid = request.getParameter("k");
-      final String sensorval = request.getParameter("v");
-      // TODO cleanup the anonymous inner class
-      log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
+    PrintWriter out = response.getWriter();
+    String auth = request.getParameter("auth");
+    final String sensorid = request.getParameter("k");
+    final String sensorval = request.getParameter("v");
+    // TODO cleanup the anonymous inner class
+    log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
+    if (SipHashHelper.validateHash(sensorid, sensorval, auth)) {
+      log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
       ofy().transact(new Work<Sensor>() {
         @Override
         public Sensor run() {
@@ -110,8 +105,12 @@ public class SensorServlet extends HttpServlet {
         }
       });
       out.println("OK");
+    } else {
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
+      // TODO: move auth to filter servlet
     }
   }
+
   /**
    * Returns a short description of the servlet.
    *
