@@ -39,7 +39,7 @@
     <servlet>
         <description>Gets the weather forecast for the provided zipcode (either in initialization params or by URL)</description>
         <servlet-name>WeatherForecast</servlet-name>
-        <servlet-class>com.openhouseautomation.WeatherForecast</servlet-class>
+        <servlet-class>com.openhouseautomation.cron.WeatherForecast</servlet-class>
         <init-param>
             <param-name>zipcode</param-name>
             <param-value>95376</param-value>
@@ -51,7 +51,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>DatastoreLogTruncator</servlet-name>
-        <servlet-class>com.openhouseautomation.DatastoreLogTruncator</servlet-class>
+        <servlet-class>com.openhouseautomation.cron.DatastoreLogTruncator</servlet-class>
         <init-param>
             <param-name>age</param-name>
             <param-value>7</param-value>
@@ -66,7 +66,7 @@
       grabs the highest and lowest temperature for the day and saves them.
       The rest of the values are deleted.  This saves datastore space and cost.</description>
         <servlet-name>ReadingServletMR</servlet-name>
-        <servlet-class>com.openhouseautomation.ReadingServletMR</servlet-class>
+        <servlet-class>com.openhouseautomation.mapreduce.ReadingServletMR</servlet-class>
     </servlet>
     <servlet>
         <description>Gives the lat,long coordinates of the IP that called this URL.</description>
@@ -143,9 +143,7 @@
     </welcome-file-list>
     <servlet>
         <servlet-name>mapreduce</servlet-name>
-        <servlet-class>
-      com.google.appengine.tools.mapreduce.MapReduceServlet
-    </servlet-class>
+        <servlet-class>com.google.appengine.tools.mapreduce.MapReduceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>mapreduce</servlet-name>
@@ -153,9 +151,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>pipeline</servlet-name>
-        <servlet-class>
-      com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet
-    </servlet-class>
+        <servlet-class>com.google.appengine.tools.pipeline.impl.servlets.PipelineServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>pipeline</servlet-name>
