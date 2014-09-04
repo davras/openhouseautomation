@@ -37,7 +37,9 @@ Current status:
 
 - Arduino code finished for wired ethernet Arduino
 - Arduino code finished for wireless Arduino (CC3000 and WiFi shields)
-- Arduino code 90% complete for Makershed arLCD + WiFi shield.
+- Arduino code finished for Makershed arLCD + WiFi shield.
+- Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
+- Spark code done for BMP180 and DS18B20 sensors
 
 To do:
 ======
@@ -53,7 +55,7 @@ Maybe:
 
 Setup Instructions:
 ===================
-Requires [Apache Maven](http://maven.apache.org) 3.0 or greater, and JDK 7+ in order to run.
+Requires [Apache Maven](http://maven.apache.org) 3.1.0 or greater, and JDK 7+ in order to run.
 
 First time setup, run
 
