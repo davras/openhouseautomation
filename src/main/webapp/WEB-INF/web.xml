@@ -82,14 +82,6 @@
         <url-pattern>/location</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>DatastoreExport</servlet-name>
-        <servlet-class>com.openhouseautomation.DatastoreExport</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>DatastoreExport</servlet-name>
-        <url-pattern>/datastoreexport</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <description>Returns the time since epoch (Jan 1, 1970) in seconds (not milliseconds!), useful for setting Arduino time.</description>
         <servlet-name>TimeServlet</servlet-name>
         <servlet-class>com.openhouseautomation.TimeServlet</servlet-class>
