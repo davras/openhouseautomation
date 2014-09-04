@@ -21,9 +21,9 @@ Features:
 - Open hardware, open software, open firmware
 - Make GAE 'learn' the scenes, like "arrived home", "going to bed", etc.
 - Triggers allow if-then. If the front door opens, turn on the porch light. If the garage door opens, turn on the garage lights. If the back door opens, turn on the back porch light for 5 mins.
-- Simple, flexible protocol, 7 fields to save Arduino memory.
- - domain.user.location.device.parameter.action=value[;timestamp]
- - GET /service?com.rasdesign.dras.home.thermostat.temperature.set=78F HTTP/1.0
+- Simple, secure protocol
+ - Each device has a numeric ID
+ - Each request will have a "time+shared secret"-based hash
 
 Code for:
 =========
