@@ -55,8 +55,7 @@
     <!-- gAutoArd core CSS -->
     <link href="/css/main.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-
+    <link rel="stylesheet" href="/css/jquery-ui.css">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -108,11 +107,11 @@
               } else {%>
           <h3>Your new sensor: (use the ID <%= sens.getId()%> in your Arduino or Spark)</h3>
           <% }
-          } else { %>
+          } else {%>
           <h3>Please provide the following information:</h3>
           <form action='addsensor.jsp'>
             <table>
-              <tr><td>Owner: </td><td><input type='text' name='owner' value="<%= request.getUserPrincipal().getName() %>"/></td><td><i>Your username</i></td></tr>
+              <tr><td>Owner: </td><td><input type='text' name='owner' value="<%= request.getUserPrincipal().getName()%>"/></td><td><i>Your username</i></td></tr>
               <tr><td>Location: </td><td><input type='text' name='location' /></td><td><i>home, work, etc.</i></td></tr>
               <tr><td>Zone: </td><td><input type='text' name='zone' /></td><td><i>downstairs, outside, garage, etc.</i></td></tr>
               <tr><td>Name: </td><td><input type='text' name='name' /></td><td><i>What to display on a webpage, like "Outside Temperature"</i></td></tr>
@@ -124,11 +123,12 @@
         </div>
       </div>
     </div>
-    
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/bootstrap.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="/js/jquery-ui.js"></script>
+
   </body>
 </html>

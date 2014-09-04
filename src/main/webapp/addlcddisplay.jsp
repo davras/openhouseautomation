@@ -18,8 +18,9 @@
     if (formvalid) {
         lcdd.setDisplayName(request.getParameter("displayname"));
         lcdd.setDisplayString(request.getParameter("displaystring"));
+        ofy().save().entity(lcdd).now();
     }
-    ofy().save().entity(lcdd).now();
+    
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,7 +37,7 @@
         <!-- gAutoArd core CSS -->
         <link href="/css/main.css" rel="stylesheet">
 
-        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="/css/jquery-ui.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -82,7 +83,7 @@
                     </ul>
                 </div>
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                    <h1>Add Sensor</h1>
+                    <h1>Add LCD Display</h1>
                     <% if (formvalid) {
                             if (errorz.length() > 0) {
                                 out.println(errorz);
@@ -91,10 +92,10 @@
                     <% }
           } else {%>
                     <h3>Please provide the following information:</h3>
-                    <form action='addlcddisplay.jsp'>
+                    <form action='addlcddisplay.jsp' id="usrform">
                         <table>
-                            <tr><td>Display Name: </td><td><input type='text' name='displayname' value=""/></td><td><i>The name to use in the LCDDisplay servlet k= param to generate the return display data</i></td></tr>
-                            <tr><td>Display String: </td><td><input type='text' name='displaystring' /></td><td><i>The encoded string to display on the LCD</i></td></tr>
+                            <tr><td>Display Name: </td><td><input type='number' name='displayname' value=""/></td><td><i>The name to use in the LCDDisplay servlet k= param to generate the return display data</i></td></tr>
+                            <tr><td>Display String: </td><td><textarea rows="3" cols="20" name="displaystring" form="usrform"></textarea></td><td><i>The encoded string to display on the LCD</i></td></tr>
                         </table>
                         <p><input type='submit' value='Create LCD Display'/>
                     </form>
@@ -108,6 +109,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <!-- Include all compiled plugins (below), or include individual files as needed -->
         <script src="/js/bootstrap.min.js"></script>
-        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <script src="/js/jquery-ui.js"></script>
     </body>
 </html>

@@ -1,14 +1,15 @@
 package com.openhouseautomation;
 
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.ObjectifyService;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.Forecast;
+import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Location;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.ReadingHistory;
 import com.openhouseautomation.model.Sensor;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyFactory;
-import com.googlecode.objectify.ObjectifyService;
 
 /**
  * Custom version of the ObjectifyService to register application model class.
@@ -23,6 +24,7 @@ public class OfyService {
     factory().register(ReadingHistory.class);
     factory().register(Forecast.class);
     factory().register(Location.class);
+    factory().register(LCDDisplay.class);
   }
 
   public static Objectify ofy() {
