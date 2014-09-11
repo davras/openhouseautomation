@@ -18,4 +18,10 @@
     <schedule>every 1 hours</schedule>
     <timezone>America/Los_Angeles</timezone>
   </cron>
+  <cron>
+    <url>/cron/getforecast?zipcode=94105</url>
+    <description>Gets the forecast for the supplied zip code</description>
+    <schedule>every 1 hours</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
 </cronentries>

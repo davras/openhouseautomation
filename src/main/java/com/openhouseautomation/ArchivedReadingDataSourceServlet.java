@@ -70,7 +70,11 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
         if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
           data.addRowFromValues(cal, new Double(reading.getHigh()), new Double(reading.getLow()));
         } else if (sensor.getType() == Sensor.Type.LIGHT) {
-          data.addRowFromValues(cal, new Double(reading.getTotal()));
+          if (reading.getTotal() != null && !"".equals(reading.getTotal())) {
+            data.addRowFromValues(cal, new Double(reading.getTotal()));
+          } else {
+            data.addRowFromValues(cal, new Double(reading.getAverage()));
+          }
         } else if (sensor.getType() == Sensor.Type.WINDSPEED) {
           data.addRowFromValues(cal, new Double(reading.getHigh()));
         }

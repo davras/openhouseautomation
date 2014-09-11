@@ -9,7 +9,6 @@ import com.googlecode.objectify.Key;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,8 +59,6 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setTimestamp(convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
-    //deduplicateStore(rhist);
-    // emit(rhist); // needs to emit an entity
   }
 
   public void reduceAvgNonZero(String key, ReducerInput<String> values) {
@@ -86,7 +83,6 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setTimestamp(convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
-    // emit(rhist);
   }
 
   public void reduceTotal(String key, ReducerInput<String> values) {
@@ -106,7 +102,6 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setTimestamp(convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
-    // emit(rhist);
   }
 
   public void reduceHigh(String key, ReducerInput<String> values) {
@@ -129,7 +124,6 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setTimestamp(convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
-    // emit(rhist);
   }
 
   public Date convertStringDate(String s) {
