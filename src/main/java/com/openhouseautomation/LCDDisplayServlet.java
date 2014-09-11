@@ -70,8 +70,7 @@ public class LCDDisplayServlet extends HttpServlet {
     }
 
     public String getSensorReading(long l) {
-        Sensor sensor = ofy().load().type(Sensor.class).id(l).now();
-        return sensor.getLastReading();
+        return ofy().load().type(Sensor.class).id(l).now().getLastReading();
     }
 
     public String getForecast(String token) {

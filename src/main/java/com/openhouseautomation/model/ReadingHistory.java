@@ -18,13 +18,12 @@ import java.util.Date;
 @Index
 public class ReadingHistory {
 
-    @Parent
-    Key<Sensor> sensor;
-    @Id
-    Long id;
+    @Parent Key<Sensor> sensor;
+    @Id String id;
     String high;
     String low;
     String average;
+    String total;
     Date timestamp;
 
     /**
@@ -52,7 +51,7 @@ public class ReadingHistory {
     /**
      * Returns the {@code id} of the {@link ReadingHistory}.
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -61,7 +60,7 @@ public class ReadingHistory {
      *
      * @param id the id to set
      */
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -105,6 +104,12 @@ public class ReadingHistory {
         this.average = value;
     }
 
+    public void setTotal(String total) {
+      this.total = total;
+    }
+    public String getTotal() {
+      return total;
+    }
     /**
      * Returns the {@code timestamp} of the {@link ReadingHistory}.
      */

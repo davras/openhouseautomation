@@ -21,9 +21,9 @@ Features:
 - Open hardware, open software, open firmware
 - Make GAE 'learn' the scenes, like "arrived home", "going to bed", etc.
 - Triggers allow if-then. If the front door opens, turn on the porch light. If the garage door opens, turn on the garage lights. If the back door opens, turn on the back porch light for 5 mins.
-- Simple, flexible protocol, 7 fields to save Arduino memory.
- - domain.user.location.device.parameter.action=value[;timestamp]
- - GET /service?com.rasdesign.dras.home.thermostat.temperature.set=78F HTTP/1.0
+- Simple, secure protocol
+ - Each device has a numeric ID
+ - Each request will have a "time+shared secret"-based hash
 
 Code for:
 =========
@@ -37,7 +37,9 @@ Current status:
 
 - Arduino code finished for wired ethernet Arduino
 - Arduino code finished for wireless Arduino (CC3000 and WiFi shields)
-- Arduino code 90% complete for Makershed arLCD + WiFi shield.
+- Arduino code finished for Makershed arLCD + WiFi shield.
+- Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
+- Spark code done for BMP180 and DS18B20 sensors
 
 To do:
 ======
@@ -53,7 +55,7 @@ Maybe:
 
 Setup Instructions:
 ===================
-Requires [Apache Maven](http://maven.apache.org) 3.0 or greater, and JDK 7+ in order to run.
+Requires [Apache Maven](http://maven.apache.org) 3.1.0 or greater, and JDK 7+ in order to run.
 
 First time setup, run
 
