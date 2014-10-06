@@ -62,15 +62,11 @@ public class LCDDisplayServlet extends HttpServlet {
                 s = s.substring(0, bgnidx) + tkresp + s.substring(endidx + 1);
             } else {
                 long sensid = Long.parseLong(item);
-                String sensrd = getSensorReading(sensid);
+                String sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading();
                 s = s.substring(0, bgnidx) + sensrd + s.substring(endidx + 1);
             }
         }
         return s;
-    }
-
-    public String getSensorReading(long l) {
-        return ofy().load().type(Sensor.class).id(l).now().getLastReading();
     }
 
     public String getForecast(String token) {

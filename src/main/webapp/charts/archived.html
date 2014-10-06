@@ -26,6 +26,26 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization28131427() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_28131427",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=28131427',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Inside Temperature',
+            "colors": ['red', 'blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization28131427);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
       function drawVisualization112578578() {
         google.visualization.drawChart({
           "containerId": "visualization_div_112578578",
@@ -163,6 +183,9 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1>Cloud Measurements</h1>
+          <h3>Inside Temperature</h3>
+          <div id="visualization_div_28131427" style="width: 90%; height: 200px;"></div>
+          <br>
           <h3>Highest Outside Wind Speed</h3>
           <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
           <br>
