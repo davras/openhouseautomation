@@ -5,6 +5,7 @@
 <%--<%@page import="static com.googlecode.objectify.ObjectifyService.ofy"%>DO NOT USE!--%>
 <%@page import="static com.openhouseautomation.OfyService.ofy"%>
 <%@page import="com.openhouseautomation.model.Sensor"%>
+<%@page import="com.openhouseautomation.model.Forecast"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -29,6 +30,7 @@
 
     <link rel="stylesheet" href="/css/jquery-ui.css">
 
+    <link rel="stylesheet" href="/css/tables.css">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -91,6 +93,28 @@
               </td>
             </tr>
             <% }%>
+          </table>
+          <br>
+          <h1>Forecast</h1>
+          <table>
+            <tr>
+              <th>Zip Code</th><th>Forecast High</th><th>Forecast Low</th><th>Prob of Precip</th>
+            </tr>
+            <%
+              Query<Forecast> queryfc = ofy().load().type(Forecast.class);
+              QueryResultIterator<Forecast> iteratorfc = queryfc.iterator();
+              while (iteratorfc.hasNext()) {
+                Forecast fcdo = (Forecast) iteratorfc.next();
+            %>
+            <tr>
+              <td> <%= fcdo.getZipCode()%></td>
+              <td> <%= fcdo.getForecastHigh()%></td>
+              <td> <%= fcdo.getForecastLow()%></td>
+              <td> <%= fcdo.getForecastPop()%>%</td>
+            </tr>
+            <%
+              }
+            %>
           </table>
         </div>
       </div>

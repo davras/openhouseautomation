@@ -26,6 +26,26 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization28131427() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_28131427",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=28131427',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Inside Temperature',
+            "colors": ['red', 'blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization28131427);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
       function drawVisualization112578578() {
         google.visualization.drawChart({
           "containerId": "visualization_div_112578578",
@@ -46,10 +66,10 @@
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3130021022() {
+      function drawVisualization5744863563743232() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_3130021022",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=3130021022',
+          "containerId": "visualization_div_5744863563743232",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ArchivedReadingDataSourceServlet?id=5744863563743232',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Temperature High and Low',
@@ -62,7 +82,7 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization3130021022);
+      google.setOnLoadCallback(drawVisualization5744863563743232);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
@@ -163,11 +183,14 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1>Cloud Measurements</h1>
+          <h3>Inside Temperature</h3>
+          <div id="visualization_div_28131427" style="width: 90%; height: 200px;"></div>
+          <br>
           <h3>Highest Outside Wind Speed</h3>
           <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Temperature High and Low</h3>
-          <div id="visualization_div_3130021022" style="width: 90%; height: 200px;"></div>
+          <div id="visualization_div_5744863563743232" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Total Light</h3>
           <div id="visualization_div_3885021817" style="width: 90%; height: 200px;"></div>

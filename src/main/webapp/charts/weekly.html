@@ -86,10 +86,10 @@
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3130021022() {
+      function drawVisualization5744863563743232() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_3130021022",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3130021022',
+          "containerId": "visualization_div_5744863563743232",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=5744863563743232',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Temperature',
@@ -102,7 +102,7 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization3130021022);
+      google.setOnLoadCallback(drawVisualization5744863563743232);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
@@ -204,6 +204,26 @@
       }
       google.setOnLoadCallback(drawVisualization3959642986);
     </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization28131427() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_28131427",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=28131427',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Inside Temperature',
+            "colors": ['blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.00"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization28131427);
+    </script>
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -246,6 +266,18 @@
 
           <script src="/js/jquery-ui.js"></script>
 
+          <h3>Inside Temperature</h3>
+          <div id="visualization_div_28131427" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Temperature</h3>
+          <div id="visualization_div_5744863563743232" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Barometer</h3>
+          <div id="visualization_div_3409600514" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Humidity</h3>
+          <div id="visualization_div_4251563943" style="width: 90%; height: 200px;"></div>
+          <br>
           <h3>Outside Wind Speed 2 min avg</h3>
           <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
           <br>
@@ -255,17 +287,8 @@
           <h3>Outside Rain Current</h3>
           <div id="visualization_div_1714117207" style="width: 90%; height: 200px;"></div>
           <br>
-          <h3>Outside Temperature</h3>
-          <div id="visualization_div_3130021022" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Barometer</h3>
-          <div id="visualization_div_3409600514" style="width: 90%; height: 200px;"></div>
-          <br>
           <h3>Outside Light Level</h3>
           <div id="visualization_div_3885021817" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Humidity</h3>
-          <div id="visualization_div_4251563943" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Office Temperature</h3>
           <div id="visualization_div_3829498030" style="width: 90%; height: 200px;"></div>

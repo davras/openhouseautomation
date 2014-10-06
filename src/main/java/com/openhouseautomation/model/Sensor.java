@@ -21,7 +21,6 @@ public class Sensor {
    * Enum for the type of sensor.
    */
   public enum Type {
-
     TEMPERATURE,
     HUMIDITY,
     PRESSURE,
@@ -30,7 +29,17 @@ public class Sensor {
     WINDSPEED,
     WINDDIRECTION,
     VOLTAGE,
-    RAIN;
+    RAIN,
+    ACCELEROMETER, /**< Gravity + linear acceleration */
+    MAGNETIC_FIELD,
+    ORIENTATION,
+    GYROSCOPE,
+    PROXIMITY,
+    GRAVITY,
+    LINEAR_ACCELERATION, /**< Acceleration not including gravity */
+    ROTATION_VECTOR,
+    CURRENT,
+    COLOR;
   }
 
   @Id
