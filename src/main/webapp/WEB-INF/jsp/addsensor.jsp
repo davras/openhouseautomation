@@ -50,14 +50,17 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li><a href="/">Overview</a></li>
+            <li>Overview</li>
             <li class="divider"></li>
-            <li class="nav-header">Devices</li>
-            <li class="active"><a href="/thermostat.jsp">Thermostat</a></li>
-            <li><a href="/lights.jsp">Lights</a></li>
-            <li><a href="/alarm.jsp">Alarm</a></li>
-            <li><a href="/charts/temperature.jsp">Weekly Temperature Chart</a></li>
-            <li><a href="/charts/temperature_archived.jsp">Archive Temperature Chart</a></li>
+            <li class="nav-header">Sensors</li>
+            <li class="active"><a href="/addsensor">Add Sensor</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Controllers</li>
+            <li class="divider"></li>
+            <li class="nav-header">Readings</li>
+            <li><a href="/status.jsp">Current</a></li>
+            <li><a href="/charts/weekly.html">Weekly</a></li>
+            <li><a href="/charts/archived.html">Archived</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

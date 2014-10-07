@@ -19,6 +19,7 @@ public class Sensor {
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
   /**
    * Enum for the type of sensor.
+   * Self-explanatory
    */
   public enum Type {
     TEMPERATURE,
@@ -53,6 +54,7 @@ public class Sensor {
   String lastReading; // "89" for 89F
   Date lastReadingDate; // Date lastReading was last updated
   String secret; // the password for this sensor, used in SipHash
+  Integer expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
 
   /**
@@ -63,6 +65,7 @@ public class Sensor {
 
   /**
    * Returns the {@code id} of the {@link Sensor}.
+   * @return Long sensor id
    */
   public Long getId() {
     return id;
@@ -79,6 +82,7 @@ public class Sensor {
 
   /**
    * Returns the {@code owner} of the {@link Sensor}.
+   * @return String owner's name/id
    */
   public String getOwner() {
     return owner;
@@ -95,6 +99,7 @@ public class Sensor {
 
   /**
    * Returns the {@code location} of the {@link Sensor}.
+   * @return String of location of sensor
    */
   public String getLocation() {
     return location;
@@ -111,6 +116,7 @@ public class Sensor {
 
   /**
    * Returns the {@code zone} of the {@link Sensor}.
+   * @return String zone of the sensor
    */
   public String getZone() {
     return zone;
@@ -127,6 +133,7 @@ public class Sensor {
 
   /**
    * Returns the {@code type} of the {@link Sensor}.
+   * @return Type of sensor, like temperature, pressure, etc. from the Sensor ENUM
    */
   public Type getType() {
     return type;
@@ -143,6 +150,7 @@ public class Sensor {
 
   /**
    * Returns the {@code name} of the {@link Sensor}.
+   * @return String the name of the sensor
    */
   public String getName() {
     return name;
@@ -159,6 +167,7 @@ public class Sensor {
 
   /**
    * Returns the {@code unit} of the {@link Sensor}.
+   * @return String the units of the Sensor, like F, C, inHg, etc.
    */
   public String getUnit() {
     return unit;
@@ -175,6 +184,7 @@ public class Sensor {
 
   /**
    * Returns the {@code lastReading} of the {@link Sensor}.
+   * @return String the last reading logged for this Sensor.
    */
   public String getLastReading() {
     return lastReading;
@@ -189,6 +199,10 @@ public class Sensor {
     this.lastReading = lastReading;
   }
 
+  /**
+   * Returns the {@code lastReadingDate} of the {@link Sensor}.
+   * @return Date the last time this sensor was updated with a reading
+   */
   public Date getLastReadingDate() {
     return lastReadingDate;
   }
@@ -202,12 +216,44 @@ public class Sensor {
     this.lastReadingDate = lastReadingDate;
   }
 
+  /**
+   * Sets the {@code secret} for this {@link Sensor}.
+   * @param secret String to set
+   */
   public void setSecret(String secret) {
     this.secret = secret;
   }
   
+  /**
+   * Returns the {@code secret} for this {@link Sensor}.
+   * @return String secret for this sensor used to authenticate devices' updates.
+   */
   public String getSecret() {
     return secret;
+  }
+  
+  /**
+   * Sets the {@code expirationtime} for this {@link Sensor}.
+   * @param expirationtime in seconds since last sensor reading
+   */
+  public void setExpirationTime(Integer expirationtime) {
+    this.expirationtime = expirationtime;
+  }
+
+  /**
+   * Returns the {@code expirationtime} for this {@link Sensor}.
+   * @return Integer expiration time in seconds
+   */
+  public Integer getExpirationTime() {
+    return expirationtime;
+  }
+  
+  /**
+   * Checks to see if the {@link Sensor} is expired.
+   * @return true if sensor's last update is older than expiration time
+   */
+  public boolean isExpired() {
+    return (lastReadingDate.getTime() + expirationtime*1000) > new Date().getTime();
   }
   @Override
   public int hashCode() {

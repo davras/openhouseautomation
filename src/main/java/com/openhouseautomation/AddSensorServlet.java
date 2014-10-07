@@ -56,7 +56,7 @@ public class AddSensorServlet extends HttpServlet {
 
       if (sensexists == null) {
         ofy().save().entity(sens).now();
-        req.setAttribute("message", "Sensor Added successfully!");
+        req.setAttribute("message", "Sensor Added successfully, ID is " + sens.getId());
         req.setAttribute("messageLevel", "success");
         req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       } else {

@@ -26,6 +26,26 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization3986975262() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_3986975262",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3986975262',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Attic Temperature',
+            "colors": ['blue'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "###.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization3986975262);
+    </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
       function drawVisualization112578578() {
         google.visualization.drawChart({
           "containerId": "visualization_div_112578578",
@@ -271,6 +291,9 @@
           <br>
           <h3>Outside Temperature</h3>
           <div id="visualization_div_5744863563743232" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Attic Temperature</h3>
+          <div id="visualization_div_3986975262" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Barometer</h3>
           <div id="visualization_div_3409600514" style="width: 90%; height: 200px;"></div>

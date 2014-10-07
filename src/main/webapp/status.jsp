@@ -67,6 +67,7 @@
             <li>Overview</li>
             <li class="divider"></li>
             <li class="nav-header">Sensors</li>
+            <li><a href="/addsensor">Add Sensor</a></li>
             <li class="divider"></li>
             <li class="nav-header">Controllers</li>
             <li class="divider"></li>
