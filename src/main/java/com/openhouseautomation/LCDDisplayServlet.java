@@ -66,20 +66,20 @@ public class LCDDisplayServlet extends HttpServlet {
         s = s.substring(0, bgnidx) + tkresp + s.substring(endidx + 1);
       } else {
         String sensstring = item;
-        String precision = "2";
+        String precision = "99";
         if (item.contains(".")) {
           sensstring = item.substring(0, item.indexOf("."));
           precision = item.substring(item.indexOf(".") + 1);
         }
         long sensid = Long.parseLong(sensstring);
         int iprecision = Integer.parseInt(precision);
-        String sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading();
-        if (iprecision == 0) {
-          s = s.substring(0, bgnidx) + (int)(Float.parseFloat(sensrd)) + s.substring(endidx + 1);
+        String sensrd = "X";
+        if (iprecision == 99) {
+          sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading();
         } else {
-          s = s.substring(0, bgnidx) + String.format("%." + precision + "f", Float.parseFloat(sensrd))
-              + s.substring(endidx + 1);
+          sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading(iprecision);
         }
+          s = s.substring(0, bgnidx) + sensrd + s.substring(endidx + 1);
       }
     }
     return s;
