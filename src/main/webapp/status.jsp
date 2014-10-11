@@ -83,12 +83,15 @@
             <%
               while (iterator.hasNext()) {
                 Sensor sens = (Sensor) iterator.next();
+                while (sens.isExpired() && iterator.hasNext()) {
+                  sens = (Sensor)iterator.next();  // don't show expired sensors
+                }
             %>
-            <tr><td>
+            <tr><td align="right">
                 <%= sens.getName()%>:
               </td><td>
                 <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
-              </td><td>
+              </td><td align="center">
                 <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000, 4 * 60 * 60)%>
               </td>
               </td>
