@@ -77,9 +77,6 @@ public class LCDDisplayServlet extends HttpServlet {
         String sensrd = "X";
         Sensor sens = ofy().load().type(Sensor.class).id(sensid).now();
         if (sens == null || sens.isExpired()) {
-          if (sens.isExpired()) {
-            log.log(Level.WARNING, "sensor is expired:{0}+{1}>{2}", new Object[]{sens.getLastReadingDate().getTime(), sens.getExpirationTime() * 1000, new Date().getTime()});
-          }
           // don't display old readings
           sensrd = "--";
         } else {

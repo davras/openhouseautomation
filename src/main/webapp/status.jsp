@@ -20,7 +20,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>gAutoArd</title>
+    <title>Open House Automation</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -83,16 +83,13 @@
             <%
               while (iterator.hasNext()) {
                 Sensor sens = (Sensor) iterator.next();
-                while (sens.isExpired() && iterator.hasNext()) {
-                  sens = (Sensor)iterator.next();  // don't show expired sensors
-                }
             %>
-            <tr><td align="right">
+            <tr<% if (sens.isExpired()) {%> style="background-color:red"<% } %>><td align="right">
                 <%= sens.getName()%>:
               </td><td>
                 <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
               </td><td align="center">
-                <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000, 4 * 60 * 60)%>
+                <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000)%>
               </td>
               </td>
             </tr>
