@@ -106,9 +106,6 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     try {
       for (int i = 0; i < positions; i++) {
         cal.setTime(new Date(i * 5 * 60 * 1000 + cutoffdate.getTime() - (7 * 60 * 60 * 1000)));
-        /**
-         * data.setCell(i+1, 1, new TableCell(new DateTimeValue(cal)));
-         */
         switch (sensors.length) {
           case 1:
             data.addRowFromValues(cal, new Double(readingsz[0][i]));
@@ -124,7 +121,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         }
       }
     } catch (TypeMismatchException e) {
-      log.log(Level.WARNING, "exception formatting data for tablerow " + i + ": " + e.fillInStackTrace());
+      log.log(Level.WARNING, "exception formatting data for tablerow: {0}", e.fillInStackTrace());
     }
     return data;
   }
