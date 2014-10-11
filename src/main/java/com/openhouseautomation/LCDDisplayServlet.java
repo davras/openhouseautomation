@@ -11,6 +11,7 @@ import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -44,18 +45,18 @@ public class LCDDisplayServlet extends HttpServlet {
     LCDDisplay lcdd = ofy().load().type(LCDDisplay.class).id(displayk).now();
     response.setContentType("text/plain");
     /**
-     *  I:{28131427} O:{3130021022}\n
-     *  {3409600514.2}inHg {4251563943.0}%RH\n
-     *  FC:{FCH95376}>{FCL95376} {FCP95376}%POP
-     * 
+     * I:{28131427} O:{3130021022}\n {3409600514.2}inHg {4251563943.0}%RH\n
+     * FC:{FCH95376}>{FCL95376} {FCP95376}%POP
+     *
      * You can use .# to specify the precision of a sensor's reading
-    */
+     */
     try (PrintWriter out = response.getWriter()) {
       out.println(replaceTokens(lcdd.getDisplayString()));
     }
   }
 
   public String replaceTokens(String s) {
+    // TODO convert to regex
     while (s.contains("{")) {
       int bgnidx = s.indexOf("{");
       int endidx = s.indexOf("}");
@@ -74,12 +75,23 @@ public class LCDDisplayServlet extends HttpServlet {
         long sensid = Long.parseLong(sensstring);
         int iprecision = Integer.parseInt(precision);
         String sensrd = "X";
-        if (iprecision == 99) {
-          sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading();
+        Sensor sens = ofy().load().type(Sensor.class).id(sensid).now();
+        if (sens == null || sens.isExpired()) {
+          if (sens.isExpired()) {
+            log.log(Level.WARNING, "sensor is expired:{0}+{1}>{2}", new Object[]{sens.getLastReadingDate().getTime(), sens.getExpirationTime() * 1000, new Date().getTime()});
+          }
+          // don't display old readings
+          sensrd = "--";
         } else {
-          sensrd = ofy().load().type(Sensor.class).id(sensid).now().getLastReading(iprecision);
+          if (iprecision == 99) {
+            // no precision specified
+            sensrd = sens.getLastReading();
+          } else {
+            // precision needed
+            sensrd = sens.getLastReading(iprecision);
+          }
         }
-          s = s.substring(0, bgnidx) + sensrd + s.substring(endidx + 1);
+        s = s.substring(0, bgnidx) + sensrd + s.substring(endidx + 1);
       }
     }
     return s;

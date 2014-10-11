@@ -44,6 +44,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setUnit("F");
       sens.setLastReading("99");
       sens.setLastReadingDate(new Date());
+      sens.setExpirationTime(new Long(3600));
 
       CRC32 hash = new CRC32();
       hash.update(salt.getBytes());

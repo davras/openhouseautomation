@@ -29,11 +29,11 @@
       function drawVisualization3986975262() {
         google.visualization.drawChart({
           "containerId": "visualization_div_3986975262",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3986975262',
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3986975262&id=28131427&id=5744863563743232',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Attic Temperature',
-            "colors": ['blue'],
+            "title": 'Temperatures',
+            "colors": ['red', 'blue', 'green'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -103,26 +103,6 @@
         });
       }
       google.setOnLoadCallback(drawVisualization1714117207);
-    </script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization5744863563743232() {
-        google.visualization.drawChart({
-          "containerId": "visualization_div_5744863563743232",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=5744863563743232',
-          "chartType": "AnnotationChart",
-          "options": {
-            "title": 'Outside Temperature',
-            "colors": ['blue'],
-            "scaleType": 'maximized',
-            "thickness": 2,
-            "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "##.00"
-          }
-        });
-      }
-      google.setOnLoadCallback(drawVisualization5744863563743232);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
@@ -224,26 +204,7 @@
       }
       google.setOnLoadCallback(drawVisualization3959642986);
     </script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization28131427() {
-        google.visualization.drawChart({
-          "containerId": "visualization_div_28131427",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=28131427',
-          "chartType": "AnnotationChart",
-          "options": {
-            "title": 'Inside Temperature',
-            "colors": ['blue'],
-            "scaleType": 'maximized',
-            "thickness": 2,
-            "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "##.00"
-          }
-        });
-      }
-      google.setOnLoadCallback(drawVisualization28131427);
-    </script>
+
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -286,13 +247,7 @@
 
           <script src="/js/jquery-ui.js"></script>
 
-          <h3>Inside Temperature</h3>
-          <div id="visualization_div_28131427" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Temperature</h3>
-          <div id="visualization_div_5744863563743232" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Attic Temperature</h3>
+          <h3>Temperatures</h3>
           <div id="visualization_div_3986975262" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Barometer</h3>
