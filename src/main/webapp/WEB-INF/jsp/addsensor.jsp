@@ -1,3 +1,6 @@
+
+<%@page import="com.openhouseautomation.model.Sensor.Type"%>
+<%@page import="com.openhouseautomation.model.Sensor"%>
 <%@page import="java.util.zip.CRC32"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -97,6 +100,18 @@
               </div>
             </div>
             
+            <div class="form-group">
+              <label for="type" class="col-sm-2 col-md-1 control-label">Type</label>
+              <div class="sol-sm-4 col-md-5">
+                <select name="type">
+                  <% for (Type t : Sensor.Type.values()) { %>
+                  <option value="<%=t%>"><%=t%></option>
+                  <% } %>
+                </select>
+              </div>
+            </div>
+              
+              
             <div class="form-group">
               <label for="name" class="col-sm-2 col-md-1 control-label">Name</label>
               <div class="col-sm-4 col-md-5">

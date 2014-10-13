@@ -57,7 +57,13 @@ public class ControllerServlet extends HttpServlet {
       // load the controller entity
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       if (controller != null) {
-        out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastStateChange().getTime() / 1000);
+        if (controller.getLastActualStateChange().getTime() > controller.getLastDesiredStateChange().getTime()) {
+          // local override, return actual state
+          out.println(controller.getId() + "=" + controller.getActualState() + ";" + controller.getLastActualStateChange().getTime()/1000);
+        } else {
+          // in auto/manual, return desired state
+          out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastStateChange().getTime() / 1000);
+        }
         log.log(Level.INFO, "sent:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastStateChange().getTime() / 1000});
       } else {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Sensor not found");
@@ -92,8 +98,10 @@ public class ControllerServlet extends HttpServlet {
           Key<Controller> ck = Key.create(Controller.class, Long.parseLong(controllerid));
           Controller controller = ofy().load().now(ck);
           // set the value
-          controller.setLastStateChange(new Date());
-          controller.setActualState(controllervalue);
+          if (!controller.getActualState().equals(controllervalue)) {
+            controller.setLastActualStateChange(new Date());
+            controller.setActualState(controllervalue);
+          }
           ofy().save().entity(controller);
           log.log(Level.INFO, "saved controller setting:{0}", controller);
           return controller;

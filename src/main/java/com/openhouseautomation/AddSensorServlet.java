@@ -39,7 +39,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setOwner(req.getParameter("owner"));
       sens.setLocation(req.getParameter("location"));
       sens.setZone(req.getParameter("zone"));
-      sens.setType(Sensor.Type.TEMPERATURE);
+      sens.setType(Sensor.Type.valueOf(req.getParameter("type")));
       sens.setName(req.getParameter("name"));
       sens.setUnit("F");
       sens.setLastReading("99");
@@ -57,7 +57,7 @@ public class AddSensorServlet extends HttpServlet {
 
       if (sensexists == null) {
         ofy().save().entity(sens).now();
-        req.setAttribute("message", "Sensor Added successfully, ID is " + sens.getId());
+        req.setAttribute("message", "Sensor added successfully, ID is " + sens.getId());
         req.setAttribute("messageLevel", "success");
         req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       } else {

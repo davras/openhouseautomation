@@ -1,3 +1,4 @@
+<%@page import="com.openhouseautomation.model.Controller"%>
 <%@page import="java.util.zip.CRC32"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -96,7 +97,16 @@
                 <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...">
               </div>
             </div>
-            
+            <div class="form-group">
+              <label for="type" class="col-sm-2 col-md-1 control-label">Type</label>
+              <div class="sol-sm-4 col-md-5">
+                <select name="type">
+                  <% for (Controller.Type t : Controller.Type.values()) { %>
+                  <option value="<%=t%>"><%=t%></option>
+                  <% } %>
+                </select>
+              </div>
+            </div>
             <div class="form-group">
               <label for="name" class="col-sm-2 col-md-1 control-label">Name</label>
               <div class="col-sm-4 col-md-5">

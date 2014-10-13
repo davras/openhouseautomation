@@ -61,7 +61,7 @@ private static final long serialVersionUID = 1L;
       cont.setOwner(request.getParameter("owner"));
       cont.setLocation(request.getParameter("location"));
       cont.setZone(request.getParameter("zone"));
-      cont.setType(Controller.Type.WHOLEHOUSEFAN); // change to get parameter and dropdown
+      cont.setType(Controller.Type.valueOf(request.getParameter("type")));
       cont.setName(request.getParameter("name"));
       cont.setLastStateChange(new Date());
 
