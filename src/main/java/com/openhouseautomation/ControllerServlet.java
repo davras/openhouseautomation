@@ -60,11 +60,13 @@ public class ControllerServlet extends HttpServlet {
         if (controller.getLastActualStateChange().getTime() > controller.getLastDesiredStateChange().getTime()) {
           // local override, return actual state
           out.println(controller.getId() + "=" + controller.getActualState() + ";" + controller.getLastActualStateChange().getTime()/1000);
+          log.log(Level.INFO, "sent actual:{0}={1};{2}", new Object[]{controller.getId(), controller.getActualState(), controller.getLastActualStateChange().getTime() / 1000});
         } else {
           // in auto/manual, return desired state
-          out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastStateChange().getTime() / 1000);
+          out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getTime() / 1000);
+                  log.log(Level.INFO, "sent desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getTime() / 1000});
         }
-        log.log(Level.INFO, "sent:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastStateChange().getTime() / 1000});
+
       } else {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Sensor not found");
       }

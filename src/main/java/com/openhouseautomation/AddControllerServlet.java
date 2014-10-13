@@ -63,7 +63,7 @@ private static final long serialVersionUID = 1L;
       cont.setZone(request.getParameter("zone"));
       cont.setType(Controller.Type.valueOf(request.getParameter("type")));
       cont.setName(request.getParameter("name"));
-      cont.setLastStateChange(new Date());
+      cont.setLastDesiredStateChange(new Date());
 
       CRC32 hash = new CRC32();
       hash.update(salt.getBytes());
