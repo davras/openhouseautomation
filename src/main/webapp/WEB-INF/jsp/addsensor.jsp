@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>gAutoArd</title>
+    <title>Open House Automation</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +36,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">gAutoArd</a>
+          <a class="navbar-brand" href="/">Open House Automation</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -50,18 +50,19 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li>Overview</li>
-            <li class="divider"></li>
-            <li class="nav-header">Sensors</li>
-            <li class="active"><a href="/addsensor">Add Sensor</a></li>
-            <li class="divider"></li>
-            <li class="nav-header">Controllers</li>
-            <li class="divider"></li>
-            <li class="nav-header">Readings</li>
-            <li><a href="/status.jsp">Current</a></li>
-            <li><a href="/charts/weekly.html">Weekly</a></li>
-            <li><a href="/charts/archived.html">Archived</a></li>
-          </ul>
+                        <li>Overview</li>
+                        <li class="divider"></li>
+                        <li class="nav-header">Sensors</li>
+                        <li class="active"><a href="/addsensor">Add Sensor</a></li>
+                        <li class="divider"></li>
+                        <li class="nav-header">Controllers</li>
+                        <li><a href="/addcontroller">Add Controller</a></li>
+                        <li class="divider"></li>
+                        <li class="nav-header">Readings</li>
+                        <li><a href="/status.jsp">Current</a></li>
+                        <li><a href="/charts/weekly.html">Weekly</a></li>
+                        <li><a href="/charts/archived.html">Archived</a></li>
+                    </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <c:choose>

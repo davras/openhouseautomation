@@ -1,18 +1,7 @@
-
-<%@page import="com.openhouseautomation.Convutils"%>
-<%@page import="com.google.appengine.api.datastore.QueryResultIterator"%>
-<%@page import="com.googlecode.objectify.cmd.Query"%>
-<%--<%@page import="static com.googlecode.objectify.ObjectifyService.ofy"%>DO NOT USE!--%>
-<%@page import="static com.openhouseautomation.OfyService.ofy"%>
-<%@page import="com.openhouseautomation.model.Sensor"%>
-<%@page import="com.openhouseautomation.model.Forecast"%>
+<%@page import="java.util.zip.CRC32"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page isELIgnored="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%
-  long snaptime = System.currentTimeMillis(); // page timing
-  Query<Sensor> query = ofy().load().type(Sensor.class);
-  QueryResultIterator<Sensor> iterator = query.iterator();
-%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -28,9 +17,6 @@
     <!-- gAutoArd core CSS -->
     <link href="/css/main.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/jquery-ui.css">
-
-    <link rel="stylesheet" href="/css/tables.css">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -50,7 +36,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">gAutoArd</a>
+          <a class="navbar-brand" href="/">Open House Automation</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -70,66 +56,67 @@
             <li><a href="/addsensor">Add Sensor</a></li>
             <li class="divider"></li>
             <li class="nav-header">Controllers</li>
-            <li><a href="/addcontroller">Add Controller</a></li>
+            <li class=""active"><a href="/addcontroller">Add Controller</a></li>
             <li class="divider"></li>
             <li class="nav-header">Readings</li>
-            <li class="active"><a href="/status.jsp">Current</a></li>
+            <li><a href="/status.jsp">Current</a></li>
             <li><a href="/charts/weekly.html">Weekly</a></li>
             <li><a href="/charts/archived.html">Archived</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1>Status</h1>
-          <table>
-            <%
-              while (iterator.hasNext()) {
-                Sensor sens = (Sensor) iterator.next();
-            %>
-            <tr<% if (sens.isExpired()) {%> style="background-color:red"<% } %>><td align="right">
-                <%= sens.getName()%>:
-              </td><td>
-                <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
-              </td><td align="center">
-                <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000)%>
-              </td>
-              </td>
-            </tr>
-            <% }%>
-          </table>
-          <br>
-          <h1>Forecast</h1>
-          <table>
-            <tr>
-              <th>Zip Code</th><th>Forecast High</th><th>Forecast Low</th><th>Prob of Precip</th>
-            </tr>
-            <%
-              Query<Forecast> queryfc = ofy().load().type(Forecast.class);
-              QueryResultIterator<Forecast> iteratorfc = queryfc.iterator();
-              while (iteratorfc.hasNext()) {
-                Forecast fcdo = (Forecast) iteratorfc.next();
-            %>
-            <tr>
-              <td> <%= fcdo.getZipCode()%></td>
-              <td> <%= fcdo.getForecastHigh()%></td>
-              <td> <%= fcdo.getForecastLow()%></td>
-              <td> <%= fcdo.getForecastPop()%>%</td>
-            </tr>
-            <%
-              }
-            %>
-          </table>
+          <c:choose>
+            <c:when test="${message != null}">
+                <div class="alert alert-${messageLevel} alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  ${message}
+                </div>
+            </c:when>
+          </c:choose>
+          <h1>Add Controller</h1>
+          <p class="lead">Please provide the following information:</p>
+          <form action='/addcontroller' method="post" class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="owner" class="col-sm-2 col-md-1 control-label">Owner</label>
+              <div class="col-sm-4 col-md-5">
+                <input type="text" class="form-control" id="owner" name="owner" placeholder="Your username">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="location" class="col-sm-2 col-md-1 control-label">Location</label>
+              <div class="col-sm-4 col-md-5">
+                <input type="text" class="form-control" id="location" name="location" placeholder="home, work, etc..">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="zone" class="col-sm-2 col-md-1 control-label">Zone</label>
+              <div class="col-sm-4 col-md-5">
+                <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="name" class="col-sm-2 col-md-1 control-label">Name</label>
+              <div class="col-sm-4 col-md-5">
+                <input type="text" class="form-control" id="name" name="name" placeholder="What to display on a webpage, like 'House Fan'">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-7 col-md-offset-1 col-md-9">
+                <button type="submit" class="btn btn-default">Create Controller</button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-
-    <p>Page Generation: <%= (System.currentTimeMillis() - snaptime)%> ms</p>
-
+    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/bootstrap.min.js"></script>
-
-    <script src="/js/jquery-ui.js"></script>
-
   </body>
 </html>

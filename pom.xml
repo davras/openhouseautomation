@@ -39,6 +39,12 @@
       <version>1.1.2</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>angularjs</artifactId>
+      <version>1.2.26</version>
+    </dependency>
+
 
     <!-- Compile/runtime dependencies -->
     <dependency>
@@ -153,7 +159,7 @@
           <execution>
             <phase>compile</phase>
             <goals>
-              <goal>enhance</goal>
+              <!--<goal>enhance</goal>-->
             </goals>
           </execution>
         </executions>
