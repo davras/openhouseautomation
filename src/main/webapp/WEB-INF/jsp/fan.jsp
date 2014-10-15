@@ -99,6 +99,7 @@
                       out.print("class=\\\"active\\\"");
                     }
                     out.print("><a href=\\\"/controller/fan&");
+                    //XXX continue here with setting up link back to controller servlet
                   }
                   out.print("<li");
                   %>
