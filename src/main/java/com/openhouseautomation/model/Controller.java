@@ -181,6 +181,11 @@ public class Controller {
         .add("zone", getZone())
         .add("type", getType())
         .add("name", getName())
+        .add("desiredstate", getDesiredState())
+        .add("actualstate", getActualState())
+        .add("desiredstatepriority", getDesiredStatePriority())
+        .add("lastdesiredstatechange", new Date(getLastDesiredStateChange().getTime()))
+        .add("lastactualstatechange", new Date(getLastActualStateChange().getTime()))
         .toString();
   }
 
@@ -188,6 +193,9 @@ public class Controller {
    * @return the desiredstate
    */
   public String getDesiredState() {
+    if (null == desiredstate) {
+      desiredstate = "0";
+    }
     return desiredstate;
   }
 
@@ -195,29 +203,13 @@ public class Controller {
    * @param desiredstate the desiredstate to set
    * @see setDesiredState(String, DesiredStatePriority) instead
    */
-  public void setDesiredstate(String desiredstate) {
-    // don't use
+  public void setDesiredState(String desiredstate) {
+    this.desiredstate = desiredstate;
+    this.lastdesiredstatechange = new Date();
   }
 
-  public void setDesiredState(String desiredstate, DesiredStatePriority dsp) {
-    // find current priority
-    int curpri = getPriorityInt(desiredstatepriority);
-    int setpri = getPriorityInt(dsp);
-    if (curpri < setpri) { // higher number is higher priority
-      this.desiredstate = desiredstate;
-      this.desiredstatepriority = dsp;
-    }
-  }
-
-  public int getPriorityInt(DesiredStatePriority dsp) {
-    int i = -1;
-    for (DesiredStatePriority dspit : DesiredStatePriority.values()) {
-      i++;
-      if (dspit == dsp) {
-        break;
-      }
-    }
-    return i;
+  public void setDesiredStatePriority(DesiredStatePriority dsp) {
+    this.desiredstatepriority = dsp;
   }
 
   /**
@@ -232,6 +224,7 @@ public class Controller {
    */
   public void setActualState(String actualstate) {
     this.actualstate = actualstate;
+    this.lastactualstatechange = new Date();
   }
 
   /**

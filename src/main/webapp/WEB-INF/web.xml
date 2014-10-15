@@ -53,6 +53,10 @@
         <servlet-name>ControllerServlet</servlet-name>
         <servlet-class>com.openhouseautomation.ControllerServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>TestServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.TestServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
         <url-pattern>/cron/getforecast</url-pattern>
@@ -125,7 +129,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ControllerServlet</servlet-name>
-        <url-pattern>/controller</url-pattern>
+        <url-pattern>/controller/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TestServlet</servlet-name>
+        <url-pattern>/testservlet/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

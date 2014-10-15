@@ -1,7 +1,6 @@
 
-<%@page import="com.openhouseautomation.model.Sensor.Type"%>
-<%@page import="com.openhouseautomation.model.Sensor"%>
-<%@page import="java.util.zip.CRC32"%>
+<%@page import="static com.openhouseautomation.OfyService.ofy()"%>
+<%@page import="com.openhouseautomation.model.Controller"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -86,10 +85,27 @@
               </div>
             </c:when>
           </c:choose>
-          <h1>Add Sensor</h1>
-          <p class="lead">Please provide the following information:</p>
-          <form action='/addsensor' method="post" class="form-horizontal" role="form">
+          <h1>Fan</h1>
+          <form action='/controller/fan' method="post" class="form-horizontal" role="form">
             <div class="form-group">
+              <ul class="nav nav-pills">
+                <% Controller controller = ofy().load().type(Controller.class).id(new Long(4280019022)).now();
+                String[] states = { "OFF", "1", "2", "3", "4", "5" };
+                if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO) {
+                  // if in AUTO, show the manual buttons, highlighting the current state
+                  for (int i=0; i < states.length; i++) {
+                    out.print("<li");
+                    if (controller.getActualState().equals(states[i])) {
+                      out.print("class=\\\"active\\\"");
+                    }
+                    out.print("><a href=\\\"/controller/fan&");
+                  }
+                  out.print("<li");
+                  %>
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Messages</a></li>
+              </ul>
               <label for="owner" class="col-sm-2 col-md-1 control-label">Owner</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="owner" name="owner" placeholder="Your username">

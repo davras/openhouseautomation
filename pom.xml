@@ -18,7 +18,7 @@
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client-appengine</artifactId>
-      <version>1.17.0-rc</version>
+      <version>1.19.0</version>
     </dependency>
 
     <dependency>
@@ -155,14 +155,15 @@
         <configuration>
           <enableJarClasses>true</enableJarClasses>
         </configuration>
-        <executions>
+        <!-- <executions>
           <execution>
             <phase>compile</phase>
             <goals>
-              <!--<goal>enhance</goal>-->
+              <goal>enhance</goal>
             </goals>
           </execution>
         </executions>
+        -->
       </plugin>
     </plugins>
   </build>
