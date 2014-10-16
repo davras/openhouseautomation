@@ -22,12 +22,23 @@ public class Controller {
    */
   public enum Type {
 
-    THERMOSTAT,
-    GARAGEDOOR,
-    ALARM,
-    LIGHT,
-    SPRINKLER,
-    WHOLEHOUSEFAN;
+    THERMOSTAT("Thermostat"),
+    GARAGEDOOR("Garage Door"),
+    ALARM("Alarm"),
+    LIGHT("Lights"),
+    SPRINKLER("Sprinkler"),
+    WHOLEHOUSEFAN("Whole House Fan");
+
+    private final String text;
+
+    private Type(final String text) {
+      this.text = text;
+    }
+
+    @Override
+    public String toString() {
+      return text;
+    }
   }
 
   public enum DesiredStatePriority { // lowest priority is on top, order is important!
@@ -37,6 +48,7 @@ public class Controller {
     LOCAL,
     EMERGENCY;
   }
+  
   @Id
   public Long id; //id from CRC32 hash of owner, location, zone, and salt.
   public String owner;//Owner of the device

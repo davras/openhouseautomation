@@ -1,4 +1,4 @@
-package com.openhouseautomation;
+package com.openhouseautomation.devices;
 
 import java.io.IOException;
 

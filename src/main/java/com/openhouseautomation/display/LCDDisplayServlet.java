@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.openhouseautomation;
+package com.openhouseautomation.display;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;

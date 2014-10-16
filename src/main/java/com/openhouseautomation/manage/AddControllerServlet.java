@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.openhouseautomation;
+package com.openhouseautomation.manage;
 
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;

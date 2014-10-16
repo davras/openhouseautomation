@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.openhouseautomation;
+package com.openhouseautomation.devices;
 
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;

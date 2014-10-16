@@ -43,37 +43,30 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-                    <ul class="nav nav-sidebar">
-                        <li class="active">Overview</li>
-                        <li class="divider"></li>
-                        <li><a href="/status.jsp">Current</a></li>
-                        <li><a href="/charts/weekly.html">Weekly</a></li>
-                        <li><a href="/charts/archived.html">Archived</a></li>
-                        <li class="divider"></li>
-                        <li class="nav-header">Control</li>
-                        <li><a href="/controller/lights">Lights</a></li>
-                        <li><a href="/controller/fan">Fan</a></li>
-                        <li><a href="/controller/thermostat">Thermostat</a></li>
-                        <li class="divider"></li>
-                        <li class="nav-header">Scenes</li>
-                        <li><a href="/scenes/wakeup">Wake Up</a></li>
-                        <li><a href="/scenes/leave">Leave</a></li>
-                        <li><a href="/scenes/gethome">Get Home</a></li>
-                        <li><a href="/scenes/watchamovie">Watch a Movie</a></li>
-                        <li><a href="/scenes/gotobed">Go to Bed</a></li>
-                        <li class="divider"></li>
-                        <li class="nav-header">Manage</li>
-                        <li><a href="/addcontroller">Add Controller</a></li>
-                        <li><a href="/addsensor">Add Sensor</a></li>
-                        <li><a href="/addlcddisplay.jsp">Add LCD Display</a></li>
-                    </ul>
+          <ul class="nav nav-sidebar">
+            <li class="active">Overview</li>
+            <li class="divider"></li>
+            <li class="nav-header"><a href="/status.html">Status</a></li>
+            <li class="divider"></li>
+            <li class="nav-header"><a href="/control/">Control</a></li>
+            <li class="divider"></li>
+            <li class="nav-header"><a href="/scenes/">Scenes</a></li>
+            <li class="divider"></li>
+            <li class="nav-header"><a href="/manage/">Manage</a></li>
+          </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <div class="jumbotron">
-            <div class="container">
-              <h2>Automated Cloud Arduino control</h2>
-              <p>Open hardware, open software, open firmware.</p>
-              <p><a href="https://code.google.com/p/gautoard/" class="btn btn-primary btn-lg" role="button">Learn more &raquo;</a></p>
+            <div>
+              <p>
+              <a href="/status/" class="btn btn-primary btn-lg">Status</a>
+              <a href="/control/" class="btn btn-primary btn-lg">Control</a>
+              </p>
+              <p>
+            </div><div>
+              <a href="/scenes/" class="btn btn-primary btn-lg">Scenes</a>
+              <a href="/manage/" class="btn btn-primary btn-lg">Manage</a>
+            </p>
             </div>
           </div>
         </div>

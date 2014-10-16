@@ -1,5 +1,5 @@
 
-<%@page import="static com.openhouseautomation.OfyService.ofy()"%>
+<%@page import="static com.openhouseautomation.OfyService.ofy"%>
 <%@page import="com.openhouseautomation.model.Controller"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -89,7 +89,7 @@
           <form action='/controller/fan' method="post" class="form-horizontal" role="form">
             <div class="form-group">
               <ul class="nav nav-pills">
-                <% Controller controller = ofy().load().type(Controller.class).id(new Long(4280019022)).now();
+                <% Controller controller = ofy().load().type(Controller.class).id(new Long(4280019022L)).now();
                 String[] states = { "OFF", "1", "2", "3", "4", "5" };
                 if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO) {
                   // if in AUTO, show the manual buttons, highlighting the current state
@@ -102,6 +102,7 @@
                     //XXX continue here with setting up link back to controller servlet
                   }
                   out.print("<li");
+                }
                   %>
                 <li class="active"><a href="#">Home</a></li>
                 <li><a href="#">Profile</a></li>
@@ -130,11 +131,7 @@
             <div class="form-group">
               <label for="type" class="col-sm-2 col-md-1 control-label">Type</label>
               <div class="sol-sm-4 col-md-5">
-                <select name="type">
-                  <% for (Type t : Sensor.Type.values()) {%>
-                  <option value="<%=t%>"><%=t%></option>
-                  <% }%>
-                </select>
+
               </div>
             </div>
 

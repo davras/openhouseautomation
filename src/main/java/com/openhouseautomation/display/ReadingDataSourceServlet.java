@@ -1,4 +1,4 @@
-package com.openhouseautomation;
+package com.openhouseautomation.display;
 
 import com.google.visualization.datasource.DataSourceServlet;
 import com.google.visualization.datasource.base.TypeMismatchException;

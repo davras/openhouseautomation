@@ -1,4 +1,4 @@
-package com.openhouseautomation;
+package com.openhouseautomation.manage;
 
 import static com.openhouseautomation.OfyService.ofy;
 

@@ -22,19 +22,19 @@
     </filter-mapping>
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.SensorServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForecastServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ForecastServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ForecastServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ArchivedReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ArchivedReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ArchivedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <description>Gets the weather forecast for the provided zipcode (either in initialization params or by URL)</description>
@@ -47,11 +47,11 @@
     </servlet>
     <servlet>
         <servlet-name>LCDDisplayServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LCDDisplayServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.LCDDisplayServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ControllerServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ControllerServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.ControllerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TestServlet</servlet-name>
@@ -83,7 +83,7 @@
     <servlet>
         <description>Gives the lat,long coordinates of the IP that called this URL.</description>
         <servlet-name>LocationServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LocationServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.LocationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LocationServlet</servlet-name>
@@ -92,7 +92,7 @@
     <servlet>
         <description>Returns the time since epoch (Jan 1, 1970) in seconds (not milliseconds!), useful for setting Arduino time.</description>
         <servlet-name>TimeServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.TimeServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.TimeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>TimeServlet</servlet-name>
@@ -100,7 +100,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>AddSensor</servlet-name>
-        <servlet-class>com.openhouseautomation.AddSensorServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.manage.AddSensorServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddSensor</servlet-name>
@@ -108,7 +108,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>AddController</servlet-name>
-        <servlet-class>com.openhouseautomation.AddControllerServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.manage.AddControllerServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddController</servlet-name>

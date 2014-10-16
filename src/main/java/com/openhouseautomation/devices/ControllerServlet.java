@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.openhouseautomation;
+package com.openhouseautomation.devices;
 
+import com.openhouseautomation.devices.SipHashHelper;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
@@ -143,7 +144,7 @@ public class ControllerServlet extends HttpServlet {
     } else if (reqpath.startsWith("/fan")) {
       log.info("doPost Controller");
 
-      
+    /*  
       sens.setOwner(req.getParameter("owner"));
       sens.setLocation(req.getParameter("location"));
       sens.setZone(req.getParameter("zone"));
@@ -174,6 +175,7 @@ public class ControllerServlet extends HttpServlet {
         req.setAttribute("messageLevel", "danger");
         req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       }
+      */
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "path not found");
     }
