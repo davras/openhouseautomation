@@ -1,11 +1,12 @@
 (function() {
-  var app = angular.module('gAutoArd', ['device-directives']);
+  var app = angular.module('gAutoArd',[]);
 
-  app.controller('SensorDisplay', ['$http', function($http) {
-      var sensorlist = this;
-      sensorlist.sensors = [];
+  app.controller('SensorController', ['$http', function($http) {
+      var sensors = this;
+      sensors.data = [];
       $http.get('/status/display/sensors').success(function(data) {
-        sensorlist.sensors = data;
+        sensors.data = data;
+        console.log(sensors.data[1].name);
       });
     }]);
 

@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.openhouseautomation.Convutils;
 
 import java.util.Date;
 
@@ -340,5 +341,10 @@ public class Sensor {
         .add("lastReading", lastReading)
         .add("lastReadingDate", lastReadingDate)
         .toString();
+  }
+  public String toJSONString() {
+    String toret = "{\"name\":\"" + getName() + "\",\"lastreading\":\"" + getLastReading() + "\",\"unit\":\"" + getUnit() + "\",\"age\":";
+    toret += "\"" + Convutils.timeAgoToString(getLastReadingDate().getTime()/1000) + "\"}";
+    return toret;
   }
 }

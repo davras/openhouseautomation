@@ -44,10 +44,15 @@
       <artifactId>angularjs</artifactId>
       <version>1.2.26</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-jetty-servlet</artifactId>
+      <artifactId>jersey-container-servlet-core</artifactId>
       <version>2.13</version>
+    </dependency> -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.3.3</version>
     </dependency>
     
     <!-- Compile/runtime dependencies -->
@@ -119,7 +124,11 @@
       <artifactId>appengine-mapreduce</artifactId>
       <version>0.7.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>unknown.binary</groupId>
+      <artifactId>javax.ws.rs-api-2.0</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -171,5 +180,12 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>unknown-jars-temp-repo</id>
+      <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+      <url>file:${project.basedir}/lib</url>
+    </repository>
+  </repositories>
 </project>
 
