@@ -1,5 +1,7 @@
 package com.openhouseautomation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -57,7 +59,9 @@ public class Sensor {
   String name;  // "Downstairs Temperature", "Wind Speed"
   String unit; // F, C, millibars, etc.
   String lastReading; // "89" for 89F
+  @JsonIgnore
   Date lastReadingDate; // Date lastReading was last updated
+  @JsonIgnore
   String secret; // the password for this sensor, used in SipHash
   Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
@@ -91,6 +95,7 @@ public class Sensor {
    *
    * @return String owner's name/id
    */
+  @JsonProperty("owner")
   public String getOwner() {
     return owner;
   }
@@ -109,6 +114,7 @@ public class Sensor {
    *
    * @return String of location of sensor
    */
+  @JsonProperty("location")
   public String getLocation() {
     return location;
   }
@@ -127,6 +133,7 @@ public class Sensor {
    *
    * @return String zone of the sensor
    */
+  @JsonProperty("zone")
   public String getZone() {
     return zone;
   }
@@ -146,6 +153,7 @@ public class Sensor {
    * @return Type of sensor, like temperature, pressure, etc. from the Sensor
    * ENUM
    */
+  @JsonProperty("type")
   public Type getType() {
     return type;
   }
@@ -164,6 +172,7 @@ public class Sensor {
    *
    * @return String the name of the sensor
    */
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -182,6 +191,7 @@ public class Sensor {
    *
    * @return String the units of the Sensor, like F, C, inHg, etc.
    */
+  @JsonProperty("unit")
   public String getUnit() {
     return unit;
   }
@@ -200,6 +210,7 @@ public class Sensor {
    *
    * @return String the last reading logged for this Sensor.
    */
+  @JsonProperty("lastreading")
   public String getLastReading() {
     return lastReading;
   }
@@ -234,6 +245,7 @@ public class Sensor {
    *
    * @return Date the last time this sensor was updated with a reading
    */
+  @JsonIgnore
   public Date getLastReadingDate() {
     return lastReadingDate;
   }
@@ -252,6 +264,7 @@ public class Sensor {
    *
    * @param secret String to set
    */
+  @JsonIgnore
   public void setSecret(String secret) {
     this.secret = secret;
   }
@@ -271,6 +284,7 @@ public class Sensor {
    *
    * @param expirationtime in seconds since last sensor reading
    */
+  @JsonIgnore
   public void setExpirationTime(Long expirationtime) {
     this.expirationtime = expirationtime;
   }
@@ -342,9 +356,9 @@ public class Sensor {
         .add("lastReadingDate", lastReadingDate)
         .toString();
   }
-  public String toJSONString() {
+  /*public String toJSONString() {
     String toret = "{\"name\":\"" + getName() + "\",\"lastreading\":\"" + getLastReading() + "\",\"unit\":\"" + getUnit() + "\",\"age\":";
     toret += "\"" + Convutils.timeAgoToString(getLastReadingDate().getTime()/1000) + "\"}";
     return toret;
-  }
+  } */
 }
