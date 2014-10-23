@@ -118,6 +118,6 @@ public class DisplaySourceServlet extends HttpServlet {
   }
 
   String testSensorString = " [{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
-  String testControllerString = "[{\"none\":\"none\"}]";
+  String testControllerString = "[{\"id\":4280019022,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"atticwhf\",\"type\":\"WHOLEHOUSEFAN\",\"name\":\"Whole House Fan\",\"desiredstate\":\"3\",\"actualstate\":\"3\",\"desiredstatepriority\":\"AUTO\",\"lastdesiredstatechange\":1413997687222,\"lastactualstatechange\":1413984661525,\"validstates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"desiredStatePriority\":\"AUTO\",\"validStates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"lastDesiredStateChange\":1413997687222,\"lastActualStateChange\":1413984661525,\"desiredState\":\"0\",\"actualState\":\"0\"}]";
 
 }

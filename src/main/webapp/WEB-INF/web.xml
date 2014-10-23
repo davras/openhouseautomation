@@ -157,7 +157,6 @@
     <servlet-name>DisplaySourceServlet</servlet-name>
     <url-pattern>/status/*</url-pattern>
     <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
-   --&gt;
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DisplaySourceServlet</servlet-name>

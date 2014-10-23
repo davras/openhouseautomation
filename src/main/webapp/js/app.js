@@ -1,5 +1,5 @@
 (function() {
-  var app = angular.module('gAutoArd',[]);
+  var app = angular.module('gAutoArd',['ui.bootstrap']);
 
   app.controller('SensorController', ['$http', function($http) {
       var sensors = this;

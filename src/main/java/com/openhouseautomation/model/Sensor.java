@@ -59,10 +59,8 @@ public class Sensor {
   String name;  // "Downstairs Temperature", "Wind Speed"
   String unit; // F, C, millibars, etc.
   String lastReading; // "89" for 89F
-  @JsonIgnore
-  Date lastReadingDate; // Date lastReading was last updated
-  @JsonIgnore
-  String secret; // the password for this sensor, used in SipHash
+  @JsonIgnore Date lastReadingDate; // Date lastReading was last updated
+  @JsonIgnore String secret; // the password for this sensor, used in SipHash
   Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
 
@@ -72,6 +70,9 @@ public class Sensor {
   public Sensor() {
   }
 
+  public String getAge() {
+    return Convutils.timeAgoToString(getLastReadingDate().getTime()/1000);
+  }
   /**
    * Returns the {@code id} of the {@link Sensor}.
    *

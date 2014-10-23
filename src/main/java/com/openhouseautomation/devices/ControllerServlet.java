@@ -5,11 +5,12 @@
  */
 package com.openhouseautomation.devices;
 
-import com.openhouseautomation.devices.SipHashHelper;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -65,8 +66,17 @@ public class ControllerServlet extends HttpServlet {
       // show the actual state
       out.println(controller.toString());
       log.log(Level.INFO, "sent display:{0}", controller.toString());
-    } else if (reqpath.startsWith("/fan")) {
-      request.getRequestDispatcher("/WEB-INF/jsp/fan.jsp").forward(request, response);
+    } else if (reqpath.startsWith("/initialize")) {
+      List vs = new ArrayList();
+      vs.add("0");
+      vs.add("1");
+      vs.add("2");
+      vs.add("3");
+      vs.add("4");
+      vs.add("5");
+      controller.setValidStates(vs);
+      ofy().save().entity(controller);
+      out.println(controller);
     }
   }
 
@@ -104,6 +114,9 @@ public class ControllerServlet extends HttpServlet {
       // always sets actual state
       // if the actual setting is not the same as the desired setting,
       // then someone has locally overridden the setting.
+      if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
+        controller.setDesiredState(controllervalue);
+      }
       if (!controller.getActualState().equals(controllervalue)) {
         log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
         controller.setActualState(controllervalue);

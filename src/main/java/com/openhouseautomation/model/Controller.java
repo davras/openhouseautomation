@@ -6,6 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Class representing a controller device.
@@ -48,7 +49,7 @@ public class Controller {
     LOCAL,
     EMERGENCY;
   }
-  
+
   @Id
   public Long id; //id from CRC32 hash of owner, location, zone, and salt.
   public String owner;//Owner of the device
@@ -61,6 +62,7 @@ public class Controller {
   public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
   public Date lastdesiredstatechange; // The Date the last time the desired state changed
   public Date lastactualstatechange; // The Date the last time the desired state changed
+  public List validstates; // the list of valid states for the desired and actual states
 
   /**
    * Empty constructor for objectify.
@@ -198,6 +200,7 @@ public class Controller {
         .add("desiredstatepriority", getDesiredStatePriority())
         .add("lastdesiredstatechange", new Date(getLastDesiredStateChange().getTime()))
         .add("lastactualstatechange", new Date(getLastActualStateChange().getTime()))
+        .add("validstates", getValidStates())
         .toString();
   }
 
@@ -205,7 +208,7 @@ public class Controller {
    * @return the desiredstate
    */
   public String getDesiredState() {
-    if (null == desiredstate) {
+    if (null == desiredstate || "".equals(desiredstate)) {
       desiredstate = "0";
     }
     return desiredstate;
@@ -273,4 +276,19 @@ public class Controller {
   public void setLastActualStateChange(Date lastactualstatechange) {
     this.lastactualstatechange = lastactualstatechange;
   }
+
+  /**
+   * @return the validstates
+   */
+  public List getValidStates() {
+    return validstates;
+  }
+
+  /**
+   * @param validstates the validstates to set
+   */
+  public void setValidStates(List validstates) {
+    this.validstates = validstates;
+  }
+
 }

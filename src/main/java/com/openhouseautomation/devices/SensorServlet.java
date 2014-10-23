@@ -83,32 +83,37 @@ public class SensorServlet extends HttpServlet {
     final String sensorval = request.getParameter("v");
     // TODO cleanup the anonymous inner class
     log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
-    if (SipHashHelper.validateHash(sensorid, sensorval, auth)) {
-      log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
-      ofy().transact(new Work<Sensor>() {
-        @Override
-        public Sensor run() {
-          Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
-          Sensor sensor = ofy().load().now(sk);
-          // set the value
-          sensor.setLastReadingDate(new Date());
-          sensor.setLastReading(sensorval);
-          ofy().save().entity(sensor);
-          log.log(Level.INFO, "saved sensor:{0}", sensor);
-          Reading reading = new Reading();
-          reading.setSensor(sk);
-          reading.setTimestamp(new Date());
-          reading.setValue(sensorval);
-          ofy().save().entity(reading);
-          log.log(Level.INFO, "logged reading:{0}", reading);
-          return sensor;
-        }
-      });
-      out.println("OK");
-    } else {
+    if (!SipHashHelper.validateHash(sensorid, sensorval, auth)) {
       response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
-      // TODO: move auth to filter servlet
+      return;
     }
+    if (null == sensorid || "".equals(sensorid) || null == sensorval || "".equals(sensorval)) {
+      response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing value");
+      return;
+    }
+    log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
+    ofy().transact(new Work<Sensor>() {
+      @Override
+      public Sensor run() {
+        Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
+        Sensor sensor = ofy().load().now(sk);
+        // set the value
+        sensor.setLastReadingDate(new Date());
+        sensor.setLastReading(sensorval);
+        ofy().save().entity(sensor);
+        log.log(Level.INFO, "saved sensor:{0}", sensor);
+        Reading reading = new Reading();
+        reading.setSensor(sk);
+        reading.setTimestamp(new Date());
+        reading.setValue(sensorval);
+        ofy().save().entity(reading);
+        log.log(Level.INFO, "logged reading:{0}", reading);
+        return sensor;
+      }
+    });
+    out.println("OK");
+
+    // TODO: move auth to filter servlet
   }
 
   /**
