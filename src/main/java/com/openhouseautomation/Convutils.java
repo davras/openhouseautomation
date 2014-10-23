@@ -13,16 +13,6 @@ public class Convutils {
 
   static long tzoffset = -8;
 
-  public static String timeAgoToString(long secs, long expirationsecs) {
-    long thistime = System.currentTimeMillis() / 1000;
-    long eventtime = secs;
-    long timeago = thistime - eventtime;
-    if (timeago > expirationsecs) {
-      return "Expired";
-    }
-    return timeAgoToString(secs);
-  }
-
   /**
    * Converts seconds to a human-eyeball friendly format
    *

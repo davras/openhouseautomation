@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.openhouseautomation;
+package com.openhouseautomation.devices;
 
 import com.github.emboss.siphash.SipHash;
 import com.github.emboss.siphash.SipKey;

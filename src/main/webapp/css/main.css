@@ -99,3 +99,13 @@ body {
 .main .page-header {
   margin-top: 0;
 }
+
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.red {
+    color: red; 
+}
+
+.black {
+    color: black;
+}

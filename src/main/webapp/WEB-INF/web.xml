@@ -22,19 +22,19 @@
     </filter-mapping>
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.SensorServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForecastServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ForecastServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ForecastServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ArchivedReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ArchivedReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ArchivedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <description>Gets the weather forecast for the provided zipcode (either in initialization params or by URL)</description>
@@ -47,7 +47,33 @@
     </servlet>
     <servlet>
         <servlet-name>LCDDisplayServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LCDDisplayServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.LCDDisplayServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ControllerServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.devices.ControllerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TestServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.TestServlet</servlet-class>
+    </servlet>
+    <!-- <servlet>
+    <servlet-name>jersey</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>com.openhouseautomation.display</param-value>
+    </init-param>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>com.openhouseautomation.display.DisplaySourceServlet</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  -->
+    <servlet>
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -75,7 +101,7 @@
     <servlet>
         <description>Gives the lat,long coordinates of the IP that called this URL.</description>
         <servlet-name>LocationServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LocationServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.LocationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LocationServlet</servlet-name>
@@ -84,19 +110,27 @@
     <servlet>
         <description>Returns the time since epoch (Jan 1, 1970) in seconds (not milliseconds!), useful for setting Arduino time.</description>
         <servlet-name>TimeServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.TimeServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.TimeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>TimeServlet</servlet-name>
         <url-pattern>/gettime</url-pattern>
     </servlet-mapping>
     <servlet>
-    <servlet-name>AddSensor</servlet-name>
-        <servlet-class>com.openhouseautomation.AddSensorServlet</servlet-class>
+        <servlet-name>AddSensor</servlet-name>
+        <servlet-class>com.openhouseautomation.manage.AddSensorServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AddSensor</servlet-name>
         <url-pattern>/addsensor</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AddController</servlet-name>
+        <servlet-class>com.openhouseautomation.manage.AddControllerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddController</servlet-name>
+        <url-pattern>/addcontroller</url-pattern>
     </servlet-mapping>
     <!-- APPSTATS -->
     <servlet>
@@ -110,6 +144,23 @@
     <servlet-mapping>
         <servlet-name>appstats</servlet-name>
         <url-pattern>/appstats/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ControllerServlet</servlet-name>
+        <url-pattern>/controller/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TestServlet</servlet-name>
+        <url-pattern>/testservlet/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>DisplaySourceServlet</servlet-name>
+    <url-pattern>/status/*</url-pattern>
+    <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <url-pattern>/status</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

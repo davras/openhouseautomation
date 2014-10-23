@@ -1,22 +1,27 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package com.openhouseautomation;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ *
  * @author dras
  */
-public class LocationServlet extends HttpServlet {
-
-  private static final long serialVersionUID = 1L;
+public class TestServlet extends HttpServlet {
 
   /**
-   * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+   * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+   * methods.
    *
    * @param request servlet request
    * @param response servlet response
@@ -25,17 +30,26 @@ public class LocationServlet extends HttpServlet {
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    String location = request.getHeader("X-AppEngine-CityLatLong");
-    response.setContentType("text/plain;charset=UTF-8");
-    PrintWriter out = response.getWriter();
-    try {
-      /* TODO(dras): output your page here. You may use following sample code. */
-      out.println(location);
-    } finally {
-      out.close();
+    response.setContentType("text/html;charset=UTF-8");
+    try (PrintWriter out = response.getWriter()) {
+      /* TODO output your page here. You may use following sample code. */
+      out.println("<!DOCTYPE html>");
+      out.println("<html>");
+      out.println("<head>");
+      out.println("<title>Servlet TestServlet</title>");      
+      out.println("</head>");
+      out.println("<body>");
+      out.println("<h1>Servlet TestServlet</h1>");
+      out.println("<br>Request context path:" + request.getContextPath());
+      out.println("<br>Request URI: " + request.getRequestURI());
+      out.println("<br>Request path info: " + request.getPathInfo());
+      out.println("<br>Request path info translated: " + request.getPathTranslated());
+      out.println("</body>");
+      out.println("</html>");
     }
   }
 
+  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.
    *
@@ -63,4 +77,15 @@ public class LocationServlet extends HttpServlet {
       throws ServletException, IOException {
     processRequest(request, response);
   }
+
+  /**
+   * Returns a short description of the servlet.
+   *
+   * @return a String containing servlet description
+   */
+  @Override
+  public String getServletInfo() {
+    return "Short description";
+  }// </editor-fold>
+
 }

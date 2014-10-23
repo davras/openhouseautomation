@@ -18,7 +18,7 @@
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client-appengine</artifactId>
-      <version>1.17.0-rc</version>
+      <version>1.19.0</version>
     </dependency>
 
     <dependency>
@@ -39,7 +39,22 @@
       <version>1.1.2</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>angularjs</artifactId>
+      <version>1.2.26</version>
+    </dependency>
+    <!--<dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet-core</artifactId>
+      <version>2.13</version>
+    </dependency> -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.3.3</version>
+    </dependency>
+    
     <!-- Compile/runtime dependencies -->
     <dependency>
       <groupId>com.google.appengine</groupId>
@@ -109,7 +124,11 @@
       <artifactId>appengine-mapreduce</artifactId>
       <version>0.7.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>unknown.binary</groupId>
+      <artifactId>javax.ws.rs-api-2.0</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -149,7 +168,7 @@
         <configuration>
           <enableJarClasses>true</enableJarClasses>
         </configuration>
-        <executions>
+        <!-- <executions>
           <execution>
             <phase>compile</phase>
             <goals>
@@ -157,8 +176,16 @@
             </goals>
           </execution>
         </executions>
+        -->
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>unknown-jars-temp-repo</id>
+      <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+      <url>file:${project.basedir}/lib</url>
+    </repository>
+  </repositories>
 </project>
 

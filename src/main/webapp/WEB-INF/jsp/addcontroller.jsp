@@ -1,6 +1,4 @@
-
-<%@page import="com.openhouseautomation.model.Sensor.Type"%>
-<%@page import="com.openhouseautomation.model.Sensor"%>
+<%@page import="com.openhouseautomation.model.Controller"%>
 <%@page import="java.util.zip.CRC32"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isELIgnored="false" %>
@@ -72,73 +70,70 @@
             <li><a href="/scenes/gotobed">Go to Bed</a></li>
             <li class="divider"></li>
             <li class="nav-header">Manage</li>
-            <li><a href="/addcontroller">Add Controller</a></li>
-            <li class="active"><a href="/addsensor">Add Sensor</a></li>
+            <li class="active"><a href="/addcontroller">Add Controller</a></li>
+            <li><a href="/addsensor">Add Sensor</a></li>
             <li><a href="/addlcddisplay.jsp">Add LCD Display</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <c:choose>
             <c:when test="${message != null}">
-              <div class="alert alert-${messageLevel} alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                ${message}
-              </div>
+                <div class="alert alert-${messageLevel} alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  ${message}
+                </div>
             </c:when>
           </c:choose>
-          <h1>Add Sensor</h1>
+          <h1>Add Controller</h1>
           <p class="lead">Please provide the following information:</p>
-          <form action='/addsensor' method="post" class="form-horizontal" role="form">
+          <form action='/addcontroller' method="post" class="form-horizontal" role="form">
             <div class="form-group">
               <label for="owner" class="col-sm-2 col-md-1 control-label">Owner</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="owner" name="owner" placeholder="Your username">
               </div>
             </div>
-
+            
             <div class="form-group">
               <label for="location" class="col-sm-2 col-md-1 control-label">Location</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="location" name="location" placeholder="home, work, etc..">
               </div>
             </div>
-
+            
             <div class="form-group">
               <label for="zone" class="col-sm-2 col-md-1 control-label">Zone</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...">
               </div>
             </div>
-
             <div class="form-group">
               <label for="type" class="col-sm-2 col-md-1 control-label">Type</label>
               <div class="sol-sm-4 col-md-5">
                 <select name="type">
-                  <% for (Type t : Sensor.Type.values()) {%>
+                  <% for (Controller.Type t : Controller.Type.values()) { %>
                   <option value="<%=t%>"><%=t%></option>
-                  <% }%>
+                  <% } %>
                 </select>
               </div>
             </div>
-
-
             <div class="form-group">
               <label for="name" class="col-sm-2 col-md-1 control-label">Name</label>
               <div class="col-sm-4 col-md-5">
-                <input type="text" class="form-control" id="name" name="name" placeholder="What to display on a webpage, like 'Outside Temperature'">
+                <input type="text" class="form-control" id="name" name="name" placeholder="What to display on a webpage, like 'House Fan'">
               </div>
             </div>
-
+            
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-7 col-md-offset-1 col-md-9">
-                <button type="submit" class="btn btn-default">Create Sensor</button>
+                <button type="submit" class="btn btn-default">Create Controller</button>
               </div>
             </div>
           </form>
         </div>
       </div>
     </div>
-
+    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
