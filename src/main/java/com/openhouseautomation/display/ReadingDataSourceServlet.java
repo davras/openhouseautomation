@@ -60,11 +60,12 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
 
     // use the sensors to get the readings
     Date cutoffdate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 7));
-    int blocks = 5 * 60 * 1000; // 5 minute blocks of time in graph
+    int resolution = 5; // graph resolution in minutes
+    int blocks = resolution * 60 * 1000; // blocks of time in graph
     int positions = 7 * 24 * 60 * 60 * 1000 / blocks;
     double[][] readingsz = new double[sensors.length][positions];
     for (int i = 0; i < sensors.length; i++) {
-      List<Reading> readings = ofy().load().type(Reading.class).ancestor(sensors[i]).filter("timestamp >", cutoffdate).list();
+      List<Reading> readings = ofy().load().type(Reading.class).ancestor(sensors[i]).filter("timestamp >", cutoffdate).chunkAll().list();
       for (Reading reading : readings) {
         int blocknumber = (int) ((reading.getTimestamp().getTime() - cutoffdate.getTime()) / blocks);
         readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
@@ -105,7 +106,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
 
     try {
       for (int i = 0; i < positions; i++) {
-        cal.setTime(new Date(i * 5 * 60 * 1000 + cutoffdate.getTime() - (7 * 60 * 60 * 1000)));
+        cal.setTime(new Date(i * resolution * 60 * 1000 + cutoffdate.getTime() - (7 * 60 * 60 * 1000)));
         switch (sensors.length) {
           case 1:
             data.addRowFromValues(cal, new Double(readingsz[0][i]));

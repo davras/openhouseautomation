@@ -3,6 +3,7 @@ package com.openhouseautomation.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -17,6 +18,7 @@ import java.util.Date;
  */
 @Entity
 @Index
+@Cache
 public class Sensor {
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
