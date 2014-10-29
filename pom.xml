@@ -6,7 +6,7 @@
   <version>1.0</version>
 
   <groupId>com.openhouseautomation</groupId>
-  <artifactId>gautoard</artifactId>
+  <artifactId>openhouseautomation</artifactId>
 
   <properties>
     <appengine.app.version>1</appengine.app.version>
