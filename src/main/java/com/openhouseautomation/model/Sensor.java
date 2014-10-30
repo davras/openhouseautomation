@@ -3,10 +3,7 @@ package com.openhouseautomation.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 
 import java.util.Date;
@@ -65,16 +62,32 @@ public class Sensor {
   @JsonIgnore String secret; // the password for this sensor, used in SipHash
   Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
+  @Ignore String humanage;
+  @OnLoad void updateAge() {
+    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getTime()/1000);
+  }
 
+  @Ignore boolean expired;
+  @OnLoad void updateExpired() {
+    if (expirationtime != null) {
+      this.expired = new Date().getTime() > (lastReadingDate.getTime() + expirationtime * 1000);
+    } else {
+      this.expired = false;
+    }
+  }
+  
+  public String getHumanAge() {
+    return humanage;
+  }
+  public boolean isExpired() {
+    return expired;
+  }
   /**
    * Empty constructor for objectify.
    */
   public Sensor() {
   }
 
-  public String getAge() {
-    return Convutils.timeAgoToString(getLastReadingDate().getTime()/1000);
-  }
   /**
    * Returns the {@code id} of the {@link Sensor}.
    *
@@ -299,19 +312,6 @@ public class Sensor {
    */
   public Long getExpirationTime() {
     return expirationtime;
-  }
-
-  /**
-   * Checks to see if the {@link Sensor} is expired.
-   *
-   * @return true if sensor's last update is older than expiration time
-   */
-  public boolean isExpired() {
-    if (expirationtime != null) {
-      return new Date().getTime() > (lastReadingDate.getTime() + expirationtime * 1000);
-    } else {
-      return false;
-    }
   }
 
   @Override

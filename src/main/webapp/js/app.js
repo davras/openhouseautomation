@@ -1,5 +1,5 @@
 (function() {
-  var app = angular.module('gAutoArd',['ui.bootstrap']);
+  var app = angular.module('gAutoArd', ['ui.bootstrap']);
 
   app.controller('SensorController', ['$http', function($http) {
       var sensors = this;
@@ -10,12 +10,20 @@
       });
     }]);
 
-    app.controller('DeviceController', ['$http', function($http) {
-        var devices = this;
-        devices.data = [];
-        $http.get('/status/display/devices').success(function(data) {
-          devices.data = data;
-          console.log(devices.data[0].name);
-        });
-    }])
+  app.controller('DeviceController', ['$http', function($http) {
+      var devices = this;
+      devices.data = [];
+      $http.get('/status/display/devices').success(function(data) {
+        devices.data = data;
+        console.log(devices.data[0].name);
+      });
+      processForm = function() {
+        console.log("a button was pushed!");
+        $http.post('/status/display/devices', devices.data)
+                .success(function(data) {
+                  //wtf goes here?
+
+                });
+      };
+    }]);
 })();

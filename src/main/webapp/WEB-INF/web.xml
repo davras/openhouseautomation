@@ -75,6 +75,14 @@
         <servlet-name>DisplaySourceServlet</servlet-name>
         <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MailNotification</servlet-name>
+        <servlet-class>com.openhouseautomation.MailNotification</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.IncomingMailHandlerServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
         <url-pattern>/cron/getforecast</url-pattern>
@@ -154,13 +162,21 @@
         <url-pattern>/testservlet/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>DisplaySourceServlet</servlet-name>
-    <url-pattern>/status/*</url-pattern>
-    <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <url-pattern>/status/*</url-pattern>
+        <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DisplaySourceServlet</servlet-name>
         <url-pattern>/status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MailNotification</servlet-name>
+        <url-pattern>/mail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <url-pattern>/_ah/mail/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
@@ -168,6 +184,7 @@
             <url-pattern>/tasks/*</url-pattern>
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
+            <url-pattern>/_ah/mail/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

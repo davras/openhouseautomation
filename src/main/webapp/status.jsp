@@ -100,7 +100,7 @@
               </td><td>
                 <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
               </td><td align="center">
-                <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000)%>
+                <%= sens.getHumanAge() %>
               </td>
               </td>
             </tr>
