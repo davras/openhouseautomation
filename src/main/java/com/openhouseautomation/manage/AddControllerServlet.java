@@ -61,7 +61,7 @@ private static final long serialVersionUID = 1L;
       cont.setOwner(request.getParameter("owner"));
       cont.setLocation(request.getParameter("location"));
       cont.setZone(request.getParameter("zone"));
-      cont.setType(Controller.Type.valueOf(request.getParameter("type")));
+      cont.setType(Controller.Type.getTypebyName(request.getParameter("type")));
       cont.setName(request.getParameter("name"));
       cont.setDesiredState("0");
       cont.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);

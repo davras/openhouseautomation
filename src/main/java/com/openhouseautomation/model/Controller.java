@@ -26,7 +26,7 @@ public class Controller {
     THERMOSTAT("Thermostat"),
     GARAGEDOOR("Garage Door"),
     ALARM("Alarm"),
-    LIGHT("Lights"),
+    LIGHTS("Lights"),
     SPRINKLER("Sprinkler"),
     WHOLEHOUSEFAN("Whole House Fan");
 
@@ -39,6 +39,14 @@ public class Controller {
     @Override
     public String toString() {
       return text;
+    }
+    public static Type getTypebyName(String longname) {
+      for (Type t : Type.values()) {
+        if (t.name().equals(longname)) {
+          return t;
+        }
+      }
+      throw new IllegalArgumentException("Non-existant type name: " + longname);
     }
   }
 
