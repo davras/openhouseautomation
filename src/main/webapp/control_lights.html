@@ -65,11 +65,16 @@
               </h2></div>
           </div>
           <form ng-submit="processForm()">
-            <div class="container-fluid list-group" ng-controller="DeviceTypeList as devicetypelist">
+            <div class="container-fluid list-group" ng-controller="DeviceController as devices">
+              <!-- Controller current settings go here -->
               <ul class="list-group">
-                <li class="list-group-item" ng-repeat="devicetype in devicetypelist.data">
-                  <!-- convert to links in the controller page -->
-                  {{devicetype.name}}
+                <li class="list-group-item" ng-repeat="device in devices.data">
+                  {{device.name}}:&nbsp;{{device.desiredstate}}
+                  <div class="btn-group" ng-repeat="state in device.validstates">
+                    <label class="btn btn-primary" ng-model="device.data[0].desiredstate"
+                           btn-radio="'{{state}}'" ng-disabled='device.actualstate == state'>{{state}}
+                    </label>
+                  </div>
                 </li>
               </ul>
             </div>

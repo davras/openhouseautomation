@@ -42,7 +42,7 @@ public class Controller {
     }
     public static Type getTypebyName(String longname) {
       for (Type t : Type.values()) {
-        if (t.name().equals(longname)) {
+        if (t.toString().equals(longname)) {
           return t;
         }
       }

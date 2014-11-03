@@ -26,4 +26,12 @@
                 });
       };
     }]);
+  app.controller('DeviceTypeList', ['$http', function($http) {
+      var devicetypelist = this;
+      devicetypelist.data = [];
+      $http.get('/status/devicetypelist').success(function(data) {
+        devicetypelist.data = data;
+        console.log(devicetypelist.data[0].name);
+      });
+    }]);
 })();

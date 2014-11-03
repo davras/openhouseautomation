@@ -53,7 +53,28 @@ public class DisplaySourceServlet extends HttpServlet {
       doDisplayControllers(request, response);
       return;
     }
+    if (request.getPathInfo().startsWith("/devicetypelist")) {
+      doListDeviceTypes(request, response);
+      return;
+    }
+    log.log(Level.WARNING, "unsupported path: " + request.getPathInfo());
     response.getWriter().println("path not supported");
+  }
+
+  private void doListDeviceTypes(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    Query<Controller> q = ofy().load().type(Controller.class).project("type").distinct(true);
+    QueryResultIterator<Controller> iterator = q.iterator();
+    out.print("[");
+    while (iterator.hasNext()) {
+      Controller c = iterator.next();
+      out.print("{\"name\":\"" + c.getType().toString() + "\"}");
+      if (iterator.hasNext()) {
+        out.print(",");
+      }
+    }
+    out.print("]");
+    return;
   }
 
   private void doDisplaySensors(HttpServletRequest request, HttpServletResponse response) throws IOException {
