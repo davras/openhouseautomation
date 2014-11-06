@@ -182,6 +182,10 @@ public class ControllerServlet extends HttpServlet {
   private void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     final String controllervalue = request.getParameter("v");
+    if (null == controllervalue || "".equals(controllervalue)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST , "passed value needs to have 16x[0,1]");
+      return;
+    }
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
@@ -189,7 +193,7 @@ public class ControllerServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
-      String curstate = controllervalue.substring(lightnum + 1, lightnum + 2);
+      String curstate = controllervalue.substring(lightnum - 1, lightnum);
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
@@ -198,7 +202,7 @@ public class ControllerServlet extends HttpServlet {
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
         if (c.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
-          log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
+          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }

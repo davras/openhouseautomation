@@ -9,9 +9,7 @@
     <title>Open House Automation</title>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/angular.min.js"></script>
-    <script src="/js/angularbootstrap.min.js"></script>
-    <script type="text/javascript" src="/js/app.js"></script>    
+
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
@@ -61,27 +59,29 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <div class="jumbotron">
             <div><h2>
-                Control
+                Fan Control
               </h2></div>
           </div>
-          <form ng-submit="processForm()">
-            <div class="container-fluid list-group" ng-controller="DeviceController as devices">
-              <!-- Controller current settings go here -->
-              <ul class="list-group">
-                <li class="list-group-item" ng-repeat="device in devices.data">
-                  {{device.name}}:&nbsp;{{device.desiredstate}}
-                  <div class="btn-group" ng-repeat="state in device.validstates">
-                    <label class="btn btn-primary" ng-model="device.data[0].desiredstate"
-                           btn-radio="'{{state}}'" ng-disabled='device.actualstate == state'>{{state}}
-                    </label>
-                  </div>
-                </li>
-              </ul>
+          <form ng-controller="FanController as fan">
+            <h4>{{fan.data[0].name}}:&nbsp;{{fan.data[0].actualState}}&nbsp;</h4>
+            <div class="btn-group">
+              <label class="btn btn-primary"
+                     interval ="fan.myInterval"
+                     ng-model="fan.data[0].desiredState"
+                     ng-repeat="state in fan.data[0].validStates"
+                     btn-radio="'{{state}}'"
+                     ng-value="state"
+                     ng-disabled="fan.data[0].actualState == state"
+                     ng-click="processForm()">
+                {{state}}
+              </label>
             </div>
           </form>
         </div>
       </div>
     </div>
-
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angularbootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>   
   </body>
 </html>
