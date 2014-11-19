@@ -37,7 +37,7 @@ public class ControllerServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
     // handles sensor reads
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
@@ -91,7 +91,7 @@ public class ControllerServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
@@ -181,19 +181,19 @@ public class ControllerServlet extends HttpServlet {
 
   private void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
-    final String controllervalue = request.getParameter("v");
-    if (null == controllervalue || "".equals(controllervalue)) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST , "passed value needs to have 16x[0,1]");
+    final String actualstate = request.getParameter("v");
+    if (null == actualstate || "".equals(actualstate)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
       return;
     }
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
-    char[] toret = "0000000000000000".toCharArray();
+    char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
-      String curstate = controllervalue.substring(lightnum - 1, lightnum);
+      String curstate = actualstate.substring(lightnum, lightnum+1);
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
@@ -209,9 +209,15 @@ public class ControllerServlet extends HttpServlet {
       }
       if (c.getDesiredState().equals("1")) {
         toret[lightnum] = '1';
+      }
+      if (c.getDesiredState().equals("0")) {
+        toret[lightnum] = '0';
+      }
     }
     ofy().save().entities(lights);
+    log.log(Level.WARNING, "returning " + new String(toret));
     out.print(new String(toret));
-    }
+    out.flush();
+    return;
   }
 }

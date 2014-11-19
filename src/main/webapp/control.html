@@ -58,22 +58,25 @@
             <li class="nav-header"><a href="/manage/">Manage</a></li>
           </ul>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <div class="jumbotron">
-            <div><h2>
-                Control
-              </h2></div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-controller="DeviceTypeList as devicetypelist">
+          <div class="jumbotron"><h2>Control</h2></div>
+          <section class="tab">
+            <ul class="nav nav-pills">
+              <li ng-repeat="devicetype in devicetypelist.data"
+                  ng-class="{ active: devicetypelist.isSet(devicetype.ordinal) }"
+                  ng-show="devicetype.display">
+                <a href ng-click="devicetypelist.setTab(devicetype.ordinal)">{{devicetype.name}}</a>
+              </li>
+            </ul>
+          </section>
+          <hr>
+          <div ng-repeat="devicetype in devicetypelist.data"
+               ng-include="devicetype.link"
+               ng-show="devicetypelist.isSet(devicetype.ordinal)">
+            <section>
+              {{ devicetype.link }} and {{ devicetype.ordinal }}
+            </section>
           </div>
-          <form ng-submit="processForm()">
-            <div class="container-fluid list-group" ng-controller="DeviceTypeList as devicetypelist">
-              <ul class="list-group">
-                <li class="list-group-item" ng-repeat="devicetype in devicetypelist.data">
-                  <!-- convert to links in the controller page -->
-                  {{devicetype.name}}
-                </li>
-              </ul>
-            </div>
-          </form>
         </div>
       </div>
     </div>

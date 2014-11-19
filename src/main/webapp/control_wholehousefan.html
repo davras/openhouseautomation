@@ -1,0 +1,18 @@
+<form ng-controller="FanController as fans">
+  <div ng-repeat="fan in fans.data">
+    <h4>{{fan.name}}:&nbsp;{{fan.actualState}}
+    </h4>
+
+    <div class="btn-group">
+      <label class="btn btn-primary"
+             ng-model="fan.desiredState"
+             ng-repeat="state in fan.validStates"
+             btn-radio="'{{state}}'"
+             ng-value="state"
+             ng-disabled="fan.actualState == state"
+             ng-click="processForm(fan.id, state)">
+        {{state}}
+      </label>
+      <label ng-hide="fan.desiredState == fan.actualState">Working...</label>
+    </div>
+</form>

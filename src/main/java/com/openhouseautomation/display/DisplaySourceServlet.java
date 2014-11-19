@@ -10,6 +10,8 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.ControllerHelper;
+import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,12 +44,17 @@ public class DisplaySourceServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+      throws ServletException, IOException {
+    log.log(Level.WARNING, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
     if (request.getPathInfo() == null) {
       return;
     }
     if (request.getPathInfo().startsWith("/display/sensors")) {
       doDisplaySensors(request, response);
+      return;
+    }
+    if (request.getPathInfo().startsWith("/display/forecast")) {
+      doDisplayForecast(request, response);
       return;
     }
     if (request.getPathInfo().startsWith("/display/devices")) {
@@ -62,20 +69,42 @@ public class DisplaySourceServlet extends HttpServlet {
     response.getWriter().println("path not supported");
   }
 
+  private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);
+    QueryResultIterator<Forecast> iterator = query.iterator();
+    List forecasts = new ArrayList();
+    while (iterator.hasNext()) {
+      Forecast fc = (Forecast) iterator.next();
+      forecasts.add(fc);
+    }
+    ObjectMapper om = new ObjectMapper();
+    om.writeValue(out, forecasts);
+  }
   private void doListDeviceTypes(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
+    if (request.getRemoteAddr().equals("127.0.0.1")) {
+      response.getWriter().print(testDeviceTypes);
+      return;
+    }
+    Controller.Type[] types = Controller.Type.values();
+    ControllerHelper ch[] = new ControllerHelper[types.length];
+    for (int i=0; i < types.length; i++) {
+      ch[i] = new ControllerHelper();
+      ch[i].ordinal = types[i].ordinal();
+      ch[i].name = types[i].toString();
+      ch[i].display = false;
+      ch[i].link = "/control_" + types[i].name().toLowerCase() + ".html";
+    }
     Query<Controller> q = ofy().load().type(Controller.class).project("type").distinct(true);
     QueryResultIterator<Controller> iterator = q.iterator();
-    out.print("[");
     while (iterator.hasNext()) {
       Controller c = iterator.next();
-      out.print("{\"name\":\"" + c.getType().toString() + "\"}");
-      if (iterator.hasNext()) {
-        out.print(",");
-      }
+      int ord = c.getType().ordinal();
+      ch[ord].display = true;
     }
-    out.print("]");
-    return;
+    ObjectMapper om = new ObjectMapper();
+    om.writeValue(out, ch);
   }
 
   private void doDisplaySensors(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -86,7 +115,7 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     // production
-    Query<Sensor> query = ofy().load().type(Sensor.class);
+    Query<Sensor> query = ofy().cache(false).load().type(Sensor.class);
     QueryResultIterator<Sensor> iterator = query.iterator();
     List sensors = new ArrayList();
     while (iterator.hasNext()) {
@@ -127,30 +156,43 @@ public class DisplaySourceServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-    log.log(Level.WARNING, "DisplaySourceServlet got a POST!");
+      throws ServletException, IOException {
+    log.log(Level.WARNING, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
     Enumeration<String> es = request.getParameterNames();
     while (es.hasMoreElements()) {
       String sp = es.nextElement();
       for (String spv : request.getParameterValues(sp)) {
-        log.log(Level.WARNING, "doPost params:" + sp + "->" + spv);
+        //log.log(Level.WARNING, "doPost params:" + sp + "->" + spv);
       }
     }
     if (request.getPathInfo().startsWith("/controller/update")) {
       doControllerUpdate(request, response);
       return;
     }
+    response.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
-  
+
   public void doControllerUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String controllerid = request.getParameter("id");
-    Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
-    controller.setDesiredState(request.getParameter("desiredState"));
-    ofy().save().entity(controller);
-    response.sendError(HttpServletResponse.SC_NO_CONTENT);
+    log.log(Level.WARNING, "going to update controller:" + controllerid);
+    if (null != controllerid && !"".equals(controllerid)) {
+      if (controllerid.equals("100")) { // all lights
+        List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
+        for (Controller c : lights) {
+          c.setDesiredState(request.getParameter("desiredState"));
+        }
+        ofy().save().entities(lights);
+        log.log(Level.INFO, "updated all controllers");
+      } else { // an individual light
+        Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
+        controller.setDesiredState(request.getParameter("desiredState"));
+        ofy().save().entity(controller);
+        log.log(Level.WARNING, "updated controller: " + controller.toString());
+        response.sendError(HttpServletResponse.SC_NO_CONTENT);
+      }
+    }
   }
-
-  String testSensorString = " [{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
+  String testDeviceTypes = "[{\"name\":\"Thermostat\",\"link\":\"/control_thermostat.html\",\"ordinal\":0,\"display\":false},{\"name\":\"Garage Door\",\"link\":\"/control_garagedoor.html\",\"ordinal\":1,\"display\":false},{\"name\":\"Alarm\",\"link\":\"/control_alarm.html\",\"ordinal\":2,\"display\":false},{\"name\":\"Lights\",\"link\":\"/control_lights.html\",\"ordinal\":3,\"display\":true},{\"name\":\"Sprinkler\",\"link\":\"/control_sprinkler.html\",\"ordinal\":4,\"display\":false},{\"name\":\"Whole House Fan\",\"link\":\"/control_wholehousefan.html\",\"ordinal\":5,\"display\":true}]";
+  String testSensorString = "[{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
   String testControllerString = "[{\"id\":4280019022,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"atticwhf\",\"type\":\"WHOLEHOUSEFAN\",\"name\":\"Whole House Fan\",\"desiredStatePriority\":\"MANUAL\",\"validStates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"lastDesiredStateChange\":1414987381855,\"lastActualStateChange\":1414987381855,\"desiredState\":\"0\",\"actualState\":\"0\"}]";
-
 }

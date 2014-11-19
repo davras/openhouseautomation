@@ -66,7 +66,7 @@ public class ReadingServletMR extends HttpServlet {
             .setValueMarshaller(Marshallers.getStringMarshaller()).setNumReducers(reduceShardCount)
             .setJobName("history").build();
 
-    MapReduceSettings mrsettings = new MapReduceSettings.Builder().build();
+    MapReduceSettings mrsettings = new MapReduceSettings.Builder().setMillisPerSlice(55000).build();
     return MapReduceJob.start(mrspecs, mrsettings);
   }
 

@@ -1,0 +1,18 @@
+<form ng-controller="AlarmController as alarms">
+  <div ng-repeat="alarm in alarms.data">
+    <h4>{{alarm.name}}:&nbsp;{{alarm.actualState}}
+    </h4>
+
+    <div class="btn-group">
+      <label class="btn btn-primary"
+             ng-model="alarm.desiredState"
+             ng-repeat="state in alarm.validStates"
+             btn-radio="'{{state}}'"
+             ng-value="state"
+             ng-disabled="alarm.actualState == state"
+             ng-click="processForm(alarm.id, state)">
+        {{state}}
+      </label>
+      <label ng-hide="alarm.desiredState == alarm.actualState">Working...</label>
+    </div>
+</form>
