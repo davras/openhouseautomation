@@ -133,12 +133,11 @@ public class ControllerServlet extends HttpServlet {
           log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-          out.println("MANUAL:" + controller.getDesiredState());
         }
       }
       ofy().save().entity(controller);
       log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
-      out.println("OK");
+      out.println(controller.getDesiredState());
       return;
 
     } else if (reqpath.startsWith("/display")) {
@@ -215,7 +214,7 @@ public class ControllerServlet extends HttpServlet {
       }
     }
     ofy().save().entities(lights);
-    log.log(Level.WARNING, "returning " + new String(toret));
+    log.log(Level.INFO, "returning " + new String(toret));
     out.print(new String(toret));
     out.flush();
     return;

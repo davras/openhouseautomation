@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +44,7 @@ public class DisplaySourceServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    log.log(Level.WARNING, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
+    log.log(Level.INFO, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
     if (request.getPathInfo() == null) {
       return;
     }
@@ -94,7 +93,7 @@ public class DisplaySourceServlet extends HttpServlet {
       ch[i].ordinal = types[i].ordinal();
       ch[i].name = types[i].toString();
       ch[i].display = false;
-      ch[i].link = "/control_" + types[i].name().toLowerCase() + ".html";
+      ch[i].link = types[i].name();
     }
     Query<Controller> q = ofy().load().type(Controller.class).project("type").distinct(true);
     QueryResultIterator<Controller> iterator = q.iterator();
@@ -157,14 +156,14 @@ public class DisplaySourceServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    log.log(Level.WARNING, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
-    Enumeration<String> es = request.getParameterNames();
-    while (es.hasMoreElements()) {
-      String sp = es.nextElement();
-      for (String spv : request.getParameterValues(sp)) {
-        //log.log(Level.WARNING, "doPost params:" + sp + "->" + spv);
-      }
-    }
+    log.log(Level.INFO, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
+//    Enumeration<String> es = request.getParameterNames();
+//    while (es.hasMoreElements()) {
+//      String sp = es.nextElement();
+//      for (String spv : request.getParameterValues(sp)) {
+//        //log.log(Level.WARNING, "doPost params:" + sp + "->" + spv);
+//      }
+//    }
     if (request.getPathInfo().startsWith("/controller/update")) {
       doControllerUpdate(request, response);
       return;
@@ -174,7 +173,7 @@ public class DisplaySourceServlet extends HttpServlet {
 
   public void doControllerUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String controllerid = request.getParameter("id");
-    log.log(Level.WARNING, "going to update controller:" + controllerid);
+    log.log(Level.INFO, "going to update controller:" + controllerid);
     if (null != controllerid && !"".equals(controllerid)) {
       if (controllerid.equals("100")) { // all lights
         List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
@@ -187,12 +186,12 @@ public class DisplaySourceServlet extends HttpServlet {
         Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
         controller.setDesiredState(request.getParameter("desiredState"));
         ofy().save().entity(controller);
-        log.log(Level.WARNING, "updated controller: " + controller.toString());
+        log.log(Level.INFO, "updated controller: " + controller.toString());
         response.sendError(HttpServletResponse.SC_NO_CONTENT);
       }
     }
   }
-  String testDeviceTypes = "[{\"name\":\"Thermostat\",\"link\":\"/control_thermostat.html\",\"ordinal\":0,\"display\":false},{\"name\":\"Garage Door\",\"link\":\"/control_garagedoor.html\",\"ordinal\":1,\"display\":false},{\"name\":\"Alarm\",\"link\":\"/control_alarm.html\",\"ordinal\":2,\"display\":false},{\"name\":\"Lights\",\"link\":\"/control_lights.html\",\"ordinal\":3,\"display\":true},{\"name\":\"Sprinkler\",\"link\":\"/control_sprinkler.html\",\"ordinal\":4,\"display\":false},{\"name\":\"Whole House Fan\",\"link\":\"/control_wholehousefan.html\",\"ordinal\":5,\"display\":true}]";
+  String testDeviceTypes = "[{\"name\":\"Thermostat\",\"link\":\"THERMOSTAT\",\"ordinal\":0,\"display\":false},{\"name\":\"Garage Door\",\"link\":\"GARAGEDOOR\",\"ordinal\":1,\"display\":false},{\"name\":\"Alarm\",\"link\":\"ALARM\",\"ordinal\":2,\"display\":true},{\"name\":\"Lights\",\"link\":\"LIGHTS\",\"ordinal\":3,\"display\":true},{\"name\":\"Sprinkler\",\"link\":\"SPRINKLER\",\"ordinal\":4,\"display\":false},{\"name\":\"Whole House Fan\",\"link\":\"WHOLEHOUSEFAN\",\"ordinal\":5,\"display\":true}]";
   String testSensorString = "[{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
   String testControllerString = "[{\"id\":4280019022,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"atticwhf\",\"type\":\"WHOLEHOUSEFAN\",\"name\":\"Whole House Fan\",\"desiredStatePriority\":\"MANUAL\",\"validStates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"lastDesiredStateChange\":1414987381855,\"lastActualStateChange\":1414987381855,\"desiredState\":\"0\",\"actualState\":\"0\"}]";
 }

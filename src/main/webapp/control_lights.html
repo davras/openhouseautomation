@@ -1,20 +1,20 @@
-<form ng-controller="LightController as lights">
+<form>
 
-  <div ng-repeat="light in lights.data">
-    <h4>{{light.name}}
-      <button ng-show="light.actualState == 0" ng-disabled="light.desiredState != light.actualState">
+  <div ng-repeat="device in devices.data">
+    <h4>{{device.name}}
+      <button ng-show="device.actualState == 0" ng-disabled="device.desiredState != device.actualState">
         <img ng-src="/images/light_off.png"
-             ng-model="light.desiredState"
-             ng-click="processForm(light.id, 1)"
+             ng-model="device.desiredState"
+             ng-click="processForm(device.id, 1)"
              />
       </button>
-      <button ng-show="light.actualState == 1" ng-disabled="light.desiredState != light.actualState">
+      <button ng-show="device.actualState == 1" ng-disabled="device.desiredState != device.actualState">
         <img ng-src="/images/light_on.png"
-             ng-model="light.desiredState"
-             ng-click="processForm(light.id, 0)"
+             ng-model="device.desiredState"
+             ng-click="processForm(device.id, 0)"
              />
       </button>
-      <label ng-hide="light.desiredState == light.actualState">
+      <label ng-hide="device.desiredState == device.actualState">
         Working...
       </label>
     </h4>
