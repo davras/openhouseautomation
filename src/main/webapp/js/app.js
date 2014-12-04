@@ -52,7 +52,7 @@
         });
       };
       this.isSet = function(tabname) {
-        //console.log("comparing " + devicetypelist.tab + "==" + tabname);
+        //console.log("comparing " + devices.currenttab + "==" + tabname);
         return devices.currenttab == tabname;
       };
       this.getLink = function() {

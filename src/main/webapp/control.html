@@ -62,8 +62,9 @@
           <div class="jumbotron"><h2>Control</h2></div>
           <section class="tab">
             <ul class="nav nav-pills">
-              <li ng-repeat="devicetype in devices.list"
-                  ng-class="{ active: devices.isSet(devicetypelist.tab) }"
+              <li role="presentation"
+                  ng-repeat="devicetype in devices.list"
+                  ng-class="{ active: devices.isSet(devicetype.link) }"
                   ng-show="devicetype.display">
                 <a href ng-click="devices.setTab(devicetype.link)">{{devicetype.name}}</a>
               </li>
@@ -72,7 +73,7 @@
           <hr>
           <div ng-include="devices.getLink()">
             <section>
-              {{ devicetype.link }} and {{ devicetype.ordinal }}
+              {{ devicetype.link}} and {{ devicetype.ordinal}}
             </section>
           </div>
         </div>

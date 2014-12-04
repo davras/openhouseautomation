@@ -1,31 +1,46 @@
 <form>
 
-  <div ng-repeat="device in devices.data">
-    <h4>{{device.name}}
-      <button ng-show="device.actualState == 0" ng-disabled="device.desiredState != device.actualState">
-        <img ng-src="/images/light_off.png"
-             ng-model="device.desiredState"
-             ng-click="processForm(device.id, 1)"
-             />
+  <div ng-repeat="device in devices.data" ng-animate=" 'animate' ">
+    <h4>
+      <button 
+        type="button"
+        class="btn btn-lg btn-default"
+        ng-show="device.actualState == 0"
+        ng-disabled="device.desiredState != device.actualState"
+        class="light-off"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 1)"   
+        >
+        {{device.name}}
       </button>
-      <button ng-show="device.actualState == 1" ng-disabled="device.desiredState != device.actualState">
-        <img ng-src="/images/light_on.png"
-             ng-model="device.desiredState"
-             ng-click="processForm(device.id, 0)"
-             />
+      <button
+        type="button"
+        class="btn btn-lg light-on"
+        ng-show="device.actualState == 1"
+        ng-disabled="device.desiredState != device.actualState"
+        class="light-on"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 0)"
+        >
+        {{device.name}}
       </button>
       <label ng-hide="device.desiredState == device.actualState">
         Working...
       </label>
     </h4>
   </div>
+  <hr>
   <div class="btn-group">
     <h4>
-      <button ng-click="processForm(100, 1)">All 
-        <img ng-src="/images/light_on.png"/>
+      <button
+        ng-click="processForm(100, 1)"
+        class="btn btn-lg light-on"      
+        >All On
       </button>
-      <button ng-click="processForm(100, 0)">All
-        <img ng-src="/images/light_off.png"/>
+      <button
+        ng-click="processForm(100, 0)"
+        class="btn btn-lg btn-default"
+        >All Off
       </button>
     </h4>
   </div>
