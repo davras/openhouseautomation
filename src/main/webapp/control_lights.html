@@ -1,13 +1,12 @@
 <form>
 
-  <div ng-repeat="device in devices.data" ng-animate=" 'animate' ">
+  <div ng-repeat="device in devices.data">
     <h4>
       <button 
         type="button"
-        class="btn btn-lg btn-default"
+        class="btn btn-lg btn-default light-off"
         ng-show="device.actualState == 0"
         ng-disabled="device.desiredState != device.actualState"
-        class="light-off"
         ng-model="device.desiredState"
         ng-click="processForm(device.id, 1)"   
         >
@@ -18,14 +17,13 @@
         class="btn btn-lg light-on"
         ng-show="device.actualState == 1"
         ng-disabled="device.desiredState != device.actualState"
-        class="light-on"
         ng-model="device.desiredState"
         ng-click="processForm(device.id, 0)"
         >
         {{device.name}}
       </button>
       <label ng-hide="device.desiredState == device.actualState">
-        Working...
+        Setting to {{device.desiredState}}...
       </label>
     </h4>
   </div>

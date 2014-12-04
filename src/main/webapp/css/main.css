@@ -122,24 +122,3 @@ body {
   color: black;
   background-color: yellow;
 }
-
-.animate-enter,
-.animate-leave {
-  -webkit-transition: 0.5s linear all;
-  -moz-transition: 0.5s linear all;
-  -o-transition: 0.5s linear all;
-  transition: 0.5s linear all;
-}
-.animate-leave.animate-leave-active,
-.animate-enter {
-	opacity: 0;
-	width: 0px;
-	height: 0px;
-}
-
-.animate-enter.animate-enter-active, 
-.animate-leave {
-	opacity: 1;
-	width: 150px;
-	height: 30px;
-}
