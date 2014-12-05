@@ -4,6 +4,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Location;
@@ -25,6 +26,7 @@ public class OfyService {
     factory().register(Forecast.class);
     factory().register(Location.class);
     factory().register(LCDDisplay.class);
+    factory().register(DatastoreConfig.class);
   }
 
   public static Objectify ofy() {

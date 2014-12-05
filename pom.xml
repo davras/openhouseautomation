@@ -26,6 +26,14 @@
       <artifactId>httpclient</artifactId>
       <version>4.3.2</version>
     </dependency>
+    
+    <!-- necessary for appstats to work -->
+    <dependency> 
+      <groupId>com.google.appengine</groupId> 
+      <artifactId>appengine-api-labs</artifactId> 
+      <version>${appengine.target.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
 
     <dependency>
       <groupId>jstl</groupId>

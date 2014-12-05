@@ -1,5 +1,6 @@
 package com.openhouseautomation;
 
+import com.openhouseautomation.model.DatastoreConfig;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Date;
  */
 public class Convutils {
 
-  static long tzoffset = -8;
+  static long tzoffset = DatastoreConfig.getValueForKey("tzoffset", -8*60);
 
   /**
    * Converts seconds to a human-eyeball friendly format

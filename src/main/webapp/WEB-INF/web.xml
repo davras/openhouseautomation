@@ -185,6 +185,7 @@
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
             <url-pattern>/_ah/mail/*</url-pattern>
+            <url-pattern>/appstats/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
