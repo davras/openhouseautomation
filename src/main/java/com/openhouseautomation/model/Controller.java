@@ -1,5 +1,6 @@
 package com.openhouseautomation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
@@ -65,12 +66,12 @@ public class Controller {
   public String zone; //Zone where the device is located
   public Type type; //The type of device
   public String name; // The name of the device
-  public String desiredstate; //What the controller wants the state to be
-  public String actualstate; //The actual state of the device in real life
-  public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
-  public Date lastdesiredstatechange; // The Date the last time the desired state changed
-  public Date lastactualstatechange; // The Date the last time the desired state changed
-  public List validstates; // the list of valid states for the desired and actual states
+  @JsonIgnore public String desiredstate; //What the controller wants the state to be
+  @JsonIgnore public String actualstate; //The actual state of the device in real life
+  @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
+  @JsonIgnore public Date lastdesiredstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public Date lastactualstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public List validstates; // the list of valid states for the desired and actual states
 
   /**
    * Empty constructor for objectify.

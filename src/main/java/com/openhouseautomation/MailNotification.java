@@ -49,6 +49,7 @@ public class MailNotification extends HttpServlet {
       msg.setFrom(new InternetAddress("davras@gmail.com", "gAutoArd admin"));
       msg.addRecipient(Message.RecipientType.TO,
           new InternetAddress("davras@gmail.com", "David Ras (gautoard)"));
+      // TODO pull sender from DS as config item
       msg.setSubject("TestSubject");
       msg.setText(msgBody);
       Transport.send(msg);

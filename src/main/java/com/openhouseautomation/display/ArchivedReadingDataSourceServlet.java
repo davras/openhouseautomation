@@ -48,7 +48,7 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
       cd.add(new ColumnDescription("date", ValueType.DATETIME, "Date"));
       Sensor sensor =
           ofy().load().type(Sensor.class).id(Long.parseLong(request.getParameter("id"))).now();
-      log.log(Level.WARNING, "sensor={0}", sensor);
+      log.log(Level.INFO, "sensor={0}", sensor);
       if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
         cd.add(new ColumnDescription("high", ValueType.NUMBER, "High"));
         cd.add(new ColumnDescription("low", ValueType.NUMBER, "Low"));

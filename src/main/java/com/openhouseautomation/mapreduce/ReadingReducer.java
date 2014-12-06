@@ -24,7 +24,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
 
   @Override
   public void reduce(String key, ReducerInput<String> values) {
-    LOG.log(Level.WARNING, "reducing: {0}", key);
+    LOG.log(Level.INFO, "reducing: {0}", key);
     if (key.startsWith("TEMPERATURE") || key.startsWith("HUMIDITY")) {
       reduceHighLow(key, values);
     } else if (key.startsWith("LIGHT")) {

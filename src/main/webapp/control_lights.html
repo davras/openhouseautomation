@@ -1,87 +1,45 @@
-<!DOCTYPE HTML>
-<html lang="en" ng-app="gAutoArd" >
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="gAutoArd landing site">
+<form>
 
-    <title>Open House Automation</title>
-
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/angular.min.js"></script>
-    <script src="/js/angularbootstrap.min.js"></script>
-    <script type="text/javascript" src="/js/app.js"></script>    
-    <!-- Bootstrap core CSS -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- gAutoArd core CSS -->
-    <link href="/css/main.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Open House Automation</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            <li>Overview</li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/status.html">Status</a></li>
-            <li class="divider"></li>
-            <li class="nav-header active">Control</li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/scenes/">Scenes</a></li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/manage/">Manage</a></li>
-          </ul>
-        </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <div class="jumbotron">
-            <div><h2>
-                Control
-              </h2></div>
-          </div>
-          <form ng-submit="processForm()">
-            <div class="container-fluid list-group" ng-controller="DeviceController as devices">
-              <!-- Controller current settings go here -->
-              <ul class="list-group">
-                <li class="list-group-item" ng-repeat="device in devices.data">
-                  {{device.name}}:&nbsp;{{device.desiredstate}}
-                  <div class="btn-group" ng-repeat="state in device.validstates">
-                    <label class="btn btn-primary" ng-model="device.data[0].desiredstate"
-                           btn-radio="'{{state}}'" ng-disabled='device.actualstate == state'>{{state}}
-                    </label>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-  </body>
-</html>
+  <div ng-repeat="device in devices.data">
+    <h4>
+      <button 
+        type="button"
+        class="btn btn-lg btn-default light-off"
+        ng-show="device.actualState == 0"
+        ng-disabled="device.desiredState != device.actualState"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 1)"   
+        >
+        {{device.name}}
+      </button>
+      <button
+        type="button"
+        class="btn btn-lg light-on"
+        ng-show="device.actualState == 1"
+        ng-disabled="device.desiredState != device.actualState"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 0)"
+        >
+        {{device.name}}
+      </button>
+      <label ng-hide="device.desiredState == device.actualState">
+        Setting to {{device.desiredState}}...
+      </label>
+    </h4>
+  </div>
+  <hr>
+  <div class="btn-group">
+    <h4>
+      <button
+        ng-click="processForm(100, 1)"
+        class="btn btn-lg light-on"      
+        >All On
+      </button>
+      <button
+        ng-click="processForm(100, 0)"
+        class="btn btn-lg btn-default"
+        >All Off
+      </button>
+    </h4>
+  </div>
+</form>

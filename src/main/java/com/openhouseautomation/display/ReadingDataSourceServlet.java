@@ -106,7 +106,8 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
 
     try {
       for (int i = 0; i < positions; i++) {
-        cal.setTime(new Date(i * resolution * 60 * 1000 + cutoffdate.getTime() - (7 * 60 * 60 * 1000)));
+        cal.setTime(new Date(i * resolution * 60 * 1000 + cutoffdate.getTime() - (8 * 60 * 60 * 1000)));
+        // TODO fix this for a specific TZ offset in minutes that is pulled from DS config
         switch (sensors.length) {
           case 1:
             data.addRowFromValues(cal, new Double(readingsz[0][i]));
