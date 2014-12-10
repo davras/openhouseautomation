@@ -69,12 +69,20 @@ public class ControllerServlet extends HttpServlet {
       log.log(Level.INFO, "sent display:{0}", controller.toString());
     } else if (reqpath.startsWith("/initialize")) {
       List vs = new ArrayList();
-      vs.add("0");
-      vs.add("1");
-      vs.add("2");
-      vs.add("3");
-      vs.add("4");
-      vs.add("5");
+      // this should be some sort of ENUM, but it is controller-type specific
+      // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
+      if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
+        vs.add("0");
+        vs.add("1");
+        vs.add("2");
+        vs.add("3");
+        vs.add("4");
+        vs.add("5");
+      } else if (controller.type == Controller.Type.ALARM) {
+        vs.add("DISARM");
+        vs.add("HOME");
+        vs.add("AWAY");
+      }
       controller.setValidStates(vs);
       ofy().save().entity(controller);
       out.println(controller);
@@ -192,7 +200,7 @@ public class ControllerServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
-      String curstate = actualstate.substring(lightnum, lightnum+1);
+      String curstate = actualstate.substring(lightnum, lightnum + 1);
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }

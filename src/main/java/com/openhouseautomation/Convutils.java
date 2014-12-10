@@ -12,7 +12,7 @@ import java.util.Date;
  */
 public class Convutils {
 
-  static long tzoffset = DatastoreConfig.getValueForKey("tzoffset", -8*60);
+  static long tzoffset = 0L;
 
   /**
    * Converts seconds to a human-eyeball friendly format
@@ -62,7 +62,10 @@ public class Convutils {
    * @return Date as String corresponding to secs parameter since epoch
    */
   public static String timeToString(long secs) {
-    return new Date((secs + (tzoffset * 60 * 60)) * 1000L).toString();
+    if (tzoffset == 0) {
+      tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffset"));
+    }
+    return new Date((secs + (tzoffset * 60)) * 1000L).toString();
   }
 
   public static Date convertStringDate(String s) {

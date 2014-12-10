@@ -47,12 +47,4 @@ public class DatastoreConfig {
     }
     return dc.getValue();
   }
-  public static String getValueForKey(String key, String defaultval) {
-    DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
-    if (dc == null) {
-      log.log(Level.SEVERE, "Could not find config value for {0}, please add to the Datastore.", key);
-      return null;
-    }
-    return dc.getValue();
-  }
 }

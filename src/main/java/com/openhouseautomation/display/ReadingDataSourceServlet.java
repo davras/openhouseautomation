@@ -60,7 +60,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
 
     // use the sensors to get the readings
     Date cutoffdate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 7));
-    int resolution = 5; // graph resolution in minutes
+    int resolution = 2; // graph resolution in minutes
     int blocks = resolution * 60 * 1000; // blocks of time in graph
     int positions = 7 * 24 * 60 * 60 * 1000 / blocks;
     double[][] readingsz = new double[sensors.length][positions];
