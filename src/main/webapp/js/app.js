@@ -1,7 +1,8 @@
 (function() {
+  //lastmod 12/6/2014 2:11pm
   var app = angular.module('gAutoArd', ['ui.bootstrap']);
 
-  app.controller('SensorController', ['$http', function($http) {
+  app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
       sensors.data = [];
       $http.get('/status/display/sensors').success(function(data) {

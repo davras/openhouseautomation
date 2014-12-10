@@ -12,7 +12,8 @@ import java.util.Date;
  */
 public class Convutils {
 
-  static long tzoffset = DatastoreConfig.getValueForKey("tzoffset", -8*60);
+  //static long tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffset", -8*60));
+  static long tzoffset = -8*60;
 
   /**
    * Converts seconds to a human-eyeball friendly format
