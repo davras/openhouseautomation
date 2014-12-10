@@ -1,4 +1,5 @@
 (function() {
+  //lastmod 12/6/2014 2:11pm
   var app = angular.module('gAutoArd', ['ui.bootstrap']);
 
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {

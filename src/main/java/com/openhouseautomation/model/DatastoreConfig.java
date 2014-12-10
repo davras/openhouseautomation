@@ -42,7 +42,11 @@ public class DatastoreConfig {
   public static String getValueForKey(String key) {
     DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
     if (dc == null) {
-      log.log(Level.SEVERE, "Could not find config value for {0}, please add to the Datastore.", key);
+      log.log(Level.SEVERE, "Could not find config value for {0}, adding placeholder with zero.  Modify the value in the Datastore", key);
+      dc = new DatastoreConfig();
+      dc.setKey(key);
+      dc.setValue("0");
+      ofy().save().entity(dc);
       return null;
     }
     return dc.getValue();
