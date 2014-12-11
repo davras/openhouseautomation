@@ -36,7 +36,7 @@
       devices.lastcomm = 0;
       devices.fastpull = false;
 
-      console.log("loading data");
+      console.log("loading devices data");
 
       // load the tab types first
       $http.get('/status/devicetypelist').success(function(data) {
@@ -105,6 +105,29 @@
           // should check for a 200 return
         });
         devices.fastpull = true;
+      };
+    }]);
+  app.controller('SceneController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+      var scenes = this;
+      scenes.list = [];
+      console.log("loading scenes data");
+
+      $http.get('/status/sceneslist').success(function(data) {
+        scenes.list = data;
+        console.log("get scenes");
+      });
+      
+      $scope.processForm = function(id) {
+        $scope.id = id;
+        console.log("a scene button was pushed:" + id);
+        $http({
+          method: 'post',
+          url: '/status/scenes/update',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          data: {id: $scope.id}
+        }).success(function() {
+          // should check for a 200 return
+        });
       };
     }]);
 })();

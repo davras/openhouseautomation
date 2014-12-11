@@ -10,6 +10,7 @@ import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Location;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.ReadingHistory;
+import com.openhouseautomation.model.Scene;
 import com.openhouseautomation.model.Sensor;
 
 /**
@@ -27,6 +28,7 @@ public class OfyService {
     factory().register(Location.class);
     factory().register(LCDDisplay.class);
     factory().register(DatastoreConfig.class);
+    factory().register(Scene.class);
   }
 
   public static Objectify ofy() {
