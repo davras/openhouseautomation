@@ -5,6 +5,8 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.apphosting.api.ApiProxy;
+import com.googlecode.objectify.Work;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
@@ -186,7 +188,7 @@ public class ControllerServlet extends HttpServlet {
     return "Handles sensor reads and updates";
   }
 
-  private void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
     if (null == actualstate || "".equals(actualstate)) {

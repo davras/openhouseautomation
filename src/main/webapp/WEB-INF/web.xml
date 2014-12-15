@@ -185,6 +185,7 @@
     <servlet-mapping>
         <servlet-name>ListenServlet</servlet-name>
         <url-pattern>/listen</url-pattern>
+        <url-pattern>/listen/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
