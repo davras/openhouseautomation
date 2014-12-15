@@ -2,6 +2,7 @@ package com.openhouseautomation;
 
 import com.google.apphosting.api.ApiProxy;
 import com.googlecode.objectify.Work;
+import com.googlecode.objectify.cmd.QueryKeys;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 
@@ -37,7 +38,7 @@ public class ListenServlet extends HttpServlet {
    * @throws IOException if an I/O error occurs
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     try (PrintWriter out = response.getWriter()) {
       // this connection stays open until timeout or a value is sent back
       // (as the result of a change)
@@ -67,9 +68,9 @@ public class ListenServlet extends HttpServlet {
           }
         });
         if (c != null) {
-          foundachange=true;
+          foundachange = true;
           response.setStatus(HttpServletResponse.SC_OK);
-          out.write(c.getId() + "=" + c.getDesiredState() + ";" + c.getLastDesiredStateChange().getTime()/1000);
+          out.write(c.getId() + "=" + c.getDesiredState() + ";" + c.getLastDesiredStateChange().getTime() / 1000);
           out.flush();
           out.close();
           return;
@@ -124,7 +125,7 @@ public class ListenServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     processRequest(request, response);
   }
 
@@ -138,7 +139,57 @@ public class ListenServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    processRequest(request, response);
+          throws ServletException, IOException {
+// handles sensor updates
+    response.setContentType("text/plain;charset=UTF-8");
+    final String reqpath = request.getPathInfo();
+    log.log(Level.FINE, "request path:" + reqpath);
+
+    if (reqpath.startsWith("/lights")) {
+      doLights(request, response);
+      return;
+    }
+  }
+
+  public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    final String actualstate = request.getParameter("v");
+    if (null == actualstate || "".equals(actualstate)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
+      return;
+    }
+    // first, set the desired state
+    // if the actual setting is not the same as the desired setting,
+    // then someone has locally overridden the setting.
+    char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
+    QueryKeys<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").keys();
+    for (Controller c : lights) {
+      int lightnum = Integer.parseInt(c.getZone());
+      String curstate = actualstate.substring(lightnum, lightnum + 1);
+      if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
+        c.setDesiredState(curstate);
+      }
+      if (!c.getActualState().equals(curstate)) {
+        log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
+        c.setActualState(curstate);
+        // if desiredstatelastchange is more than 60 secs old, this is a local override.
+        if (c.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
+          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
+          c.setDesiredState(curstate);
+          c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        }
+      }
+      if (c.getDesiredState().equals("1")) {
+        toret[lightnum] = '1';
+      }
+      if (c.getDesiredState().equals("0")) {
+        toret[lightnum] = '0';
+      }
+    }
+    ofy().save().entities(lights);
+    log.log(Level.INFO, "returning " + new String(toret));
+    out.print(new String(toret));
+    out.flush();
+    return;
   }
 }
