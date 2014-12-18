@@ -199,19 +199,17 @@ public class ListenServlet extends HttpServlet {
     // now loop, waiting for a value to change
     final List<Controller> cinitial = lights;
     boolean foundachange = false;
-    long timeout = 5000L; // stop looping when this many ms are left in the request timer      
+    long timeout = 8000L; // stop looping when this many ms are left in the request timer
+    // TODO DatastoreConfig the timeout value.
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
       // each transaction gets a fresh, empty cache, so loads will load from datastore
-      log.log(Level.INFO, "new transaction");
       Controller c = ofy().transact(new Work<Controller>() {
         public Controller run() {
           for (Controller controllercompareinitial : cinitial) {
             Controller controllernew = ofy().cache(false).load().type(Controller.class).id(controllercompareinitial.getId()).now();
             String newval = controllernew.getDesiredState();
-            log.log(Level.INFO, "init={0} current={1}", new Object[]{controllercompareinitial.getDesiredState(),
-              newval});
             if (!controllercompareinitial.getDesiredState().equals(newval)) {
               // send the new value back & close
               return controllernew;
@@ -237,17 +235,18 @@ public class ListenServlet extends HttpServlet {
           return;
         }
         // TODO(dras): how to detect if client disconnected?
+        log.log(Level.INFO, "{0} seconds left in request timer", ApiProxy.getCurrentEnvironment().getRemainingMillis());
         try {
-          log.log(Level.INFO, "zzz...");
           Thread.sleep(2000);
         } catch (InterruptedException e) {
         }
       }
     }
-    // if you get to this point (timeout), the value didn't change
-    log.log(Level.INFO, "no change, returning 204");
-    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    // returns 204, no content, which tells the client to
-    // immediately reconnect
+    // if you get to this point (timeout), the value didn't change, 
+    // but send back desired anyway (less code for the arduino)
+    out.print(new String(toret));
+    out.flush();
+    out.close();
+    return;
   }
 }
