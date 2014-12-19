@@ -39,13 +39,13 @@ public class DatastoreConfig {
     this.value = value;
   }
 
-  public static String getValueForKey(String key) {
+  public static String getValueForKey(String key, String defaultstr) {
     DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
     if (dc == null) {
-      log.log(Level.SEVERE, "Could not find config value for {0}, adding placeholder with zero.  Modify the value in the Datastore", key);
+      log.log(Level.WARNING, "Could not find config value for {0}, adding placeholder with {1}.  Modify the value in the Datastore", new Object[]{key, defaultstr});
       dc = new DatastoreConfig();
       dc.setKey(key);
-      dc.setValue("0");
+      dc.setValue(defaultstr);
       ofy().save().entity(dc);
       return null;
     }

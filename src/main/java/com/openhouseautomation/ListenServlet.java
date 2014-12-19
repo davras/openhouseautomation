@@ -1,9 +1,9 @@
 package com.openhouseautomation;
 
 import com.google.apphosting.api.ApiProxy;
-import com.googlecode.objectify.Work;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,10 +27,30 @@ public class ListenServlet extends HttpServlet {
   // when the controller changes desiredState, this servlet detects the modification and sends
   // notification back to the client.  Connection is held open until timeout or data change.
   // pseudo Half-BOSH
+
+  /**
+   * architecture: Goal: read most recent Controller status from Memcache
+   * Verified that an Objectify.save() will update Memcache, now how to read
+   * from Memcache for the latest value?.
+   *
+   * Doesn't work: regular Objectify load()
+   * Why: Reads from session cache don't reflect other thread's modifications (doesn't normally read Memcache)
+   * 
+   * Doesn't work: Objectify load with cache(false)
+   * Why: Bypasses memcache and reads from Datastore
+   * 
+   * Doesn't work: Transactions in Objectify
+   * Why: Bypasses memcache and reads from Datastore
+   * Docs state: Starting a transaction creates a new Objectify instance with a fresh, empty session cache
+   * Which implies that memcache is used, but later docs state:
+   * (Transactional) Reads and writes bypass the memcache
+   * 
+   * Works!!!: Use Objectify.clear() between each read to clear the session cache, but still read from Memcache
+   */
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ListenServlet.class.getName());
-  long timeout = 5000L; // stop looping when this many ms are left in the request timer
-
+  long timeout = 8000L; // stop looping when this many ms are left in the request timer
+  long pollinterval = 1000L; // poll for changes once per second
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
    * methods.
@@ -41,38 +61,32 @@ public class ListenServlet extends HttpServlet {
    * @throws IOException if an I/O error occurs
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     try (PrintWriter out = response.getWriter()) {
       response.setContentType("text/plain");
 
       final ArrayList<Controller> cinitial = this.arrangeRequest(request);
       log.log(Level.INFO, "got {0} keys to listen for", cinitial.size());
       boolean foundachange = false;
+      timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
+      pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
+      Controller changedcontroller = null;
       while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
-        // each transaction gets a fresh, empty session cache, so loads will load from datastore
-        // don't use .cache(false) because it will bypass memcache and go to datastore
-        log.log(Level.INFO, "new transaction");
-        Controller c = ofy().transact(new Work<Controller>() {
-          public Controller run() {
-            for (Controller controllercompareinitial : cinitial) {
-              Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
-              String newval = controllernew.getDesiredState();
-              log.log(Level.INFO, "init={0} current={1}", new Object[]{controllercompareinitial.getDesiredState(),
-                newval});
-              if (!controllercompareinitial.getDesiredState().equals(newval)) {
-                // send the new value back & close
-                return controllernew;
-              }
-            }
-            return null;
+        ofy().clear(); // clear the session cache, not the memcache
+        log.log(Level.INFO, "cleared cache");
+        for (Controller controllercompareinitial : cinitial) {
+          Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+          String newval = controllernew.getDesiredState();
+          if (!controllercompareinitial.getDesiredState().equals(newval)) {
+            foundachange = true;
+            changedcontroller = controllernew;
           }
-        });
-        if (c != null) {
-          foundachange = true;
+        }
+        if (foundachange) {
           response.setStatus(HttpServletResponse.SC_OK);
-          out.write(c.getId() + "=" + c.getDesiredState() + ";" + c.getLastDesiredStateChange().getTime() / 1000);
+          out.write(changedcontroller.getId() + "=" + changedcontroller.getDesiredState() + ";" + changedcontroller.getLastDesiredStateChange().getTime() / 1000);
           out.flush();
           out.close();
           return;
@@ -83,7 +97,7 @@ public class ListenServlet extends HttpServlet {
         // TODO(dras): how to detect if client disconnected?
         try {
           log.log(Level.INFO, "zzz...");
-          Thread.sleep(2000);
+          Thread.sleep(pollinterval);
         } catch (InterruptedException e) {
         }
       }
@@ -95,7 +109,8 @@ public class ListenServlet extends HttpServlet {
   }
 
   /**
-   * Transforms the HTTP Request into a list of Controller objects loaded from Datastore
+   * Transforms the HTTP Request into a list of Controller objects loaded from
+   * Datastore
    *
    * @param req The servlet request with controller ids as parameters
    * @return An ArrayList of Controllers parsed from the HTTP Request
@@ -127,7 +142,7 @@ public class ListenServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     processRequest(request, response);
   }
 
@@ -141,7 +156,7 @@ public class ListenServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
@@ -154,6 +169,8 @@ public class ListenServlet extends HttpServlet {
   }
 
   private void doLightsListen(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
+    pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
     if (null == actualstate || "".equals(actualstate)) {
@@ -199,49 +216,39 @@ public class ListenServlet extends HttpServlet {
       return;
     }
     // now loop, waiting for a value to change
-    final List<Controller> cinitial = lights;
+    List<Controller> cinitial = lights;
     boolean foundachange = false;
-    long timeout = 8000L; // stop looping when this many ms are left in the request timer
-    // TODO DatastoreConfig the timeout value.
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
-      // each transaction gets a fresh, empty cache, so loads will load from datastore
-      Controller c = ofy().transact(new Work<Controller>() {
-        public Controller run() {
-          for (Controller controllercompareinitial : cinitial) {
-            Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
-            String newval = controllernew.getDesiredState();
-            if (!controllercompareinitial.getDesiredState().equals(newval)) {
-              // send the new value back & close
-              return controllernew;
-            }
-          }
-          return null;
+      ofy().clear(); // clear the session cache
+      for (Controller controllercompareinitial : cinitial) {
+        Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+        String newval = controllernew.getDesiredState();
+        if (!controllercompareinitial.getDesiredState().equals(newval)) {
+          foundachange = true;
+          int index = -1;
+          index = Integer.parseInt(controllernew.getZone());
+          String desiredstate = controllernew.getDesiredState();
+          toret[index] = newval.charAt(0);
         }
-      });
-      if (c != null) {
-        foundachange = true;
+      }
+      if (foundachange) {
         response.setStatus(HttpServletResponse.SC_OK);
-        int index = -1;
-        index = Integer.parseInt(c.getZone());
-        String desiredstate = c.getDesiredState();
-        if (index != -1 && desiredstate != null && !"".equals(desiredstate) && desiredstate.length() == 1) {
-          toret[index] = desiredstate.charAt(0);
-          out.print(new String(toret));
-          out.flush();
-          out.close();
-          return;
-        }
-        if (out.checkError()) {
-          return;
-        }
-        // TODO(dras): how to detect if client disconnected?
-        log.log(Level.INFO, "{0} seconds left in request timer", ApiProxy.getCurrentEnvironment().getRemainingMillis());
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-        }
+        out.print(new String(toret));
+        out.flush();
+        out.close();
+        return;
+      }
+      if (out.checkError()) {
+        return;
+      }
+
+      // TODO(dras): how to detect if client disconnected?
+      //log.log(Level.INFO, "{0} seconds left in request timer", ApiProxy.getCurrentEnvironment().getRemainingMillis());
+      try {
+        Thread.sleep(pollinterval);
+      } catch (InterruptedException e) {
       }
     }
     // if you get to this point (timeout), the value didn't change, 
