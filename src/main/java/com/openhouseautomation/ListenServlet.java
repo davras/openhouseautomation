@@ -50,12 +50,13 @@ public class ListenServlet extends HttpServlet {
       while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
-        // each transaction gets a fresh, empty cache, so loads will load from datastore
+        // each transaction gets a fresh, empty session cache, so loads will load from datastore
+        // don't use .cache(false) because it will bypass memcache and go to datastore
         log.log(Level.INFO, "new transaction");
         Controller c = ofy().transact(new Work<Controller>() {
           public Controller run() {
             for (Controller controllercompareinitial : cinitial) {
-              Controller controllernew = ofy().cache(false).load().type(Controller.class).id(controllercompareinitial.getId()).now();
+              Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
               String newval = controllernew.getDesiredState();
               log.log(Level.INFO, "init={0} current={1}", new Object[]{controllercompareinitial.getDesiredState(),
                 newval});
@@ -208,7 +209,7 @@ public class ListenServlet extends HttpServlet {
       Controller c = ofy().transact(new Work<Controller>() {
         public Controller run() {
           for (Controller controllercompareinitial : cinitial) {
-            Controller controllernew = ofy().cache(false).load().type(Controller.class).id(controllercompareinitial.getId()).now();
+            Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
             String newval = controllernew.getDesiredState();
             if (!controllercompareinitial.getDesiredState().equals(newval)) {
               // send the new value back & close
