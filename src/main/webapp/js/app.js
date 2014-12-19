@@ -1,7 +1,27 @@
 (function() {
   //lastmod 12/6/2014 2:11pm
   var app = angular.module('gAutoArd', ['ui.bootstrap']);
-
+  /**
+   * @const
+   */
+  SENSOR_DATA_URL = "/status/display/sensors";
+  /**
+   * @const
+   */
+  FORECAST_DATA_URL = "/status/display/forecast";
+  /**
+   * @const
+   */
+  DEVICE_TYPE_LIST_URL = "/status/devicetypelist";
+  /**
+   * @const
+   */
+  DEVICE_TYPESPECIFIC_LIST_URL = "/status/display/devices?type=";
+  /**
+   * @const
+   */
+  SCENE_LIST_URL = "/status/sceneslist";
+  
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
       sensors.data = [];
@@ -11,7 +31,7 @@
       });
       var sensorPromise = $interval(function() {
         console.log("refreshing sensors data");
-        $http.get('/status/display/sensors').success(function(data) {
+        $http.get(SENSOR_DATA_URL).success(function(data) {
           sensors.data = data;
         });
       }, 60000);
@@ -23,7 +43,7 @@
   app.controller('ForecastController', ['$http', function($http) {
       var forecasts = this;
       forecasts.data = [];
-      $http.get('/status/display/forecast').success(function(data) {
+      $http.get(FORECAST_DATA_URL).success(function(data) {
         forecasts.data = data;
       });
     }]);
@@ -39,7 +59,7 @@
       console.log("loading devices data");
 
       // load the tab types first
-      $http.get('/status/devicetypelist').success(function(data) {
+      $http.get(DEVICE_TYPE_LIST_URL).success(function(data) {
         devices.list = data;
         console.log("get device types");
       });
@@ -48,7 +68,7 @@
         devices.currenttab = newval; // save the new tab
         console.log("tab set to " + newval);
         // immediately load the controller data for this device
-        $http.get('/status/display/devices?type=' + devices.currenttab).success(function(data) {
+        $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).success(function(data) {
           devices.data = data;  // now filled with new tab's data
         });
       };
@@ -62,7 +82,7 @@
       var devicePromise = $interval(function() {
         //console.log(new Date().getTime() + ">" + (devices.lastcomm + 15000));
         if (devices.fastpull || (new Date().getTime() > (devices.lastcomm + 15000))) {
-          $http.get('/status/display/devices?type=' + devices.currenttab).success(function(data) {
+          $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).success(function(data) {
             devices.data = data;
             devices.lastcomm = new Date().getTime();
             var len = devices.data.length;
@@ -112,7 +132,7 @@
       scenes.list = [];
       console.log("loading scenes data");
 
-      $http.get('/status/sceneslist').success(function(data) {
+      $http.get(SCENE_LIST_URL).success(function(data) {
         scenes.list = data;
         console.log("get scenes");
       });
