@@ -9,14 +9,14 @@
         console.log("loading sensor data");
         sensors.data = data;
       });
-      var sensorpromise = $interval(function() {
+      var sensorPromise = $interval(function() {
         console.log("refreshing sensors data");
         $http.get('/status/display/sensors').success(function(data) {
           sensors.data = data;
         });
       }, 60000);
       $scope.$on('$destroy', function() {
-        $interval.cancel(sensorpromise);
+        $interval.cancel(sensorPromise);
       });
     }]);
 
@@ -59,7 +59,7 @@
       this.getLink = function() {
         return "/control_" + devices.currenttab.toLowerCase() + ".html";
       };
-      var devicepromise = $interval(function() {
+      var devicePromise = $interval(function() {
         //console.log(new Date().getTime() + ">" + (devices.lastcomm + 15000));
         if (devices.fastpull || (new Date().getTime() > (devices.lastcomm + 15000))) {
           $http.get('/status/display/devices?type=' + devices.currenttab).success(function(data) {
@@ -76,7 +76,7 @@
         }
       }, 1000);
       $scope.$on('$destroy', function() {
-        $interval.cancel(devicepromise);
+        $interval.cancel(devicePromise);
       });
 
       $scope.processForm = function(id, state) {

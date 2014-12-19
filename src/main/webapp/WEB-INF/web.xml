@@ -9,6 +9,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!--
+    Appstats does not work with ListenServlet.  The 100 reads per request is too large for Memcache
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>

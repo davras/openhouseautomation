@@ -23,7 +23,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author dras
  */
 public class ListenServlet extends HttpServlet {
-
+  // this servlet handles incoming requests to wait for a value change.
+  // when the controller changes desiredState, this servlet detects the modification and sends
+  // notification back to the client.  Connection is held open until timeout or data change.
+  // pseudo Half-BOSH
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ListenServlet.class.getName());
   long timeout = 5000L; // stop looping when this many ms are left in the request timer
@@ -40,8 +43,6 @@ public class ListenServlet extends HttpServlet {
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try (PrintWriter out = response.getWriter()) {
-      // this connection stays open until timeout or a value is sent back
-      // (as the result of a change)
       response.setContentType("text/plain");
 
       final ArrayList<Controller> cinitial = this.arrangeRequest(request);
@@ -94,10 +95,10 @@ public class ListenServlet extends HttpServlet {
   }
 
   /**
-   * Transforms the HTTP Request into a set of EventBeans
+   * Transforms the HTTP Request into a list of Controller objects loaded from Datastore
    *
-   * @param req The servlet request
-   * @return An ArrayList of EventBeans parsed from the HTTP Request
+   * @param req The servlet request with controller ids as parameters
+   * @return An ArrayList of Controllers parsed from the HTTP Request
    * @throws IOException
    */
   public ArrayList<Controller> arrangeRequest(HttpServletRequest req) throws IOException {
@@ -107,7 +108,7 @@ public class ListenServlet extends HttpServlet {
       String controllerid = paramNames.nextElement();
       log.log(Level.INFO, "got an id:{0}", controllerid);
       if ("auth".equals(controllerid)) {
-        continue; // the auth isn't a bean
+        continue; // the auth isn't a controller
       }
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       ebs.add(controller);
