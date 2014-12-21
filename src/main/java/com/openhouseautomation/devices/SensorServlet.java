@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,7 +19,6 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
-import java.util.Date;
 
 /**
  *
@@ -56,8 +56,8 @@ public class SensorServlet extends HttpServlet {
       // load the sensor entity
       Sensor sensor = ofy().load().type(Sensor.class).id(Long.parseLong(sensorid)).now();
       if (sensor != null) {
-        out.println(sensor.getId() + "=" + sensor.getLastReading() + ";" + sensor.getLastReadingDate().getTime() / 1000);
-        log.log(Level.INFO, "sent:{0}={1};{2}", new Object[]{sensor.getId(), sensor.getLastReading(), sensor.getLastReadingDate().getTime() / 1000});
+        out.println(sensor.getId() + "=" + sensor.getLastReading() + ";" + sensor.getLastReadingDate().getMillis() / 1000);
+        log.log(Level.INFO, "sent:{0}={1};{2}", new Object[]{sensor.getId(), sensor.getLastReading(), sensor.getLastReadingDate().getMillis() / 1000});
       } else {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Sensor not found");
       }
@@ -98,13 +98,13 @@ public class SensorServlet extends HttpServlet {
         Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
         Sensor sensor = ofy().load().now(sk);
         // set the value
-        sensor.setLastReadingDate(new Date());
+        sensor.setLastReadingDate(new DateTime());
         sensor.setLastReading(sensorval);
         ofy().save().entity(sensor);
         log.log(Level.INFO, "saved sensor:{0}", sensor);
         Reading reading = new Reading();
         reading.setSensor(sk);
-        reading.setTimestamp(new Date());
+        reading.setTimestamp(new DateTime());
         reading.setValue(sensorval);
         ofy().save().entity(reading);
         log.log(Level.INFO, "logged reading:{0}", reading);

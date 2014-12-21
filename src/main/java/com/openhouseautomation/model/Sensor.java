@@ -2,6 +2,7 @@ package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
@@ -58,19 +59,19 @@ public class Sensor {
   String name;  // "Downstairs Temperature", "Wind Speed"
   String unit; // F, C, millibars, etc.
   String lastReading; // "89" for 89F
-  @JsonIgnore Date lastReadingDate; // Date lastReading was last updated
+  @JsonIgnore DateTime lastReadingDate; // Date lastReading was last updated
   @JsonIgnore String secret; // the password for this sensor, used in SipHash
   Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
   @Ignore String humanage;
   @OnLoad void updateAge() {
-    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getTime()/1000);
+    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis()/1000);
   }
 
   @Ignore boolean expired;
   @OnLoad void updateExpired() {
     if (expirationtime != null) {
-      this.expired = new Date().getTime() > (lastReadingDate.getTime() + expirationtime * 1000);
+      this.expired = new DateTime().getMillis() > (lastReadingDate.getMillis() + expirationtime * 1000);
     } else {
       this.expired = false;
     }
@@ -262,7 +263,7 @@ public class Sensor {
    * @return Date the last time this sensor was updated with a reading
    */
   @JsonIgnore
-  public Date getLastReadingDate() {
+  public DateTime getLastReadingDate() {
     return lastReadingDate;
   }
 
@@ -271,7 +272,7 @@ public class Sensor {
    *
    * @param lastReadingDate the lastReadingDate to set
    */
-  public void setLastReadingDate(Date lastReadingDate) {
+  public void setLastReadingDate(DateTime lastReadingDate) {
     this.lastReadingDate = lastReadingDate;
   }
 
@@ -359,9 +360,5 @@ public class Sensor {
         .add("lastReadingDate", lastReadingDate)
         .toString();
   }
-  /*public String toJSONString() {
-    String toret = "{\"name\":\"" + getName() + "\",\"lastreading\":\"" + getLastReading() + "\",\"unit\":\"" + getUnit() + "\",\"age\":";
-    toret += "\"" + Convutils.timeAgoToString(getLastReadingDate().getTime()/1000) + "\"}";
-    return toret;
-  } */
+
 }

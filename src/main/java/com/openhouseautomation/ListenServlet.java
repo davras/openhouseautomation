@@ -86,7 +86,7 @@ public class ListenServlet extends HttpServlet {
         }
         if (foundachange) {
           response.setStatus(HttpServletResponse.SC_OK);
-          out.write(changedcontroller.getId() + "=" + changedcontroller.getDesiredState() + ";" + changedcontroller.getLastDesiredStateChange().getTime() / 1000);
+          out.write(changedcontroller.getId() + "=" + changedcontroller.getDesiredState() + ";" + changedcontroller.getLastDesiredStateChange().getMillis() / 1000);
           out.flush();
           out.close();
           return;
@@ -194,7 +194,7 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
           log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);

@@ -1,5 +1,6 @@
 package com.openhouseautomation.model;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
@@ -7,7 +8,6 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
-import java.util.Date;
 
 /**
  * A class representing a reading from a sensor device.
@@ -21,7 +21,7 @@ public class Reading {
   @Parent Key<Sensor> sensor;
   @Id Long id;
   String value;
-  Date timestamp;
+  DateTime timestamp;
   
   /**
    * Empty constructor for objectify.
@@ -79,7 +79,7 @@ public class Reading {
   /**
    * Returns the {@code timestamp} of the {@link Reading}.
    */
-  public Date getTimestamp() {
+  public DateTime getTimestamp() {
     return timestamp;
   }
   
@@ -88,7 +88,7 @@ public class Reading {
    *
    * @param id the id to set
    */
-  public void setTimestamp(Date timestamp) {
+  public void setTimestamp(DateTime timestamp) {
     this.timestamp = timestamp;
   }
 

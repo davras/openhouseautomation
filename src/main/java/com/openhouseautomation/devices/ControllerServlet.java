@@ -63,8 +63,8 @@ public class ControllerServlet extends HttpServlet {
     }
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
-      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getTime() / 1000);
-      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getTime() / 1000});
+      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
+      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getMillis() / 1000});
     } else if (reqpath.startsWith("/display")) {
       // show the actual state
       out.println(controller.toString());
@@ -139,7 +139,7 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
         controller.setActualState(controllervalue);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (controller.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
+        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
           log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
@@ -210,7 +210,7 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
           log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);

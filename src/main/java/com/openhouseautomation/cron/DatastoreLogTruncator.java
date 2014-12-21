@@ -1,10 +1,13 @@
 package com.openhouseautomation.cron;
 
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.google.appengine.repackaged.org.joda.time.Period;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
+import com.openhouseautomation.model.DatastoreConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,17 +43,11 @@ public class DatastoreLogTruncator extends HttpServlet {
 
     response.setContentType("text/html;charset=UTF-8");
     PrintWriter out = response.getWriter();
-    long minage = 6;
+    int minage = Integer.parseInt(DatastoreConfig.getValueForKey("deletereadingsolderthandays", "6"));
     try {
-      minage = Long.parseLong(getServletConfig().getInitParameter("age"));
-    } catch (Exception e) {
-      // TODO(dras): If no action is required, add justification in a comment.
-    }
-    try {
-      Date cutoffdate = new Date(System.currentTimeMillis() - (minage * 86400000));
-
-      log.log(Level.INFO, "aggregating keys older than {0}", cutoffdate);
-
+      DateTime curdate = new DateTime();
+      DateTime cutoffdate = curdate.minus(Period.days(minage));
+      log.log(Level.INFO, "deleting keys older than {0}", cutoffdate);
       Iterable<Key<Reading>> oldreadings =
           ofy().load().type(Reading.class).filter("timestamp <", cutoffdate).keys();
       ofy().delete().keys(oldreadings);

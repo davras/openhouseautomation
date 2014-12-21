@@ -1,8 +1,12 @@
 package com.openhouseautomation;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.google.appengine.repackaged.org.joda.time.DateTimeZone;
+import com.google.appengine.repackaged.org.joda.time.Instant;
+import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormat;
+import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormatter;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -12,7 +16,7 @@ import java.util.Date;
  */
 public class Convutils {
 
-  static long tzoffset = 0L;
+  static String timezone="UTC";
 
   /**
    * Converts seconds to a human-eyeball friendly format
@@ -52,30 +56,27 @@ public class Convutils {
    * @return String
    */
   public static String currentDate() {
-    return new Date().toString();
+    return Instant.now().toString();
   }
 
   /**
-   * Turns seconds-since-epoch into Date String
+   * Turns seconds-since-epoch into a Joda DateTime String
    *
    * @param secs since epoch
    * @return Date as String corresponding to secs parameter since epoch
    */
   public static String timeToString(long secs) {
-    if (tzoffset == 0) {
-      tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffsetmins", "-420"));
+    if ("UTC".equals(timezone)) {
+      timezone = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
     }
-    return new Date((secs + (tzoffset * 60)) * 1000L).toString();
+    DateTimeZone zone = DateTimeZone.forID(timezone);
+    DateTime dt = new DateTime(secs*1000L,zone);
+    return dt.toString();
   }
 
-  public static Date convertStringDate(String s) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    Date d;
-    try {
-      d = dateFormat.parse(s);
-    } catch (ParseException pe) {
-      return new Date(0L);
-    }
+  public static DateTime convertStringDate(String s) {
+    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd"); 
+    DateTime d = fmt.parseDateTime(s);
     return d;
   }
 }

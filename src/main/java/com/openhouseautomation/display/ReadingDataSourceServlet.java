@@ -1,5 +1,8 @@
 package com.openhouseautomation.display;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.google.appengine.repackaged.org.joda.time.DateTimeZone;
+import com.google.appengine.repackaged.org.joda.time.Period;
 import com.google.visualization.datasource.DataSourceServlet;
 import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
@@ -7,15 +10,16 @@ import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 import com.googlecode.objectify.NotFoundException;
-import com.ibm.icu.util.GregorianCalendar;
-import com.ibm.icu.util.TimeZone;
+// because import java.util.GregorianCalendar gives a type mismatch (wtf?)
+import java.util.GregorianCalendar;
+//import com.ibm.icu.util.GregorianCalendar;
+//import com.ibm.icu.util.TimeZone;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.Sensor;
-
 import java.util.ArrayList;
-// because import java.util.GregorianCalendar gives a type mismatch (wtf?)
-import java.util.Date;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +63,8 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     data.addColumns(cd);
 
     // use the sensors to get the readings
-    Date cutoffdate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 7));
+    int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
+    DateTime cutoffdate = new DateTime().minus(Period.days(shortchartdays));
     int resolution = 5; // graph resolution in minutes
     int blocks = resolution * 60 * 1000; // blocks of time in graph
     int positions = 7 * 24 * 60 * 60 * 1000 / blocks;
@@ -67,7 +72,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     for (int i = 0; i < sensors.length; i++) {
       List<Reading> readings = ofy().load().type(Reading.class).ancestor(sensors[i]).filter("timestamp >", cutoffdate).chunkAll().list();
       for (Reading reading : readings) {
-        int blocknumber = (int) ((reading.getTimestamp().getTime() - cutoffdate.getTime()) / blocks);
+        int blocknumber = (int) ((reading.getTimestamp().getMillis() - cutoffdate.getMillis()) / blocks);
         readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
       }
     }
@@ -99,14 +104,19 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     }
 
     // now fill the data table
-    GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-    // without a timezone of GMT, you will get:
-    // can't create DateTimeValue from GregorianCalendar that is not GMT.
-    // and if you want your graph in a TZ other than GMT? Nope.
-
     try {
       for (int i = 0; i < positions; i++) {
-        cal.setTime(new Date(i * resolution * 60 * 1000 + cutoffdate.getTime() - (8 * 60 * 60 * 1000)));
+        String szonelocal = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
+        DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
+        DateTimeZone dtzonelocal = DateTimeZone.forID(szonelocal);
+        long tzoffset = dtzonelocal.getOffsetFromLocal(cutoffdate.getMillis() + i * resolution * 60 * 1000);
+        long offsettime = cutoffdate.getMillis() + i * resolution * 60 * 1000 - tzoffset;
+        DateTime dt = new DateTime(offsettime, dtzonedisp);
+        // without a timezone of GMT, you will get:
+        // can't create DateTimeValue from GregorianCalendar that is not GMT.
+        // and if you want your graph in a TZ other than GMT? Nope.
+
+        GregorianCalendar cal = dt.toGregorianCalendar();
         // TODO fix this for a specific TZ offset in minutes that is pulled from DS config
         switch (sensors.length) {
           case 1:

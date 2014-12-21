@@ -5,12 +5,12 @@
  */
 package com.openhouseautomation.model;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import java.util.Date;
 
 /**
  *
@@ -26,7 +26,7 @@ public class Forecast {
     String forecasthigh;
     String forecastlow;
     String forecastpop;
-    Date lastupdate;
+    DateTime lastupdate;
     
     public Forecast() {
     }
@@ -63,11 +63,11 @@ public class Forecast {
         return zipcode;
     }
 
-    public void setLastUpdate(Date lastupdate) {
+    public void setLastUpdate(DateTime lastupdate) {
         this.lastupdate = lastupdate;
     }
     
-    public Date getLastUpdate() {
+    public DateTime getLastUpdate() {
         return lastupdate;
     }
     
