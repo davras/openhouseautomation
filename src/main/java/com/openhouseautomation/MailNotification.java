@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation;
 
+import com.google.apphosting.api.ApiProxy;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -45,8 +46,8 @@ public class MailNotification extends HttpServlet {
       Session session = Session.getDefaultInstance(props, null);
       String msgBody = "This is a test message.";
       Message msg = new MimeMessage(session);
-      //msg.setFrom(new InternetAddress("admin@gautoard.appspot.com", "gAutoArd admin"));
-      msg.setFrom(new InternetAddress("davras@gmail.com", "gAutoArd admin"));
+      msg.setFrom(new InternetAddress("notification@" + ApiProxy.getCurrentEnvironment().getAppId() + ".appspotmail.com", "OpenHouseAutomation Notification"));
+      //msg.setFrom(new InternetAddress("davras@gmail.com", "gAutoArd admin"));
       msg.addRecipient(Message.RecipientType.TO,
           new InternetAddress("davras@gmail.com", "David Ras (gautoard)"));
       // TODO pull sender from DS as config item

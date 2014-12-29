@@ -63,7 +63,7 @@ public class Convutils {
    */
   public static String timeToString(long secs) {
     if (tzoffset == 0) {
-      tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffsetinmins", "-480"));
+      tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffsetmins", "-420"));
     }
     return new Date((secs + (tzoffset * 60)) * 1000L).toString();
   }

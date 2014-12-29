@@ -9,6 +9,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!--
+    Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
+        -->
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -21,7 +23,7 @@
         <filter-name>appstats</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    -->
+
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
         <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
@@ -59,20 +61,6 @@
         <servlet-name>TestServlet</servlet-name>
         <servlet-class>com.openhouseautomation.TestServlet</servlet-class>
     </servlet>
-    <!-- <servlet>
-    <servlet-name>jersey</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>com.openhouseautomation.display</param-value>
-    </init-param>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>com.openhouseautomation.display.DisplaySourceServlet</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  -->
     <servlet>
         <servlet-name>DisplaySourceServlet</servlet-name>
         <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
