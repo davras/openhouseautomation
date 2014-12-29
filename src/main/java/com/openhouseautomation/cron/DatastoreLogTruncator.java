@@ -5,6 +5,7 @@ import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
+import com.openhouseautomation.model.DatastoreConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,12 +41,7 @@ public class DatastoreLogTruncator extends HttpServlet {
 
     response.setContentType("text/html;charset=UTF-8");
     PrintWriter out = response.getWriter();
-    long minage = 6;
-    try {
-      minage = Long.parseLong(getServletConfig().getInitParameter("age"));
-    } catch (Exception e) {
-      // TODO(dras): If no action is required, add justification in a comment.
-    }
+    long minage = Long.parseLong(DatastoreConfig.getValueForKey("dsminagedays", "6"));
     try {
       Date cutoffdate = new Date(System.currentTimeMillis() - (minage * 86400000));
 

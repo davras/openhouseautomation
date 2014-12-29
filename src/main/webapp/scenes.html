@@ -64,18 +64,12 @@
             <ul class="nav nav-pills">
               <li role="presentation"
                   ng-repeat="scene in scenes.list"
-                  ng-class="{ active: scenes.isSet(scene.link) }"
-                  ng-show="devicetype.display">
-                <a href ng-click="devices.setTab(devicetype.link)">{{devicetype.name}}</a>
+                  ng-class="{ active: scenes.isSet(scene.id) }"
+                  >
+                <a href ng-click="processForm(scene.id)">{{scene.name}}</a>
               </li>
             </ul>
           </section>
-          <hr>
-          <div ng-include="devices.getLink()">
-            <section>
-              {{ devicetype.link}} and {{ devicetype.ordinal}}
-            </section>
-          </div>
         </div>
       </div>
     </div>

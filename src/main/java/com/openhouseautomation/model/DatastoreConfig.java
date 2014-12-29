@@ -18,7 +18,7 @@ public class DatastoreConfig {
 
   @Ignore
   private static final Logger log = Logger.getLogger(DatastoreConfig.class.getName());
-  
+
   @Id
   String key;
   String value;
@@ -39,15 +39,15 @@ public class DatastoreConfig {
     this.value = value;
   }
 
-  public static String getValueForKey(String key) {
+  public static String getValueForKey(String key, String defaultstr) {
     DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
     if (dc == null) {
-      log.log(Level.SEVERE, "Could not find config value for {0}, adding placeholder with zero.  Modify the value in the Datastore", key);
+      log.log(Level.SEVERE, "Could not find config value for {0}, adding placeholder with \"X\".  Modify the value in the Datastore", key);
       dc = new DatastoreConfig();
       dc.setKey(key);
-      dc.setValue("0");
+      dc.setValue(defaultstr);
       ofy().save().entity(dc);
-      return null;
+      return defaultstr;
     }
     return dc.getValue();
   }

@@ -4,6 +4,7 @@ import static com.openhouseautomation.OfyService.ofy;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.mapreduce.Mapper;
+import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.Sensor;
 
@@ -46,7 +47,8 @@ public class ReadingMapper extends Mapper<Entity, String, String> {
   }
 
   public synchronized String getDateString(Date d) {
-    Date d2 = new Date(d.getTime()-7*60*60*1000);
+    long tzoffset = Long.parseLong(DatastoreConfig.getValueForKey("tzoffsetinmins", "-480"));
+    Date d2 = new Date(d.getTime()+tzoffset*60*1000);
     // entityday should be formatted as yyyymmdd, like 20140214 for feb 14, 2014
     DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
     return formatter.format(d2);

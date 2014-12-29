@@ -4,6 +4,7 @@ import com.google.apphosting.api.ApiProxy;
 import com.googlecode.objectify.Work;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +27,7 @@ public class ListenServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ListenServlet.class.getName());
-  long timeout = 5000L; // stop looping when this many ms are left in the request timer
+  long timeout = 8000L; // stop looping when this many ms are left in the request timer
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -47,6 +48,7 @@ public class ListenServlet extends HttpServlet {
       final ArrayList<Controller> cinitial = this.arrangeRequest(request);
       log.log(Level.INFO, "got {0} keys to listen for", cinitial.size());
       boolean foundachange = false;
+      timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
       while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
@@ -199,7 +201,7 @@ public class ListenServlet extends HttpServlet {
     // now loop, waiting for a value to change
     final List<Controller> cinitial = lights;
     boolean foundachange = false;
-    long timeout = 8000L; // stop looping when this many ms are left in the request timer
+    timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
     // TODO DatastoreConfig the timeout value.
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?

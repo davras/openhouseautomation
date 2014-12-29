@@ -110,6 +110,7 @@
   app.controller('SceneController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var scenes = this;
       scenes.list = [];
+      scenes.active = 0;
       console.log("loading scenes data");
 
       $http.get('/status/sceneslist').success(function(data) {
@@ -119,6 +120,7 @@
       
       $scope.processForm = function(id) {
         $scope.id = id;
+        scenes.active = id;
         console.log("a scene button was pushed:" + id);
         $http({
           method: 'post',
@@ -128,6 +130,9 @@
         }).success(function() {
           // should check for a 200 return
         });
+      };
+      $scope.isSet = function(id) {
+        return (scenes.active == id);
       };
     }]);
 })();
