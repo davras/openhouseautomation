@@ -50,7 +50,7 @@ public class ListenServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ListenServlet.class.getName());
   long timeout = 8000L; // stop looping when this many ms are left in the request timer
-  long pollinterval = 2500L; // poll for changes once per second
+  long pollinterval = 1000L; // poll for changes once per second
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
    * methods.
@@ -218,7 +218,6 @@ public class ListenServlet extends HttpServlet {
     // now loop, waiting for a value to change
     List<Controller> cinitial = lights;
     boolean foundachange = false;
-    timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
