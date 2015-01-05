@@ -1,13 +1,11 @@
 package com.openhouseautomation;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.appengine.repackaged.org.joda.time.DateTimeZone;
-import com.google.appengine.repackaged.org.joda.time.Instant;
-import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormat;
-import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import com.openhouseautomation.model.DatastoreConfig;
-import java.text.ParseException;
-import java.util.Date;
 
 /**
  * A set of conversion utilities for convenience

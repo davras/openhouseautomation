@@ -3,10 +3,10 @@ package com.openhouseautomation.mapreduce;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.appengine.repackaged.org.joda.time.DateTimeZone;
-import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormat;
-import com.google.appengine.repackaged.org.joda.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import com.google.appengine.tools.mapreduce.Mapper;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Reading;

@@ -5,7 +5,7 @@
  */
 package com.openhouseautomation.devices;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
+import org.joda.time.DateTime;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,7 +39,7 @@ public class SensorServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     // handles sensor reads
     response.setContentType("text/plain;charset=UTF-8");
     try (PrintWriter out = response.getWriter()) {
@@ -74,24 +74,26 @@ public class SensorServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
     String auth = request.getParameter("auth");
     final String sensorid = request.getParameter("k");
     final String sensorval = request.getParameter("v");
-    // TODO cleanup the anonymous inner class
-    log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
-    if (!SipHashHelper.validateHash(sensorid, sensorval, auth)) {
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
-      return;
-    }
     if (null == sensorid || "".equals(sensorid) || null == sensorval || "".equals(sensorval)) {
       response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing value");
       return;
     }
-    log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
+    log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
+    SipHashHelper shh = new SipHashHelper();
+    if (!shh.validateHash(sensorid, sensorval, auth)) {
+      log.log(Level.WARNING, "hash validation failed:{0}", shh.getError());
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
+      return;
+    } else {
+      log.log(Level.INFO, "Hash validated");
+    }
     ofy().transact(new Work<Sensor>() {
       @Override
       public Sensor run() {

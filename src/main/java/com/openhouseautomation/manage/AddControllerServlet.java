@@ -6,7 +6,7 @@
 
 package com.openhouseautomation.manage;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
+import org.joda.time.DateTime;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
 import java.util.zip.CRC32;

@@ -39,7 +39,7 @@ public class ControllerServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     // handles sensor reads
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
@@ -101,7 +101,7 @@ public class ControllerServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
@@ -118,10 +118,14 @@ public class ControllerServlet extends HttpServlet {
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     // TODO cleanup the anonymous inner class
     log.log(Level.INFO, "k={0},v={1}", new Object[]{controllerid, controllervalue});
-    log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
-    if (!SipHashHelper.validateHash(controllerid, controllervalue, auth)) {
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
+    log.log(Level.INFO, "checking siphash auth: {0}", auth);
+    SipHashHelper shh = new SipHashHelper();
+    if (!shh.validateHash(controllerid, controllervalue, auth)) {
+      log.log(Level.WARNING, "hash validation failed");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
       return;
+    } else {
+      log.log(Level.INFO, "Hash validated");
     }
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");

@@ -1,8 +1,8 @@
 package com.openhouseautomation.cron;
 
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.appengine.repackaged.org.joda.time.Period;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Reading;

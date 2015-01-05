@@ -1,7 +1,7 @@
 package com.openhouseautomation.display;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.appengine.repackaged.org.joda.time.DateTimeZone;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.ReadingHistory;

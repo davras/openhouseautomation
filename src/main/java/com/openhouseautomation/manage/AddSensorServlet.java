@@ -1,6 +1,6 @@
 package com.openhouseautomation.manage;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
+import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Sensor;

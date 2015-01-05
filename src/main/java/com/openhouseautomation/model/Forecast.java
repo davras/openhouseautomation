@@ -5,7 +5,7 @@
  */
 package com.openhouseautomation.model;
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
+import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
