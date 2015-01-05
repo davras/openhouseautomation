@@ -18,7 +18,7 @@ public class DatastoreConfig {
 
   @Ignore
   private static final Logger log = Logger.getLogger(DatastoreConfig.class.getName());
-  
+
   @Id
   String key;
   String value;
@@ -47,7 +47,7 @@ public class DatastoreConfig {
       dc.setKey(key);
       dc.setValue(defaultstr);
       ofy().save().entity(dc);
-      return null;
+      return defaultstr;
     }
     return dc.getValue();
   }
