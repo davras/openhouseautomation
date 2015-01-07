@@ -26,14 +26,20 @@ public class SipHashHelper {
       error = "null or blank id or value";
       return false;
     }
+    if (auth == null || "".equals(auth)) {
+      error = "null or blank auth";
+      return false;
+    }
+    auth = auth.toUpperCase(); // make sure we are comparing upper case
     SipHash sipHash = new SipHash();
     String key = DatastoreConfig.getValueForKey("sensorsecret", "0123456789abcdef"); // don't use the default secret!
     String time = String.valueOf(System.currentTimeMillis() / 1000 / 60); // one minute window for hash
     //long digest = SipHash.digest(sk, new String(sensorid+value+time).getBytes());
     long result = sipHash.hash(key.getBytes(),(val + id).getBytes());
-    String sresult = SipHash.toHex(SipHash.longToBytes(result));
-    error = "Ext: " + auth + ", Int: " + sresult;
-    return sresult.equals(auth);
+    String sleresult = SipHash.toHex(SipHash.longToBytesLE(result));
+    String sberesult = SipHash.toHex(SipHash.longToBytes(result));
+    error = "Submitted: " + auth + ", IntBE: " + sberesult + ", IntLE: " + sleresult;
+    return sberesult.equals(auth) || sleresult.equals(auth);
   }
   public String getError() {
     return error;

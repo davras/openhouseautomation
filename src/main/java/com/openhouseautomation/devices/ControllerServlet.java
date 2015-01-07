@@ -5,8 +5,6 @@
  */
 package com.openhouseautomation.devices;
 
-import com.google.apphosting.api.ApiProxy;
-import com.googlecode.objectify.Work;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
