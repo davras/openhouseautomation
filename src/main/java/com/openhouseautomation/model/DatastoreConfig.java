@@ -51,4 +51,11 @@ public class DatastoreConfig {
     }
     return dc.getValue();
   }
+  public static String getValueForKey(String key) {
+    DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
+    if (dc == null) {
+      return null;
+    }
+    return dc.getValue();
+  }
 }

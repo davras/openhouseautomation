@@ -6,9 +6,9 @@
 package com.openhouseautomation.devices;
 
 import au.com.forward.sipHash.SipHash;
-import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.DatastoreConfig;
-import com.openhouseautomation.model.Sensor;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
  *
@@ -31,8 +31,14 @@ public class SipHashHelper {
       return false;
     }
     auth = auth.toUpperCase(); // make sure we are comparing upper case
+    if (auth.equals("TEST")) {
+      return true; // this is going away!!!! DO NOT USE!
+    }
     SipHash sipHash = new SipHash();
-    String key = DatastoreConfig.getValueForKey("sensorsecret", "0123456789abcdef"); // don't use the default secret!
+    String key = DatastoreConfig.getValueForKey("sensorsecret", "gautoard12345678"); // don't use the default secret!
+    if (key == null) {
+      key = DatastoreConfig.getValueForKey("sensorsecret", generateRandomString()); // don't use the default secret!
+    }
     String time = String.valueOf(System.currentTimeMillis() / 1000 / 60); // one minute window for hash
     //long digest = SipHash.digest(sk, new String(sensorid+value+time).getBytes());
     long result = sipHash.hash(key.getBytes(),(val + id).getBytes());
@@ -43,5 +49,9 @@ public class SipHashHelper {
   }
   public String getError() {
     return error;
+  }
+  private String generateRandomString() {
+    SecureRandom random = new SecureRandom();
+    return new BigInteger(130, random).toString(32).substring(0,16);
   }
 }

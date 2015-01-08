@@ -117,6 +117,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         // and if you want your graph in a TZ other than GMT? Nope.
 
         GregorianCalendar cal = dt.toGregorianCalendar();
+        log.log(Level.WARNING, "type is: " + cal.getClass().getName() + ", and " + cal.toString());
         // TODO fix this for a specific TZ offset in minutes that is pulled from DS config
         switch (sensors.length) {
           case 1:
@@ -133,7 +134,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         }
       }
     } catch (TypeMismatchException e) {
-      log.log(Level.WARNING, "exception formatting data for tablerow: {0}", e.fillInStackTrace());
+      log.log(Level.SEVERE, e.toString(), e);
     }
     return data;
   }

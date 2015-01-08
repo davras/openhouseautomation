@@ -99,6 +99,10 @@ public class SensorServlet extends HttpServlet {
       public Sensor run() {
         Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
         Sensor sensor = ofy().load().now(sk);
+        if (sensor == null) {
+          log.log(Level.INFO, "sensor not found:{0}", sensorid);
+          return null;
+        }
         // set the value
         sensor.setLastReadingDate(new DateTime());
         sensor.setLastReading(sensorval);
