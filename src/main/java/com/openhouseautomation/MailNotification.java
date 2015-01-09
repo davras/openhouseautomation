@@ -47,9 +47,9 @@ public class MailNotification extends HttpServlet {
       String msgBody = "This is a test message.";
       Message msg = new MimeMessage(session);
       msg.setFrom(new InternetAddress("notification@" + ApiProxy.getCurrentEnvironment().getAppId() + ".appspotmail.com", "OpenHouseAutomation Notification"));
-      //msg.setFrom(new InternetAddress("davras@gmail.com", "gAutoArd admin"));
+      //msg.setFrom(new InternetAddress("davras@gmail.com", "Open House Automation admin"));
       msg.addRecipient(Message.RecipientType.TO,
-          new InternetAddress("davras@gmail.com", "David Ras (gautoard)"));
+          new InternetAddress("davras@gmail.com", "David Ras (Open House Automation)"));
       // TODO pull sender from DS as config item
       msg.setSubject("TestSubject");
       msg.setText(msgBody);

@@ -11,9 +11,11 @@ import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 import com.googlecode.objectify.NotFoundException;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
-import java.util.GregorianCalendar;
-//import com.ibm.icu.util.GregorianCalendar;
-//import com.ibm.icu.util.TimeZone;
+//import java.util.GregorianCalendar; // DO NOT USE
+import com.ibm.icu.util.GregorianCalendar;
+// converts java.util.GregorianCalendar (as returned by JodaTime.getGregorianCalendar)
+// to com.ibm.icu.util.GregorianCalendar (as needed by Google Visualization Library)
+import com.openhouseautomation.GregorianCalendarCopy;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Reading;
@@ -110,15 +112,12 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
         DateTimeZone dtzonelocal = DateTimeZone.forID(szonelocal);
         long tzoffset = dtzonelocal.getOffsetFromLocal(cutoffdate.getMillis() + i * resolution * 60 * 1000);
-        long offsettime = cutoffdate.getMillis() + i * resolution * 60 * 1000 - tzoffset;
+        long offsettime = cutoffdate.getMillis() + i * resolution * 60 * 1000 + tzoffset;
         DateTime dt = new DateTime(offsettime, dtzonedisp);
         // without a timezone of GMT, you will get:
         // can't create DateTimeValue from GregorianCalendar that is not GMT.
         // and if you want your graph in a TZ other than GMT? Nope.
-
-        GregorianCalendar cal = dt.toGregorianCalendar();
-        log.log(Level.WARNING, "type is: " + cal.getClass().getName() + ", and " + cal.toString());
-        // TODO fix this for a specific TZ offset in minutes that is pulled from DS config
+        GregorianCalendar cal = GregorianCalendarCopy.convert(dt.toGregorianCalendar());
         switch (sensors.length) {
           case 1:
             data.addRowFromValues(cal, new Double(readingsz[0][i]));

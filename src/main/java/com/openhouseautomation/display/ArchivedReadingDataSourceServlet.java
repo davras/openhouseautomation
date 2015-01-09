@@ -12,9 +12,12 @@ import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
-import java.util.GregorianCalendar;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
-
+//import java.util.GregorianCalendar; // DO NOT USE
+import com.ibm.icu.util.GregorianCalendar;
+// converts java.util.GregorianCalendar (as returned by JodaTime.getGregorianCalendar)
+// to com.ibm.icu.util.GregorianCalendar (as needed by Google Visualization Library)
+import com.openhouseautomation.GregorianCalendarCopy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,7 +33,7 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
 
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ArchivedReadingDataSourceServlet.class
-          .getName());
+      .getName());
 
   // TODO: only in place for testing, not for production
   @Override
@@ -48,7 +51,7 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
       // Fill the data table.
       cd.add(new ColumnDescription("date", ValueType.DATETIME, "Date"));
       Sensor sensor
-              = ofy().load().type(Sensor.class).id(Long.parseLong(request.getParameter("id"))).now();
+          = ofy().load().type(Sensor.class).id(Long.parseLong(request.getParameter("id"))).now();
       log.log(Level.INFO, "sensor={0}", sensor);
       if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
         cd.add(new ColumnDescription("high", ValueType.NUMBER, "High"));
@@ -61,15 +64,15 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
       data.addColumns(cd);
 
       List<ReadingHistory> readings
-              = ofy().load().type(ReadingHistory.class).ancestor(sensor).list();
+          = ofy().load().type(ReadingHistory.class).ancestor(sensor).list();
       DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
       DateTime dt;
-      // without a timezone of GMT, you will get:
-      // can't create DateTimeValue from GregorianCalendar that is not GMT.
-      // and if you want your graph in a TZ other than GMT? Nope.
       for (ReadingHistory reading : readings) {
         dt = new DateTime(reading.getTimestamp(), dtzonedisp);
-        GregorianCalendar cal = dt.toGregorianCalendar();
+        // without a timezone of GMT, you will get:
+        // can't create DateTimeValue from GregorianCalendar that is not GMT.
+        // and if you want your graph in a TZ other than GMT? Nope.
+        GregorianCalendar cal = GregorianCalendarCopy.convert(dt.toGregorianCalendar());
         if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
           data.addRowFromValues(cal, new Double(reading.getHigh()), new Double(reading.getLow()));
         } else if (sensor.getType() == Sensor.Type.LIGHT) {
