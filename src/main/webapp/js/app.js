@@ -21,11 +21,19 @@
    * @const
    */
   SCENE_LIST_URL = "/status/sceneslist";
+  /**
+   * @const
+   */
+  CONTROLLER_UPDATE_URL = "/status/controller/update";
+  /**
+   * @const
+   */
+  SCENE_STATUS_UPDATE_URL = "/status/scenes/update";
   
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
       sensors.data = [];
-      $http.get('/status/display/sensors').success(function(data) {
+      $http.get(SENSOR_DATA_URL).success(function(data) {
         console.log("loading sensor data");
         sensors.data = data;
       });
@@ -94,7 +102,7 @@
             }
           });
         }
-      }, 1000);
+      }, 2500);
       $scope.$on('$destroy', function() {
         $interval.cancel(devicePromise);
       });
@@ -112,7 +120,7 @@
         }
         $http({
           method: 'post',
-          url: '/status/controller/update',
+          url: CONTROLLER_UPDATE_URL,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
           transformRequest: function(obj) {
             var str = [];
@@ -144,7 +152,7 @@
         console.log("a scene button was pushed:" + id);
         $http({
           method: 'post',
-          url: '/status/scenes/update',
+          url: SCENE_STATUS_UPDATE_URL,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
           data: {id: $scope.id}
         }).success(function() {
