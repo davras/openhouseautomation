@@ -38,14 +38,14 @@ public class ReadingMapper extends Mapper<Entity, String, String> {
     Sensor sensor = ofy().load().now(reading.getSensor());
     if (sensor == null) {
       log.log(Level.SEVERE, "null sensor");
+      // this can happen if you delete a sensor that had readings.
+    } else {
+      String sentitydate = getDateString(reading.getTimestamp());
+      String value = reading.getValue(); // value of reading
+      emit(sensor.getType() + ":" + sensor.getId() + ":" + sentitydate, value);
     }
-    String sentitydate = getDateString(reading.getTimestamp());
-    String value = reading.getValue(); // value of reading
-    emit(sensor.getType() + ":" + sensor.getId() + ":" + sentitydate, value);
     // emits the form: TEMPERATURE:38382834:20140417, 72
     // where TYPE:SENSORID:DATE,READING
-    // } catch (EntityNotFoundException e) {
-    // }
   }
 
   public synchronized String getDateString(DateTime d) {
