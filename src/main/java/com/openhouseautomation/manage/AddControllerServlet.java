@@ -6,9 +6,9 @@
 
 package com.openhouseautomation.manage;
 
+import org.joda.time.DateTime;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
-import java.util.Date;
 import java.util.zip.CRC32;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -61,13 +61,13 @@ private static final long serialVersionUID = 1L;
       cont.setOwner(request.getParameter("owner"));
       cont.setLocation(request.getParameter("location"));
       cont.setZone(request.getParameter("zone"));
-      cont.setType(Controller.Type.valueOf(request.getParameter("type")));
+      cont.setType(Controller.Type.getTypebyName(request.getParameter("type")));
       cont.setName(request.getParameter("name"));
       cont.setDesiredState("0");
       cont.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
       cont.setActualState("0");
-      cont.setLastDesiredStateChange(new Date());
-      cont.setLastActualStateChange(new Date());
+      cont.setLastDesiredStateChange(new DateTime());
+      cont.setLastActualStateChange(new DateTime());
 
       CRC32 hash = new CRC32();
       hash.update(salt.getBytes());

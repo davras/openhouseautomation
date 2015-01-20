@@ -104,7 +104,7 @@
             <div class="form-group">
               <label for="zone" class="col-sm-2 col-md-1 control-label">Zone</label>
               <div class="col-sm-4 col-md-5">
-                <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...">
+                <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...If lights, then the unit code.">
               </div>
             </div>
             <div class="form-group">

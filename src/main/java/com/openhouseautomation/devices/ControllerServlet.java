@@ -53,6 +53,7 @@ public class ControllerServlet extends HttpServlet {
     log.info("1. authorization checked");
     log.log(Level.INFO, "k={0}", controllerid);
     // load the controller entity
+
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
@@ -60,20 +61,28 @@ public class ControllerServlet extends HttpServlet {
     }
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
-      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getTime() / 1000);
-      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getTime() / 1000});
+      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
+      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getMillis() / 1000});
     } else if (reqpath.startsWith("/display")) {
       // show the actual state
       out.println(controller.toString());
       log.log(Level.INFO, "sent display:{0}", controller.toString());
     } else if (reqpath.startsWith("/initialize")) {
       List vs = new ArrayList();
-      vs.add("0");
-      vs.add("1");
-      vs.add("2");
-      vs.add("3");
-      vs.add("4");
-      vs.add("5");
+      // this should be some sort of ENUM, but it is controller-type specific
+      // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
+      if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
+        vs.add("0");
+        vs.add("1");
+        vs.add("2");
+        vs.add("3");
+        vs.add("4");
+        vs.add("5");
+      } else if (controller.type == Controller.Type.ALARM) {
+        vs.add("DISARM");
+        vs.add("HOME");
+        vs.add("AWAY");
+      }
       controller.setValidStates(vs);
       ofy().save().entity(controller);
       out.println(controller);
@@ -93,23 +102,34 @@ public class ControllerServlet extends HttpServlet {
           throws ServletException, IOException {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
+    final String reqpath = request.getPathInfo();
+    log.log(Level.FINE, "request path:" + reqpath);
+
+    if (reqpath.startsWith("/lights")) {
+      doLights(request, response);
+      return;
+    }
     PrintWriter out = response.getWriter();
     String auth = request.getParameter("auth");
     final String controllerid = request.getParameter("k");
     final String controllervalue = request.getParameter("v");
-    final String reqpath = request.getPathInfo();
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     // TODO cleanup the anonymous inner class
     log.log(Level.INFO, "k={0},v={1}", new Object[]{controllerid, controllervalue});
-    log.log(Level.INFO, "1. checking siphash auth: {0}", auth);
-    if (!SipHashHelper.validateHash(controllerid, controllervalue, auth)) {
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
+    log.log(Level.INFO, "checking siphash auth: {0}", auth);
+    SipHashHelper shh = new SipHashHelper();
+    if (!shh.validateHash(controllerid, controllervalue, auth)) {
+      log.log(Level.WARNING, "hash validation failed");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
       return;
+    } else {
+      log.log(Level.INFO, "Hash validated");
     }
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
+
     if (reqpath.startsWith("/device")) {
       // always sets actual state
       // if the actual setting is not the same as the desired setting,
@@ -121,16 +141,15 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
         controller.setActualState(controllervalue);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (controller.getLastDesiredStateChange().getTime() < (System.currentTimeMillis() - 60000)) {
+        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
           log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-          out.println("MANUAL:" + controller.getDesiredState());
         }
       }
       ofy().save().entity(controller);
       log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
-      out.println("OK");
+      out.println(controller.getDesiredState());
       return;
 
     } else if (reqpath.startsWith("/display")) {
@@ -156,39 +175,6 @@ public class ControllerServlet extends HttpServlet {
 
     } else if (reqpath.startsWith("/fan")) {
       log.info("doPost Controller");
-
-    /*  
-      sens.setOwner(req.getParameter("owner"));
-      sens.setLocation(req.getParameter("location"));
-      sens.setZone(req.getParameter("zone"));
-      sens.setType(Sensor.Type.valueOf(req.getParameter("type")));
-      sens.setName(req.getParameter("name"));
-      sens.setUnit("F");
-      sens.setLastReading("99");
-      sens.setLastReadingDate(new Date());
-      sens.setExpirationTime(new Long(3600));
-
-      CRC32 hash = new CRC32();
-      hash.update(salt.getBytes());
-      hash.update(sens.getOwner().getBytes());
-      hash.update(sens.getLocation().getBytes());
-      hash.update(sens.getZone().getBytes());
-      sens.setId(hash.getValue());
-
-      Sensor sensexists = ofy().load().type(Sensor.class).id(sens.getId()).now();
-
-      if (sensexists == null) {
-        ofy().save().entity(sens).now();
-        req.setAttribute("message", "Sensor added successfully, ID is " + sens.getId());
-        req.setAttribute("messageLevel", "success");
-        req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
-      } else {
-        log.warning("Sensor already exists with id: " + sens.getId());
-        req.setAttribute("message", "Sensor already exists with id: " + sens.getId());
-        req.setAttribute("messageLevel", "danger");
-        req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
-      }
-      */
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "path not found");
     }
@@ -204,4 +190,45 @@ public class ControllerServlet extends HttpServlet {
     return "Handles sensor reads and updates";
   }
 
+  public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    final String actualstate = request.getParameter("v");
+    if (null == actualstate || "".equals(actualstate)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
+      return;
+    }
+    // first, set the desired state
+    // if the actual setting is not the same as the desired setting,
+    // then someone has locally overridden the setting.
+    char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
+    List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
+    for (Controller c : lights) {
+      int lightnum = Integer.parseInt(c.getZone());
+      String curstate = actualstate.substring(lightnum, lightnum + 1);
+      if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
+        c.setDesiredState(curstate);
+      }
+      if (!c.getActualState().equals(curstate)) {
+        log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
+        c.setActualState(curstate);
+        // if desiredstatelastchange is more than 60 secs old, this is a local override.
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
+          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
+          c.setDesiredState(curstate);
+          c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        }
+      }
+      if (c.getDesiredState().equals("1")) {
+        toret[lightnum] = '1';
+      }
+      if (c.getDesiredState().equals("0")) {
+        toret[lightnum] = '0';
+      }
+    }
+    ofy().save().entities(lights);
+    log.log(Level.INFO, "returning " + new String(toret));
+    out.print(new String(toret));
+    out.flush();
+    return;
+  }
 }

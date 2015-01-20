@@ -109,3 +109,16 @@ body {
 .black {
     color: black;
 }
+
+.gold {
+  color: gold;
+}
+
+.lightgray {
+  color: lightgray;
+}
+
+.light-on {
+  color: black;
+  background-color: yellow;
+}

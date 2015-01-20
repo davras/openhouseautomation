@@ -1,11 +1,11 @@
 package com.openhouseautomation.manage;
 
+import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Sensor;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
@@ -43,7 +43,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setName(req.getParameter("name"));
       sens.setUnit("F");
       sens.setLastReading("99");
-      sens.setLastReadingDate(new Date());
+      sens.setLastReadingDate(new DateTime());
       sens.setExpirationTime(new Long(3600));
 
       CRC32 hash = new CRC32();

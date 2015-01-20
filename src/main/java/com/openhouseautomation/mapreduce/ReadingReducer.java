@@ -6,9 +6,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.ReadingHistory;
 import com.openhouseautomation.model.Sensor;
 import com.googlecode.objectify.Key;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.openhouseautomation.Convutils;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +22,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
 
   @Override
   public void reduce(String key, ReducerInput<String> values) {
-    LOG.log(Level.WARNING, "reducing: {0}", key);
+    LOG.log(Level.INFO, "reducing: {0}", key);
     if (key.startsWith("TEMPERATURE") || key.startsWith("HUMIDITY")) {
       reduceHighLow(key, values);
     } else if (key.startsWith("LIGHT")) {
@@ -56,7 +54,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setHigh(high);
     rhist.setLow(low);
-    rhist.setTimestamp(convertStringDate(readingdate));
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
   }
@@ -80,7 +78,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setAverage(Float.toString(totalval / readings));
-    rhist.setTimestamp(convertStringDate(readingdate));
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
   }
@@ -99,18 +97,16 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setTotal(Float.toString(totalval));
-    rhist.setTimestamp(convertStringDate(readingdate));
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
   }
 
   public void reduceHigh(String key, ReducerInput<String> values) {
     String high = "-9999";
-    Float val = 0f;
     while (values.hasNext()) {
       String value = values.next();
-      val = Float.parseFloat(value);
-      if (val > Float.parseFloat(high)) {
+      if (Float.parseFloat(value) > Float.parseFloat(high)) {
         high = value;
       }
     }
@@ -121,19 +117,9 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setHigh(high);
-    rhist.setTimestamp(convertStringDate(readingdate));
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
     ofy().save().entity(rhist).now();
   }
 
-  public Date convertStringDate(String s) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    Date d;
-    try {
-      d = dateFormat.parse(s);
-    } catch (ParseException pe) {
-      return new Date(0L);
-    }
-    return d;
-  }
 }

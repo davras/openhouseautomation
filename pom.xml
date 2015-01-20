@@ -10,7 +10,7 @@
 
   <properties>
     <appengine.app.version>1</appengine.app.version>
-    <appengine.target.version>1.9.8</appengine.target.version>
+    <appengine.target.version>1.9.17</appengine.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -19,12 +19,31 @@
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client-appengine</artifactId>
       <version>1.19.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>guava-jdk5</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.3.2</version>
+    </dependency>
+    
+    <!-- necessary for appstats to work -->
+    <dependency> 
+      <groupId>com.google.appengine</groupId> 
+      <artifactId>appengine-api-labs</artifactId> 
+      <version>${appengine.target.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.6</version>
     </dependency>
 
     <dependency>
@@ -75,7 +94,7 @@
     <dependency>
       <groupId>com.googlecode.objectify</groupId>
       <artifactId>objectify</artifactId>
-      <version>5.0.2</version>
+      <version>5.0.5</version>
     </dependency>
     <dependency>
       <groupId>javax.measure</groupId>
@@ -85,7 +104,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>16.0.1</version>
+      <version>18.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.visualization</groupId>
@@ -98,7 +117,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -122,12 +141,7 @@
     <dependency>
       <groupId>com.google.appengine.tools</groupId>
       <artifactId>appengine-mapreduce</artifactId>
-      <version>0.7.2</version>
-    </dependency>
-    <dependency>
-      <groupId>unknown.binary</groupId>
-      <artifactId>javax.ws.rs-api-2.0</artifactId>
-      <version>SNAPSHOT</version>
+      <version>0.8.2</version>
     </dependency>
   </dependencies>
 
@@ -180,12 +194,5 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>unknown-jars-temp-repo</id>
-      <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
-      <url>file:${project.basedir}/lib</url>
-    </repository>
-  </repositories>
 </project>
 

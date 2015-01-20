@@ -1,11 +1,12 @@
 package com.openhouseautomation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ public class Controller {
     THERMOSTAT("Thermostat"),
     GARAGEDOOR("Garage Door"),
     ALARM("Alarm"),
-    LIGHT("Lights"),
+    LIGHTS("Lights"),
     SPRINKLER("Sprinkler"),
     WHOLEHOUSEFAN("Whole House Fan");
 
@@ -39,6 +40,14 @@ public class Controller {
     @Override
     public String toString() {
       return text;
+    }
+    public static Type getTypebyName(String longname) {
+      for (Type t : Type.values()) {
+        if (t.toString().equals(longname)) {
+          return t;
+        }
+      }
+      throw new IllegalArgumentException("Non-existant type name: " + longname);
     }
   }
 
@@ -57,12 +66,12 @@ public class Controller {
   public String zone; //Zone where the device is located
   public Type type; //The type of device
   public String name; // The name of the device
-  public String desiredstate; //What the controller wants the state to be
-  public String actualstate; //The actual state of the device in real life
-  public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
-  public Date lastdesiredstatechange; // The Date the last time the desired state changed
-  public Date lastactualstatechange; // The Date the last time the desired state changed
-  public List validstates; // the list of valid states for the desired and actual states
+  @JsonIgnore public String desiredstate; //What the controller wants the state to be
+  @JsonIgnore public String actualstate; //The actual state of the device in real life
+  @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
+  @JsonIgnore public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public DateTime lastactualstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public List validstates; // the list of valid states for the desired and actual states
 
   /**
    * Empty constructor for objectify.
@@ -198,8 +207,8 @@ public class Controller {
         .add("desiredstate", getDesiredState())
         .add("actualstate", getActualState())
         .add("desiredstatepriority", getDesiredStatePriority())
-        .add("lastdesiredstatechange", new Date(getLastDesiredStateChange().getTime()))
-        .add("lastactualstatechange", new Date(getLastActualStateChange().getTime()))
+        .add("lastdesiredstatechange", getLastDesiredStateChange())
+        .add("lastactualstatechange", getLastActualStateChange())
         .add("validstates", getValidStates())
         .toString();
   }
@@ -220,7 +229,7 @@ public class Controller {
    */
   public void setDesiredState(String desiredstate) {
     this.desiredstate = desiredstate;
-    this.lastdesiredstatechange = new Date();
+    this.lastdesiredstatechange = new DateTime();
   }
 
   public void setDesiredStatePriority(DesiredStatePriority dsp) {
@@ -239,7 +248,7 @@ public class Controller {
    */
   public void setActualState(String actualstate) {
     this.actualstate = actualstate;
-    this.lastactualstatechange = new Date();
+    this.lastactualstatechange = new DateTime();
   }
 
   /**
@@ -252,28 +261,28 @@ public class Controller {
   /**
    * @return the lastdesiredstatechange
    */
-  public Date getLastDesiredStateChange() {
+  public DateTime getLastDesiredStateChange() {
     return lastdesiredstatechange;
   }
 
   /**
    * @param lastdesiredstatechange the lastdesiredstatechange to set
    */
-  public void setLastDesiredStateChange(Date lastdesiredstatechange) {
+  public void setLastDesiredStateChange(DateTime lastdesiredstatechange) {
     this.lastdesiredstatechange = lastdesiredstatechange;
   }
 
   /**
    * @return the lastactualstatechange
    */
-  public Date getLastActualStateChange() {
+  public DateTime getLastActualStateChange() {
     return lastactualstatechange;
   }
 
   /**
    * @param lastactualstatechange the lastactualstatechange to set
    */
-  public void setLastActualStateChange(Date lastactualstatechange) {
+  public void setLastActualStateChange(DateTime lastactualstatechange) {
     this.lastactualstatechange = lastactualstatechange;
   }
 

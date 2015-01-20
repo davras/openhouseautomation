@@ -8,6 +8,9 @@
         <filter-name>ObjectifyFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <!--
+    Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
+        -->
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -20,6 +23,7 @@
         <filter-name>appstats</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
         <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
@@ -57,23 +61,21 @@
         <servlet-name>TestServlet</servlet-name>
         <servlet-class>com.openhouseautomation.TestServlet</servlet-class>
     </servlet>
-    <!-- <servlet>
-    <servlet-name>jersey</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>com.openhouseautomation.display</param-value>
-    </init-param>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>com.openhouseautomation.display.DisplaySourceServlet</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  -->
     <servlet>
         <servlet-name>DisplaySourceServlet</servlet-name>
         <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MailNotification</servlet-name>
+        <servlet-class>com.openhouseautomation.MailNotification</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.IncomingMailHandlerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ListenServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.ListenServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -154,13 +156,26 @@
         <url-pattern>/testservlet/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    <servlet-name>DisplaySourceServlet</servlet-name>
-    <url-pattern>/status/*</url-pattern>
-    <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <url-pattern>/status/*</url-pattern>
+        <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DisplaySourceServlet</servlet-name>
         <url-pattern>/status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MailNotification</servlet-name>
+        <url-pattern>/mail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <url-pattern>/_ah/mail/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListenServlet</servlet-name>
+        <url-pattern>/listen</url-pattern>
+        <url-pattern>/listen/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
@@ -168,6 +183,8 @@
             <url-pattern>/tasks/*</url-pattern>
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
+            <url-pattern>/_ah/mail/*</url-pattern>
+            <url-pattern>/appstats/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

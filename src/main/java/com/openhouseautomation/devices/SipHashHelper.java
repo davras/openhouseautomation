@@ -3,29 +3,55 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.openhouseautomation.devices;
 
-import com.github.emboss.siphash.SipHash;
-import com.github.emboss.siphash.SipKey;
-import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.model.Sensor;
+import au.com.forward.sipHash.SipHash;
+import com.openhouseautomation.model.DatastoreConfig;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
  *
  * @author dras
  */
 public class SipHashHelper {
-  public static boolean validateHash(String sensorid, String value, String hash) {
-    if ("test".equals(hash)) {
-      return true;
+
+  private String secret;
+  public String error="";
+
+  public SipHashHelper() { }
+  
+  public boolean validateHash(String id, String val, String auth) {
+    if (id == null || "".equals(id) || val == null || "".equals(val)) {
+      error = "null or blank id or value";
+      return false;
     }
-    Sensor sensor = ofy().load().type(Sensor.class).id(Long.parseLong(sensorid)).now();
-    String secret = sensor.getSecret().trim().concat("0123456789abcdef").substring(0,16);
-    byte[] bsec = secret.getBytes();
-    SipKey sk = new SipKey(bsec);
-    String time = String.valueOf(System.currentTimeMillis()/1000/60); // one minute window for hash
-    long digest = SipHash.digest(sk, new String(sensorid+value+time).getBytes());
-    return String.valueOf(digest).equals(hash);
+    if (auth == null || "".equals(auth)) {
+      error = "null or blank auth";
+      return false;
+    }
+    auth = auth.toUpperCase(); // make sure we are comparing upper case
+    if (auth.equals("TEST")) {
+      return true; // this is going away!!!! DO NOT USE!
+    }
+    SipHash sipHash = new SipHash();
+    String key = DatastoreConfig.getValueForKey("sensorsecret", "gautoard12345678"); // don't use the default secret!
+    if (key == null) {
+      key = DatastoreConfig.getValueForKey("sensorsecret", generateRandomString()); // don't use the default secret!
+    }
+    String time = String.valueOf(System.currentTimeMillis() / 1000 / 60); // one minute window for hash
+    //long digest = SipHash.digest(sk, new String(sensorid+value+time).getBytes());
+    long result = sipHash.hash(key.getBytes(),(val + id).getBytes());
+    String sleresult = SipHash.toHex(SipHash.longToBytesLE(result));
+    String sberesult = SipHash.toHex(SipHash.longToBytes(result));
+    error = "Submitted: " + auth + ", IntBE: " + sberesult + ", IntLE: " + sleresult;
+    return sberesult.equals(auth) || sleresult.equals(auth);
+  }
+  public String getError() {
+    return error;
+  }
+  private String generateRandomString() {
+    SecureRandom random = new SecureRandom();
+    return new BigInteger(130, random).toString(32).substring(0,16);
   }
 }

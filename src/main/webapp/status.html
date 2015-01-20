@@ -69,9 +69,21 @@
             <!-- Sensor current readings go here -->
             <ul class="list-group">
               <li class="list-group-item" ng-repeat="sensor in sensors.data">{{ sensor.name}}:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
-                <i ng-class='{red : sensor.expired, black : !sensor.expired}'>{{sensor.age}}</i>
+                <i ng-class='{red : sensor.expired, black : !sensor.expired}'>{{sensor.humanAge}}</i>
               </li>
             </ul>
+            <hr/>
+          </div>
+          <div class="table-condensed" ng-controller="ForecastController as forecasts">
+            <table class="table">
+              <thead>
+                <tr><th>Zipcode</th><th>High</th><th>Low</th><th>PoP</th>
+              </thead>
+              <tr ng-repeat="forecast in forecasts.data">
+                <td>{{ forecast.zipCode }}</td><td>{{forecast.forecastHigh}}F</td>
+                <td>{{forecast.forecastLow}}F</td><td>{{forecast.forecastPop}}%</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>

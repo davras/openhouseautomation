@@ -67,7 +67,7 @@ public class ForecastServlet extends HttpServlet {
         out.println("high=" + forecast.getForecastHigh());
         out.println("low=" + forecast.getForecastLow());
         out.println("pop=" + forecast.getForecastPop());
-        out.println("last update=" + forecast.getLastUpdate().getTime() / 1000);
+        out.println("last update=" + forecast.getLastUpdate().getMillis() / 1000);
         out.println("last update(human)=" + forecast.getLastUpdate());
       }
     }
