@@ -23,7 +23,6 @@
         <filter-name>appstats</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
         <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
@@ -76,6 +75,10 @@
     <servlet>
         <servlet-name>ListenServlet</servlet-name>
         <servlet-class>com.openhouseautomation.ListenServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -176,6 +179,10 @@
         <servlet-name>ListenServlet</servlet-name>
         <url-pattern>/listen</url-pattern>
         <url-pattern>/listen/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
+        <url-pattern>/CombinedReadingDataSourceServlet</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

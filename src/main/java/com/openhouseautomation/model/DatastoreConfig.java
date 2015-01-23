@@ -41,7 +41,7 @@ public class DatastoreConfig {
 
   public static String getValueForKey(String key, String defaultstr) {
     DatastoreConfig dc = ofy().load().type(DatastoreConfig.class).id(key).now();
-    if (dc == null) {
+    if (dc == null && null != defaultstr && !"".equals(defaultstr)) {
       log.log(Level.WARNING, "Could not find config value for {0}, adding placeholder with {1}.  Modify the value in the Datastore", new Object[]{key, defaultstr});
       dc = new DatastoreConfig();
       dc.setKey(key);
