@@ -73,7 +73,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     double[][] readingsz = new double[sensors.length][positions + 10]; // fudge for ArrayIndexOutOfBoundsException
     for (int i = 0; i < sensors.length; i++) {
       List<Reading> readings = ofy().load().type(Reading.class).ancestor(sensors[i])
-          .filter("timestamp >", cutoffdate).chunkAll().list();
+              .filter("timestamp >", cutoffdate).chunkAll().list();
       for (Reading reading : readings) {
         int blocknumber = (int) ((reading.getTimestamp().getMillis() - cutoffdate.getMillis()) / blocks);
         readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
@@ -125,11 +125,22 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
             break;
           case 2:
             data.addRowFromValues(cal, new Double(readingsz[0][i]),
-                new Double(readingsz[1][i]));
+                    new Double(readingsz[1][i]));
             break;
           case 3:
             data.addRowFromValues(cal, new Double(readingsz[0][i]),
-                new Double(readingsz[1][i]), new Double(readingsz[2][i]));
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]));
+            break;
+          case 4:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]),
+                    new Double(readingsz[3][i]));
+            break;
+          case 5:
+          default:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]),
+                    new Double(readingsz[3][i]), new Double(readingsz[4][i]));
             break;
         }
       }
