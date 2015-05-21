@@ -57,9 +57,9 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         sensors[i] = ofy().load().type(Sensor.class).id(Long.parseLong(sensorids[i])).safe();
         cd.add(new ColumnDescription(Long.toString(sensors[i].getId()), ValueType.NUMBER, sensors[i].getName()));
       }
-    } catch (NotFoundException | NumberFormatException e) {
+    } catch (Exception e) {
       // can't send a response
-      log.log(Level.SEVERE, "could not retrieve entity");
+      log.log(Level.SEVERE, "could not retrieve entity for {0}", request.getParameterValues("id"));
       return null;
     }
     data.addColumns(cd);
