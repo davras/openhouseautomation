@@ -28,7 +28,9 @@ public class MailNotification {
   public void setBody(String s) {
     this.body = s;
   }
-
+  public String getBody() {
+    return body;
+  }
   public void setRecipient(String s) {
     this.recipient = s;
   }

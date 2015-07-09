@@ -162,7 +162,7 @@ public class ListenServlet extends HttpServlet {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
-    log.log(Level.FINE, "request path:" + reqpath);
+    log.log(Level.INFO, "request path:" + reqpath);
 
     if (reqpath.startsWith("/lights")) {
       doLightsListen(request, response);
