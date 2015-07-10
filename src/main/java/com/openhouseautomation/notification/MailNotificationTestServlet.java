@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.openhouseautomation;
+package com.openhouseautomation.notification;
 
 import com.google.apphosting.api.ApiProxy;
+import com.openhouseautomation.model.DatastoreConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -25,9 +26,9 @@ import javax.mail.internet.MimeMessage;
  *
  * @author dras
  */
-public class MailNotification extends HttpServlet {
+public class MailNotificationTestServlet extends HttpServlet {
 
-  private static final Logger log = Logger.getLogger(MailNotification.class.getName());
+  private static final Logger log = Logger.getLogger(MailNotificationTestServlet.class.getName());
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,24 +40,33 @@ public class MailNotification extends HttpServlet {
    * @throws IOException if an I/O error occurs
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     response.setContentType("text/plain");
-    try (PrintWriter out = response.getWriter()) {
+    PrintWriter out = response.getWriter();
+    String sender = DatastoreConfig.getValueForKey("e-mail sender", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com");
+    String recipient = "rbruyere@gmail.com";
+    try {
       Properties props = new Properties();
       Session session = Session.getDefaultInstance(props, null);
-      String msgBody = "This is a test message.";
+      String msgBody = "This is a test message sent from " + sender;
       Message msg = new MimeMessage(session);
-      msg.setFrom(new InternetAddress("notification@" + ApiProxy.getCurrentEnvironment().getAppId() + ".appspotmail.com", "OpenHouseAutomation Notification"));
-      //msg.setFrom(new InternetAddress("davras@gmail.com", "Open House Automation admin"));
+      // will change s~gautoard to gautoard with substring
+      // will not work on Master-Slave apps
+      msg.setFrom(new InternetAddress(sender));
       msg.addRecipient(Message.RecipientType.TO,
-          new InternetAddress("davras@gmail.com", "David Ras (Open House Automation)"));
+              new InternetAddress(recipient, "RyanB (Open House Automation)"));
       // TODO pull sender from DS as config item
-      msg.setSubject("TestSubject");
+      msg.setSubject("Test mail from " + sender);
       msg.setText(msgBody);
       Transport.send(msg);
       out.println("SENT");
+      out.println("From: " + sender);
+      out.println("To: " + recipient);
     } catch (Exception e) {
       log.log(Level.WARNING, "error:" + e.fillInStackTrace());
+      out.println("FAILED");
+      out.println("From: " + sender);
+      out.println("To: " + recipient);
     }
   }
 
@@ -71,7 +81,7 @@ public class MailNotification extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     processRequest(request, response);
   }
 
@@ -85,7 +95,7 @@ public class MailNotification extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     processRequest(request, response);
   }
 

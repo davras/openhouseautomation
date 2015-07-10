@@ -9,8 +9,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!--
-    Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
-        -->
+Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
+  -->
     <filter>
         <filter-name>appstats</filter-name>
         <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -66,11 +66,11 @@
     </servlet>
     <servlet>
         <servlet-name>MailNotification</servlet-name>
-        <servlet-class>com.openhouseautomation.MailNotification</servlet-class>
+        <servlet-class>com.openhouseautomation.notification.MailNotificationTestServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.IncomingMailHandlerServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.notification.IncomingMailHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ListenServlet</servlet-name>
@@ -79,6 +79,10 @@
     <servlet>
         <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
         <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TaskHandler</servlet-name>
+        <servlet-class>com.openhouseautomation.tasks.TaskHandler</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -184,19 +188,6 @@
         <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
         <url-pattern>/CombinedReadingDataSourceServlet</url-pattern>
     </servlet-mapping>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Admin Only</web-resource-name>
-            <url-pattern>/tasks/*</url-pattern>
-            <url-pattern>/cron/*</url-pattern>
-            <url-pattern>/mapreduce/*</url-pattern>
-            <url-pattern>/_ah/mail/*</url-pattern>
-            <url-pattern>/appstats/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>admin</role-name>
-        </auth-constraint>
-    </security-constraint>
     <servlet-mapping>
         <servlet-name>SensorServlet</servlet-name>
         <url-pattern>/sensor</url-pattern>
@@ -237,4 +228,24 @@
         <servlet-name>pipeline</servlet-name>
         <url-pattern>/_ah/pipeline/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TaskHandler</servlet-name>
+        <url-pattern>/tasks/*</url-pattern>
+    </servlet-mapping>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin Only</web-resource-name>
+            <url-pattern>/tasks/*</url-pattern>
+            <url-pattern>/cron/*</url-pattern>
+            <url-pattern>/mapreduce/*</url-pattern>
+            <url-pattern>/appstats/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>mail</web-resource-name>
+            <url-pattern>/_ah/mail/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 </web-app>

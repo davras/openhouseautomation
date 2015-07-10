@@ -9,7 +9,6 @@ import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
-import com.googlecode.objectify.NotFoundException;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
 //import java.util.GregorianCalendar; // DO NOT USE
 import com.ibm.icu.util.GregorianCalendar;
@@ -57,9 +56,9 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         sensors[i] = ofy().load().type(Sensor.class).id(Long.parseLong(sensorids[i])).safe();
         cd.add(new ColumnDescription(Long.toString(sensors[i].getId()), ValueType.NUMBER, sensors[i].getName()));
       }
-    } catch (NotFoundException | NumberFormatException e) {
+    } catch (Exception e) {
       // can't send a response
-      log.log(Level.SEVERE, "could not retrieve entity");
+      log.log(Level.SEVERE, "could not retrieve entity for {0}", request.getParameterValues("id"));
       return null;
     }
     data.addColumns(cd);
@@ -138,6 +137,13 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
             data.addRowFromValues(cal, new Double(readingsz[0][i]),
                     new Double(readingsz[1][i]), new Double(readingsz[2][i]),
                     new Double(readingsz[3][i]));
+            break;
+          case 5:
+          default:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]),
+                    new Double(readingsz[3][i]), new Double(readingsz[4][i]));
+            break;
         }
       }
     } catch (TypeMismatchException e) {

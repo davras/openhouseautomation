@@ -60,7 +60,6 @@ public class LCDDisplayServlet extends HttpServlet {
       int bgnidx = s.indexOf("{");
       int endidx = s.indexOf("}");
       String item = s.substring(bgnidx + 1, endidx);
-      log.log(Level.FINE, "item={0}", item);
       if (item.startsWith("FC")) {
         String tkresp = getForecast(item);
         s = s.substring(0, bgnidx) + tkresp + s.substring(endidx + 1);
