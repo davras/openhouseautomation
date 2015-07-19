@@ -84,6 +84,7 @@ public class Utilities {
     Sensor sens = ofy().load().type(Sensor.class).filter("name", name).first().now();
     return Double.parseDouble(sens.getLastReading());
   }
+
   public static double getForecastHigh(String zipcode) {
     Forecast forecast = ofy().load().type(Forecast.class).id(zipcode).now();
     return Double.parseDouble(forecast.getForecastHigh());
