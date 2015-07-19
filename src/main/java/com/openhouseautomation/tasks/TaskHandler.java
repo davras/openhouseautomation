@@ -7,6 +7,7 @@ package com.openhouseautomation.tasks;
 
 import com.googlecode.objectify.Key;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Sensor;
 import com.openhouseautomation.notification.MailNotification;
@@ -91,37 +92,9 @@ public class TaskHandler extends HttpServlet {
     }
     if (sensor.getName().equals("Outside Temperature") || sensor.getName().equals("Inside Temperature")) {
       log.log(Level.INFO, "processing: {0}", sensor.getName());
-      compareTemperaturesforCooling();
+      new HouseFan().process();
     } else {
       log.log(Level.INFO, "ignoring: {0}", sensor.getName());
-    }
-  }
-
-  public void compareTemperaturesforCooling() {
-    double outsidetemp = Utilities.getReading("Outside Temperature");
-    double insidetemp = Utilities.getReading("Inside Temperature");
-    double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
-
-    log.log(Level.INFO,
-            "Outside Temperature: {0}" + "\n" + "Inside Temperature: {1}"
-            + "\n" + "Outside Temperature Slope: {2}", new Object[]{outsidetemp, insidetemp, Double.toString(tempslope)});
-    // if outside temperature is less than inside temperature
-    if (outsidetemp < (insidetemp - 1)) {
-      // and if slope is negative (outside temperature going down for the last hour)
-      if (tempslope < 0) {
-        MailNotification mnotif = new MailNotification();
-        mnotif.setBody(
-                "Outside Temperature is lower than Inside Temperature\n\n"
-                + "Outside Temperature: " + outsidetemp + "\n"
-                + "Inside Temperature: " + insidetemp + "\n"
-                + "Outside Temperature Slope: " + tempslope);
-        mnotif.setRecipient("davras@gmail.com");
-        mnotif.setSubject("A/C off, House Fan on");
-        mnotif.sendNotification();
-        log.log(Level.INFO, "mail sent:{0}", mnotif.getBody());
-      }
-    } else {
-      log.log(Level.INFO, "no notification sent");
     }
   }
 }
