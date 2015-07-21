@@ -38,7 +38,7 @@
       <groupId>com.google.appengine</groupId> 
       <artifactId>appengine-api-labs</artifactId> 
       <version>${appengine.target.version}</version>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

@@ -13,77 +13,88 @@ import java.util.logging.Logger;
  */
 public class HouseFan {
 
+  WeightedDecision wd = new WeightedDecision();
+
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
   public void process() {
+    // save DS queries if it fails early
+
+    Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+    // check for EMERGENCY
+    if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
+      wd.addElement("DesiredStatePriority", 1, 5); // full speed
+      log.log(Level.WARNING, wd.toString());
+    }
+
+    // skip everything if the controller is not in AUTO
+    int manualcontrol = controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO ? 0 : 1;
+    wd.addElement("DesiredStatePriority", 1, manualcontrol);
+    if (manualcontrol == 1) {
+      return;  //bail out early
+    }
+
     // get the inside and outside temperatures
     double outsidetemp = Utilities.getDoubleReading("Outside Temperature");
     double insidetemp = Utilities.getDoubleReading("Inside Temperature");
-    double tempslope = 0;
-    double forecasthigh = 0;
-    double setpoint = 0;
-    int fanspeedchange = 0; // no change by default
-    int desiredfanspeed = 0; // off by default
-
-    // figure out if fan needs to speed up or slow down, store change in fanspeedchange.
-    // is outside colder than inside?
-    log.log(Level.INFO,
-            "Outside Temperature: {0}" + "\n" + "Inside Temperature: {1}", new Object[]{outsidetemp, insidetemp});
-    if (outsidetemp < (insidetemp - 1)) {
-      // and the temperature outside is falling
-      tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
-      log.log(Level.INFO, "Outside Temperature Slope: {0}", Double.toString(tempslope));
-      if (tempslope < 0) {
-        forecasthigh = Utilities.getForecastHigh("95376");
-        setpoint = (forecasthigh * -2 / 5) + 102;
-        desiredfanspeed = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
-        log.log(Level.INFO, "Forecast High: {0}" + "\n" + "Setpoint: {1}" + "\n" + "Desired Speed: {2}",
-                new Object[]{Double.toString(forecasthigh), Double.toString(setpoint), Integer.toString(desiredfanspeed)});
-      } else {
-        // it's warming up outside, so turn off the fan to preserve the cool
-        fanspeedchange = -1;
-      }
-    } else {
-      // hotter outside than inside
-      fanspeedchange = -1;
+    // do not run fan when outside is hotter than inside
+    if (outsidetemp > (insidetemp - 1)) {
+      wd.addElement("Outside vs Inside Temperature", 5, 0);
+      log.log(Level.INFO, wd.toString());
+      return;
     }
+
+    // decrease fan speed if outside is warming up
+    double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
+    if (tempslope >= 0) {
+      wd.addElement("Outside Temperature Slope", 10, -1);
+    }
+
+    // if the forecast high tomorrow is less than 80F, don't cool house.
+    double forecasthigh = Utilities.getForecastHigh("95376");
+    if (forecasthigh < 80) {
+      wd.addElement("Forecast High", 5, 0);
+    }
+
+    // compute setpoint based on forecast high for tomorrow
+    double setpoint = (forecasthigh * -2 / 5) + 102;
+    int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
+    wd.addElement("Setpoint", 1000, setpoint);
+    wd.addElement("Desired Fan Speed", 20, desiredfanspeedtemperatureforecast);
+
     // code to update the whf controllers' desired speed next
-    Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
-    if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO) {
-      int oldfanspeed = Integer.parseInt(controller.getDesiredState());
-      if (oldfanspeed < desiredfanspeed) {
-        fanspeedchange = 1;
-      }
-      int newfanspeed = oldfanspeed + fanspeedchange;
-      if (newfanspeed < 0) {
-        newfanspeed = 0;
-      }
-      if (newfanspeed > 5) {
-        newfanspeed = 5;
-      }
-      if (oldfanspeed == desiredfanspeed) {
-        return;
-      }
-      controller.setDesiredState(Integer.toString(newfanspeed));
-      ofy().save().entity(controller);
+    int oldfanspeed = Integer.parseInt(controller.getDesiredState());
+    wd.addElement("Old Fan Speed", 1020, oldfanspeed);
 
-      // if fan speed changed, send notification
-      // yes, it will send a lot of debug mail during this testing phase
-      // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
-      MailNotification mnotif = new MailNotification();
-      mnotif.setBody(
-              "Outside Temperature: " + outsidetemp + "\n"
-              + "Inside Temperature: " + insidetemp + "\n"
-              + "Outside Temperature Slope: " + tempslope + "\n"
-              + "Forecast High: " + forecasthigh + "\n"
-              + "Setpoint: " + setpoint + "\n"
-              + "New Fan speed: " + newfanspeed + "\n"
-              + "Old Fan speed was: " + oldfanspeed + "\n"
-              + "Controller Desired State Priority: " + controller.getDesiredStatePriority().toString() + "\n"
-      );
-      mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-      mnotif.setSubject("Fan Speed change: " + oldfanspeed + " -> " + newfanspeed);
-      mnotif.sendNotification();
+    // now, what does the weighted decision say?
+    int newfanspeed = oldfanspeed;
+    int desiredfanspeed = (Integer) wd.getTopValue();
+    if (oldfanspeed < desiredfanspeed) {
+      newfanspeed++;
     }
+    if (oldfanspeed > desiredfanspeed) {
+      newfanspeed--;
+    }
+    // bounds checking
+    newfanspeed = Math.min(newfanspeed, 5);
+    newfanspeed = Math.max(newfanspeed, 0);
+
+    // if no changes are necessary
+    if (oldfanspeed == desiredfanspeed) {
+      log.log(Level.INFO, wd.toString());
+      return;
+    }
+    // save new speed
+    controller.setDesiredState(Integer.toString(newfanspeed));
+    ofy().save().entity(controller);
+
+    // if fan speed changed, send notification
+    // yes, it will send a lot of debug mail during this testing phase
+    // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
+    MailNotification mnotif = new MailNotification();
+    mnotif.setBody(wd.toMessage());
+    mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
+    mnotif.setSubject("Fan Speed change: " + oldfanspeed + " -> " + newfanspeed);
+    mnotif.sendNotification();
   }
 }
