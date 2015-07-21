@@ -22,8 +22,11 @@ public class HouseFan {
     double tempslope = 0;
     double forecasthigh = 0;
     double setpoint = 0;
-    int fanspeed = 0; // off by default
-    // make sure it's colder outside than inside.
+    int fanspeedchange = 0; // no change by default
+    int desiredfanspeed = 0; // off by default
+
+    // figure out if fan needs to speed up or slow down, store change in fanspeedchange.
+    // is outside colder than inside?
     log.log(Level.INFO,
             "Outside Temperature: {0}" + "\n" + "Inside Temperature: {1}", new Object[]{outsidetemp, insidetemp});
     if (outsidetemp < (insidetemp - 1)) {
@@ -33,43 +36,54 @@ public class HouseFan {
       if (tempslope < 0) {
         forecasthigh = Utilities.getForecastHigh("95376");
         setpoint = (forecasthigh * -2 / 5) + 102;
-        fanspeed = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
-        log.log(Level.INFO, "Forecast High: {0}" + "\n" + "Setpoint: {1}" + "\n" + "Speed: {2}",
-                new Object[]{Double.toString(forecasthigh), Double.toString(setpoint), Integer.toString(fanspeed)});
+        desiredfanspeed = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
+        log.log(Level.INFO, "Forecast High: {0}" + "\n" + "Setpoint: {1}" + "\n" + "Desired Speed: {2}",
+                new Object[]{Double.toString(forecasthigh), Double.toString(setpoint), Integer.toString(desiredfanspeed)});
       } else {
         // it's warming up outside, so turn off the fan to preserve the cool
-        fanspeed = 0;
+        fanspeedchange = -1;
       }
     } else {
       // hotter outside than inside
-      fanspeed = 0;
+      fanspeedchange = -1;
     }
     // code to update the whf controllers' desired speed next
     Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO) {
-      String oldval = controller.getDesiredState();
-      if (Integer.parseInt(oldval) != fanspeed) {
-        controller.setDesiredState(Integer.toString(fanspeed));
-        ofy().save().entity(controller);
-
-        // if fan speed changed, send notification
-        // yes, it will send a lot of debug mail during this testing phase
-        // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
-        MailNotification mnotif = new MailNotification();
-        mnotif.setBody(
-                "Outside Temperature: " + outsidetemp + "\n"
-                + "Inside Temperature: " + insidetemp + "\n"
-                + "Outside Temperature Slope: " + tempslope + "\n"
-                + "Forecast High: " + forecasthigh + "\n"
-                + "Setpoint: " + setpoint + "\n"
-                + "Fan speed: " + fanspeed + "\n"
-                + "Fan speed was: " + oldval + "\n"
-                + "Controller Desired State Priority: " + controller.getDesiredStatePriority().toString() + "\n"
-        );
-        mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-        mnotif.setSubject("Fan Speed change: " + oldval + " -> " + fanspeed);
-        mnotif.sendNotification();
+      int oldfanspeed = Integer.parseInt(controller.getDesiredState());
+      if (oldfanspeed < desiredfanspeed) {
+        fanspeedchange = 1;
       }
+      int newfanspeed = oldfanspeed + fanspeedchange;
+      if (newfanspeed < 0) {
+        newfanspeed = 0;
+      }
+      if (newfanspeed > 5) {
+        newfanspeed = 5;
+      }
+      if (oldfanspeed == desiredfanspeed) {
+        return;
+      }
+      controller.setDesiredState(Integer.toString(newfanspeed));
+      ofy().save().entity(controller);
+
+      // if fan speed changed, send notification
+      // yes, it will send a lot of debug mail during this testing phase
+      // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
+      MailNotification mnotif = new MailNotification();
+      mnotif.setBody(
+              "Outside Temperature: " + outsidetemp + "\n"
+              + "Inside Temperature: " + insidetemp + "\n"
+              + "Outside Temperature Slope: " + tempslope + "\n"
+              + "Forecast High: " + forecasthigh + "\n"
+              + "Setpoint: " + setpoint + "\n"
+              + "New Fan speed: " + newfanspeed + "\n"
+              + "Old Fan speed was: " + oldfanspeed + "\n"
+              + "Controller Desired State Priority: " + controller.getDesiredStatePriority().toString() + "\n"
+      );
+      mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
+      mnotif.setSubject("Fan Speed change: " + oldfanspeed + " -> " + newfanspeed);
+      mnotif.sendNotification();
     }
   }
 }
