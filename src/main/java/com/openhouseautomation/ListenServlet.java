@@ -80,6 +80,12 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+          // this block should handle memcache flushes
+          if (controllernew == null) {
+            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            return;
+          }
           String newval = controllernew.getDesiredState();
           if (!controllercompareinitial.getDesiredState().equals(newval)) {
             foundachange = true;
