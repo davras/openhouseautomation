@@ -84,7 +84,9 @@ public class HouseFan {
   public void considerSlope() {
     // decrease fan speed if outside is warming up
     double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
-    if (tempslope >= 0) {
+    if (tempslope >= 1) {
+      // this will make the fan slow down if temperature outside is increasing, i.e. warming up
+      // to avoid hysteresis, make sure the slope is > 1 (increasing quickly)
       wd.addElement("Outside Temperature Slope", 10, -1);
     }
   }
