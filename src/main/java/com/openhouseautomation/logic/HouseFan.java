@@ -31,7 +31,6 @@ public class HouseFan {
     considerForecast();
     computeDesiredSpeed();
     processFanChange();
-    sendNotfication();
   }
 
   public boolean considerStatePriority() {
@@ -47,9 +46,12 @@ public class HouseFan {
 
   public boolean considerControlMode() {
     // skip everything if the controller is not in AUTO
-    int manualcontrol = controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO ? 0 : 1;
-    wd.addElement("DesiredStatePriority", 1, manualcontrol);
-    return (manualcontrol == 0);
+    if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
+      wd.addElement("DesiredStatePriority", 1030, "Not in " + Controller.DesiredStatePriority.AUTO.name());
+      log.log(Level.INFO, wd.toString());
+      return false;
+    }
+    return true;
   }
 
   public boolean considerTemperatures() {
@@ -116,9 +118,10 @@ public class HouseFan {
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
+    sendNotification();
   }
 
-  public void sendNotfication() {
+  public void sendNotification() {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase
     // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub

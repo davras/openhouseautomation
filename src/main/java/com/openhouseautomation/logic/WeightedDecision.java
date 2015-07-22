@@ -15,7 +15,7 @@ import java.util.PriorityQueue;
 public class WeightedDecision {
 
   // store data
-  PriorityQueue<DecisionElement> queue = new PriorityQueue<>();
+  PriorityQueue<DecisionElement> queue = new PriorityQueue<>(20, new WDsort());
 
   static class WDsort implements Comparator<DecisionElement> {
 
