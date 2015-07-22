@@ -21,7 +21,7 @@ public class WeightedDecision {
 
     @Override
     public int compare(DecisionElement one, DecisionElement two) {
-      return two.getWeight() - one.getWeight();
+      return one.getWeight() - two.getWeight();
     }
   }
 
@@ -42,6 +42,9 @@ public class WeightedDecision {
     public Object getValue() {
       return this.value;
     }
+    public String getName() {
+      return this.name;
+    }
   }
 
   public void addElement(String name, int weight, Object value) {
@@ -51,6 +54,9 @@ public class WeightedDecision {
   
   public Object getTopValue() {
     return queue.peek().getValue();
+  }
+  public String getTopName() {
+    return queue.peek().getName();
   }
   @Override
   public String toString() {

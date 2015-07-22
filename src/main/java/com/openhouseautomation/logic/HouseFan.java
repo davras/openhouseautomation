@@ -88,7 +88,7 @@ public class HouseFan {
     double setpoint = (forecasthigh * -2 / 5) + 102;
     int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
     wd.addElement("Setpoint", 1000, setpoint);
-    wd.addElement("Desired Fan Speed", 20, desiredfanspeedtemperatureforecast);
+    wd.addElement("Fan Speed from Forecast", 20, desiredfanspeedtemperatureforecast);
   }
 
   public void processFanChange() {
@@ -99,6 +99,7 @@ public class HouseFan {
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
     int newdesiredfanspeed = (Integer) wd.getTopValue();
+    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: "  + wd.getTopName());
     
     if (olddesiredfanspeed < newdesiredfanspeed) {
       newfanspeed++;
@@ -119,7 +120,7 @@ public class HouseFan {
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
-    log.log(Level.WARNING, "Changed fan speed: " + olddesiredfanspeed + " -> " + newfanspeed);
+    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     sendNotification();
   }
 
