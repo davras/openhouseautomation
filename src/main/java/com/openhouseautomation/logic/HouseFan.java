@@ -20,13 +20,19 @@ public class HouseFan {
   int oldfanspeed;
   int newfanspeed;
   boolean tocontinue;
-  
+
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
   public void process() {
-    if (!considerStatePriority()) return;
-    if (!considerControlMode()) return;
-    if (!considerTemperatures()) return;
+    if (!considerStatePriority()) {
+      return;
+    }
+    if (!considerControlMode()) {
+      return;
+    }
+    if (!considerTemperatures()) {
+      return;
+    }
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
@@ -36,6 +42,10 @@ public class HouseFan {
 
   public boolean considerStatePriority() {
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+    if (controller == null) {
+      log.log(Level.INFO, "null controller");
+      return false;
+    }
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
       wd.addElement("DesiredStatePriority", 1, 5); // full speed
@@ -56,6 +66,10 @@ public class HouseFan {
     // get the inside and outside temperatures
     double outsidetemp = Utilities.getDoubleReading("Outside Temperature");
     insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
+      log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
+      return false;
+    }
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
       wd.addElement("Outside vs Inside Temperature", 5, 0);
@@ -76,6 +90,10 @@ public class HouseFan {
   public void considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
     forecasthigh = Utilities.getForecastHigh("95376");
+    if (forecasthigh == 0 || forecasthigh < -100 || forecasthigh > 150) {
+      log.log(Level.INFO, "bad forecasthigh: {0}", forecasthigh);
+      return;
+    }
     if (forecasthigh < 80) {
       wd.addElement("Forecast High", 5, 0);
     }
@@ -97,7 +115,7 @@ public class HouseFan {
     // now, what does the weighted decision say?
     newfanspeed = oldfanspeed;
     int desiredfanspeed = (Integer) wd.getTopValue();
-    
+
     if (oldfanspeed < desiredfanspeed) {
       newfanspeed++;
     }
@@ -122,6 +140,8 @@ public class HouseFan {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase
     // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
+    boolean tosend = Boolean.parseBoolean(DatastoreConfig.getValueForKey("send mail", "true"));
+    if (!tosend) return;
     MailNotification mnotif = new MailNotification();
     mnotif.setBody(wd.toMessage());
     mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
