@@ -17,7 +17,7 @@ public class HouseFan {
   Controller controller;
   double forecasthigh;
   double insidetemp;
-  int oldfanspeed;
+  int olddesiredfanspeed;
   int newfanspeed;
   boolean tocontinue;
 
@@ -37,7 +37,6 @@ public class HouseFan {
     considerForecast();
     computeDesiredSpeed();
     processFanChange();
-    sendNotfication();
   }
 
   public boolean considerStatePriority() {
@@ -57,9 +56,12 @@ public class HouseFan {
 
   public boolean considerControlMode() {
     // skip everything if the controller is not in AUTO
-    int manualcontrol = controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO ? 0 : 1;
-    wd.addElement("DesiredStatePriority", 1, manualcontrol);
-    return (manualcontrol == 0);
+    if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
+      wd.addElement("DesiredStatePriority", 1030, "Not in " + Controller.DesiredStatePriority.AUTO.name());
+      log.log(Level.INFO, wd.toString());
+      return false;
+    }
+    return true;
   }
 
   public boolean considerTemperatures() {
@@ -104,22 +106,23 @@ public class HouseFan {
     double setpoint = (forecasthigh * -2 / 5) + 102;
     int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
     wd.addElement("Setpoint", 1000, setpoint);
-    wd.addElement("Desired Fan Speed", 20, desiredfanspeedtemperatureforecast);
+    wd.addElement("Fan Speed from Forecast", 20, desiredfanspeedtemperatureforecast);
   }
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    oldfanspeed = Integer.parseInt(controller.getDesiredState());
-    wd.addElement("Old Fan Speed", 1020, oldfanspeed);
+    olddesiredfanspeed = Integer.parseInt(controller.getDesiredState());
+    wd.addElement("Old Fan Speed", 1020, olddesiredfanspeed);
 
     // now, what does the weighted decision say?
-    newfanspeed = oldfanspeed;
-    int desiredfanspeed = (Integer) wd.getTopValue();
-
-    if (oldfanspeed < desiredfanspeed) {
+    newfanspeed = olddesiredfanspeed;
+    int newdesiredfanspeed = (Integer) wd.getTopValue();
+    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: "  + wd.getTopName());
+    
+    if (olddesiredfanspeed < newdesiredfanspeed) {
       newfanspeed++;
     }
-    if (oldfanspeed > desiredfanspeed) {
+    if (olddesiredfanspeed > newdesiredfanspeed) {
       newfanspeed--;
     }
     // bounds checking
@@ -127,16 +130,19 @@ public class HouseFan {
     newfanspeed = Math.max(newfanspeed, 0);
 
     // if no changes are necessary
-    if (oldfanspeed == desiredfanspeed) {
+    if (olddesiredfanspeed == newfanspeed) {
       log.log(Level.INFO, wd.toString());
+      log.log(Level.INFO, "No changes needed");
       return;
     }
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
+    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
+    sendNotification();
   }
 
-  public void sendNotfication() {
+  public void sendNotification() {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase
     // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
@@ -145,7 +151,7 @@ public class HouseFan {
     MailNotification mnotif = new MailNotification();
     mnotif.setBody(wd.toMessage());
     mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-    mnotif.setSubject("Fan Speed change: " + oldfanspeed + " -> " + newfanspeed);
+    mnotif.setSubject("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     mnotif.sendNotification();
   }
 }

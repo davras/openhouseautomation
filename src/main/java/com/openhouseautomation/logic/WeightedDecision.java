@@ -15,13 +15,13 @@ import java.util.PriorityQueue;
 public class WeightedDecision {
 
   // store data
-  PriorityQueue<DecisionElement> queue = new PriorityQueue<>();
+  PriorityQueue<DecisionElement> queue = new PriorityQueue<>(20, new WDsort());
 
   static class WDsort implements Comparator<DecisionElement> {
 
     @Override
     public int compare(DecisionElement one, DecisionElement two) {
-      return two.getWeight() - one.getWeight();
+      return one.getWeight() - two.getWeight();
     }
   }
 
@@ -42,6 +42,9 @@ public class WeightedDecision {
     public Object getValue() {
       return this.value;
     }
+    public String getName() {
+      return this.name;
+    }
   }
 
   public void addElement(String name, int weight, Object value) {
@@ -52,11 +55,14 @@ public class WeightedDecision {
   public Object getTopValue() {
     return queue.peek().getValue();
   }
+  public String getTopName() {
+    return queue.peek().getName();
+  }
   @Override
   public String toString() {
     String toret = "{";
     for (DecisionElement de: queue) {
-      toret = "[" + de.name + ", " + de.weight + ", " + de.value + "],";
+      toret += "[" + de.name + ", " + de.weight + ", " + de.value + "],";
     }
     //remove last comma
     toret = toret.substring(0,toret.length()-1);
