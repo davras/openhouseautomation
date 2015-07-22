@@ -14,61 +14,90 @@ import java.util.logging.Logger;
 public class HouseFan {
 
   WeightedDecision wd = new WeightedDecision();
-
+  Controller controller;
+  double forecasthigh;
+  double insidetemp;
+  int oldfanspeed;
+  int newfanspeed;
+  boolean tocontinue;
+  
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
   public void process() {
-    // save DS queries if it fails early
+    if (!considerStatePriority()) return;
+    if (!considerControlMode()) return;
+    if (!considerTemperatures()) return;
+    considerSlope();
+    considerForecast();
+    computeDesiredSpeed();
+    processFanChange();
+    sendNotfication();
+  }
 
-    Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+  public boolean considerStatePriority() {
+    controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
       wd.addElement("DesiredStatePriority", 1, 5); // full speed
       log.log(Level.WARNING, wd.toString());
+      return false;
     }
+    return true;
+  }
 
+  public boolean considerControlMode() {
     // skip everything if the controller is not in AUTO
     int manualcontrol = controller.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO ? 0 : 1;
     wd.addElement("DesiredStatePriority", 1, manualcontrol);
-    if (manualcontrol == 1) {
-      return;  //bail out early
-    }
+    return (manualcontrol == 0);
+  }
 
+  public boolean considerTemperatures() {
     // get the inside and outside temperatures
     double outsidetemp = Utilities.getDoubleReading("Outside Temperature");
-    double insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    insidetemp = Utilities.getDoubleReading("Inside Temperature");
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
       wd.addElement("Outside vs Inside Temperature", 5, 0);
       log.log(Level.INFO, wd.toString());
-      return;
+      return false;
     }
+    return true;
+  }
 
+  public void considerSlope() {
     // decrease fan speed if outside is warming up
     double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
     if (tempslope >= 0) {
       wd.addElement("Outside Temperature Slope", 10, -1);
     }
+  }
 
+  public void considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
-    double forecasthigh = Utilities.getForecastHigh("95376");
+    forecasthigh = Utilities.getForecastHigh("95376");
     if (forecasthigh < 80) {
       wd.addElement("Forecast High", 5, 0);
     }
+  }
 
+  public void computeDesiredSpeed() {
     // compute setpoint based on forecast high for tomorrow
     double setpoint = (forecasthigh * -2 / 5) + 102;
     int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
     wd.addElement("Setpoint", 1000, setpoint);
     wd.addElement("Desired Fan Speed", 20, desiredfanspeedtemperatureforecast);
+  }
 
+  public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    int oldfanspeed = Integer.parseInt(controller.getDesiredState());
+    oldfanspeed = Integer.parseInt(controller.getDesiredState());
     wd.addElement("Old Fan Speed", 1020, oldfanspeed);
 
     // now, what does the weighted decision say?
-    int newfanspeed = oldfanspeed;
+    newfanspeed = oldfanspeed;
     int desiredfanspeed = (Integer) wd.getTopValue();
+    
     if (oldfanspeed < desiredfanspeed) {
       newfanspeed++;
     }
@@ -87,7 +116,9 @@ public class HouseFan {
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
+  }
 
+  public void sendNotfication() {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase
     // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub

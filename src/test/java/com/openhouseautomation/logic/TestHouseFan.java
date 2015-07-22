@@ -9,6 +9,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -34,6 +35,12 @@ public class TestHouseFan {
 
   @Test
   public void doTest() {
+    HouseFan hftester = new HouseFan();
+    Controller controller = new Controller();
+    controller.setName("Whole House Fan");
+    controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
+    ofy().save().entity(controller);
+    assertEquals(false, hftester.considerStatePriority());
     assertEquals(2,2);
     System.out.println("this was a test");
     
