@@ -119,7 +119,7 @@ public class HouseFan {
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
-    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
+    log.log(Level.WARNING, "Changed fan speed: " + olddesiredfanspeed + " -> " + newfanspeed);
     sendNotification();
   }
 
