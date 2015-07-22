@@ -17,7 +17,7 @@ public class HouseFan {
   Controller controller;
   double forecasthigh;
   double insidetemp;
-  int oldfanspeed;
+  int olddesiredfanspeed;
   int newfanspeed;
   boolean tocontinue;
   
@@ -93,17 +93,17 @@ public class HouseFan {
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    oldfanspeed = Integer.parseInt(controller.getDesiredState());
-    wd.addElement("Old Fan Speed", 1020, oldfanspeed);
+    olddesiredfanspeed = Integer.parseInt(controller.getDesiredState());
+    wd.addElement("Old Fan Speed", 1020, olddesiredfanspeed);
 
     // now, what does the weighted decision say?
-    newfanspeed = oldfanspeed;
-    int desiredfanspeed = (Integer) wd.getTopValue();
+    newfanspeed = olddesiredfanspeed;
+    int newdesiredfanspeed = (Integer) wd.getTopValue();
     
-    if (oldfanspeed < desiredfanspeed) {
+    if (olddesiredfanspeed < newdesiredfanspeed) {
       newfanspeed++;
     }
-    if (oldfanspeed > desiredfanspeed) {
+    if (olddesiredfanspeed > newdesiredfanspeed) {
       newfanspeed--;
     }
     // bounds checking
@@ -111,13 +111,15 @@ public class HouseFan {
     newfanspeed = Math.max(newfanspeed, 0);
 
     // if no changes are necessary
-    if (oldfanspeed == desiredfanspeed) {
+    if (olddesiredfanspeed == newfanspeed) {
       log.log(Level.INFO, wd.toString());
+      log.log(Level.INFO, "No changes needed");
       return;
     }
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
+    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     sendNotification();
   }
 
@@ -128,7 +130,7 @@ public class HouseFan {
     MailNotification mnotif = new MailNotification();
     mnotif.setBody(wd.toMessage());
     mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-    mnotif.setSubject("Fan Speed change: " + oldfanspeed + " -> " + newfanspeed);
+    mnotif.setSubject("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     mnotif.sendNotification();
   }
 }

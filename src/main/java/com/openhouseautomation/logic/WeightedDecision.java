@@ -56,7 +56,7 @@ public class WeightedDecision {
   public String toString() {
     String toret = "{";
     for (DecisionElement de: queue) {
-      toret = "[" + de.name + ", " + de.weight + ", " + de.value + "],";
+      toret += "[" + de.name + ", " + de.weight + ", " + de.value + "],";
     }
     //remove last comma
     toret = toret.substring(0,toret.length()-1);
