@@ -24,6 +24,9 @@ public class HouseFan {
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
   public void process() {
+    if (!setup()) {
+      return;
+    }
     if (!considerStatePriority()) {
       return;
     }
@@ -39,12 +42,15 @@ public class HouseFan {
     processFanChange();
   }
 
-  public boolean considerStatePriority() {
+  public boolean setup() {
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
       log.log(Level.INFO, "null controller");
       return false;
     }
+    return true;
+  }
+  public boolean considerStatePriority() {
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
       wd.addElement("DesiredStatePriority", 1, 5); // full speed
@@ -57,7 +63,7 @@ public class HouseFan {
   public boolean considerControlMode() {
     // skip everything if the controller is not in AUTO
     if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
-      wd.addElement("DesiredStatePriority", 1030, "Not in " + Controller.DesiredStatePriority.AUTO.name());
+      wd.addElement("DesiredStatePriority", 1000, "Not in " + Controller.DesiredStatePriority.AUTO.name());
       log.log(Level.INFO, wd.toString());
       return false;
     }
@@ -67,7 +73,9 @@ public class HouseFan {
   public boolean considerTemperatures() {
     // get the inside and outside temperatures
     double outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+    wd.addElement("Outside Temperature", 1000, outsidetemp);
     insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    wd.addElement("Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
       log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
       return false;
@@ -84,6 +92,7 @@ public class HouseFan {
   public void considerSlope() {
     // decrease fan speed if outside is warming up
     double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
+    wd.addElement("Outside Temperature Slope", 1000, tempslope);
     if (tempslope >= 1) {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
       // to avoid hysteresis, make sure the slope is > 1 (increasing quickly)
@@ -94,6 +103,7 @@ public class HouseFan {
   public void considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
     forecasthigh = Utilities.getForecastHigh("95376");
+    wd.addElement("Forecast High", 1000, forecasthigh);
     if (forecasthigh == 0 || forecasthigh < -100 || forecasthigh > 150) {
       log.log(Level.INFO, "bad forecasthigh: {0}", forecasthigh);
       return;
@@ -114,7 +124,7 @@ public class HouseFan {
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
     olddesiredfanspeed = Integer.parseInt(controller.getDesiredState());
-    wd.addElement("Old Fan Speed", 1020, olddesiredfanspeed);
+    wd.addElement("Old Fan Speed", 1000, olddesiredfanspeed);
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;

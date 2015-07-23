@@ -20,7 +20,7 @@ import org.junit.Test;
  * @author dras
  */
 public class TestHouseFan {
-
+  Controller controller;
   public TestHouseFan() {
     ObjectifyService.register(Controller.class);
   }
@@ -30,19 +30,38 @@ public class TestHouseFan {
 
   @Before
   public void setUp() {
-    helper.setUp();
+    controller = new Controller();
+    controller.setName("Whole House Fan");
   }
 
-  @Test
-  public void doTest() {
+  //@Test
+  public void testConsiderStatePriority() {
     HouseFan hftester = new HouseFan();
     Controller controller = new Controller();
     controller.setName("Whole House Fan");
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
     ofy().save().entity(controller);
     assertEquals(false, hftester.considerStatePriority());
-    assertEquals(2,2);
-    System.out.println("this was a test");
+  }
+  
+  //@Test
+  public void testConsiderControlMode() {
+    HouseFan hftester = new HouseFan();
+    Controller controller = new Controller();
+    controller.setName("Whole House Fan");
+    controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+    ofy().save().entity(controller);
+    assertEquals(true, hftester.considerControlMode());
     
+    // test the positives as well
+    controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+    ofy().save().entity(controller);
+    assertEquals(false, hftester.considerControlMode());
+    controller.setDesiredStatePriority(Controller.DesiredStatePriority.LOCAL);
+    ofy().save().entity(controller);
+    assertEquals(false, hftester.considerControlMode());
+    controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
+    ofy().save().entity(controller);
+    assertEquals(false, hftester.considerControlMode());
   }
 }
