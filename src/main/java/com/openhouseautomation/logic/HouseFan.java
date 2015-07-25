@@ -23,6 +23,10 @@ public class HouseFan {
 
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
+  // for testing
+  public WeightedDecision getWeightedDecision() {
+    return wd;
+  }
   public void process() {
     if (!setup()) {
       return;
@@ -50,6 +54,7 @@ public class HouseFan {
     }
     return true;
   }
+
   public boolean considerStatePriority() {
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
@@ -129,8 +134,8 @@ public class HouseFan {
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
     int newdesiredfanspeed = (Integer) wd.getTopValue();
-    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: "  + wd.getTopName());
-    
+    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
+
     if (olddesiredfanspeed < newdesiredfanspeed) {
       newfanspeed++;
     }
@@ -159,7 +164,9 @@ public class HouseFan {
     // yes, it will send a lot of debug mail during this testing phase
     // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
     boolean tosend = Boolean.parseBoolean(DatastoreConfig.getValueForKey("send mail", "true"));
-    if (!tosend) return;
+    if (!tosend) {
+      return;
+    }
     MailNotification mnotif = new MailNotification();
     mnotif.setBody(wd.toMessage());
     mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));

@@ -7,8 +7,6 @@ import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 
-import java.util.Date;
-
 /**
  * A class representing a sensor device.
  *
