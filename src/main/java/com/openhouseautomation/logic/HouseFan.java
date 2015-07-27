@@ -27,6 +27,7 @@ public class HouseFan {
   public WeightedDecision getWeightedDecision() {
     return wd;
   }
+
   public void process() {
     if (!setup()) {
       return;
@@ -143,12 +144,11 @@ public class HouseFan {
       newfanspeed--;
     }
     // bounds checking
-    newfanspeed = Math.min(newfanspeed, 5);
-    newfanspeed = Math.max(newfanspeed, 0);
+    newfanspeed = ensureRange(newfanspeed,0, 5);
 
     // if no changes are necessary
+    log.log(Level.INFO, wd.toString());
     if (olddesiredfanspeed == newfanspeed) {
-      log.log(Level.INFO, wd.toString());
       log.log(Level.INFO, "No changes needed");
       return;
     }
@@ -159,6 +159,10 @@ public class HouseFan {
     sendNotification();
   }
 
+  public int ensureRange(int value, int min, int max) {
+   return Math.min(Math.max(value, min), max);
+}
+  
   public void sendNotification() {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase
