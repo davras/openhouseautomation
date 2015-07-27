@@ -134,6 +134,34 @@
         });
         devices.fastpull = true;
       };
+      
+      $scope.processFormDSP = function(id, state) {
+        $scope.id = id;
+        $scope.state = state;
+        console.log("a button was pushed:" + id + "=>" + state);
+        var len = devices.data.length;
+        for (var p = 0; p < len; p++) {
+          if ($scope.id === devices.data[p].id) {
+            devices.data[p].desiredStatePriority = $scope.state;
+            console.log("set id:" + devices.data[p].id + " to " + $scope.state);
+          }
+        }
+        $http({
+          method: 'post',
+          url: CONTROLLER_UPDATE_URL,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          transformRequest: function(obj) {
+            var str = [];
+            for (var p in obj)
+              str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            return str.join("&");
+          },
+          data: {id: $scope.id, desiredStatePriority: $scope.state}
+        }).success(function() {
+          // should check for a 200 return
+        });
+        devices.fastpull = true;
+      };
     }]);
   app.controller('SceneController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var scenes = this;
