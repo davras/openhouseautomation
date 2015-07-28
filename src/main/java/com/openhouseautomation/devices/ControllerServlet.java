@@ -140,8 +140,10 @@ public class ControllerServlet extends HttpServlet {
       if (!controller.getActualState().equals(controllervalue)) {
         log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
         controller.setActualState(controllervalue);
-        // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
+        // if desiredstatelastchange is more than 60 secs old and
+        // the desiredstate is not the actual state, this is a local override.
+        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+                && !controller.getDesiredState().equals(controller.getActualState())) {
           log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
@@ -212,7 +214,8 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+                && !c.getDesiredState().equals(c.getActualState())) {
           log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
