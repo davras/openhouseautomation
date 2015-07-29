@@ -32,11 +32,14 @@ public class SipHashHelper {
     }
     auth = auth.toUpperCase(); // make sure we are comparing upper case
     if (auth.equals("TEST")) {
-      return true; // this is going away!!!! DO NOT USE!
+      String allowtestauth = DatastoreConfig.getValueForKey("allowtestauth", "false");
+      if (allowtestauth.equals("true")) {
+        return true; // this is going away!!!! DO NOT USE!
+      }
     }
     SipHash sipHash = new SipHash();
-    String key = DatastoreConfig.getValueForKey("sensorsecret", "gautoard12345678"); // don't use the default secret!
-    if (key == null) {
+    String key = DatastoreConfig.getValueForKey("sensorsecret", ""); // don't use the default secret!
+    if (key == null || "".equals(key)) {
       key = DatastoreConfig.getValueForKey("sensorsecret", generateRandomString()); // don't use the default secret!
     }
     String time = String.valueOf(System.currentTimeMillis() / 1000 / 60); // one minute window for hash

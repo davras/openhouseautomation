@@ -29,11 +29,11 @@
       function drawVisualization3986975262() {
         google.visualization.drawChart({
           "containerId": "visualization_div_3986975262",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3986975262&id=28131427&id=3130021022',
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3986975262&id=28131427&id=2154791004&id=3130021022',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Temperatures',
-            "colors": ['red', 'blue', 'green'],
+            "colors": ['red', 'blue', 'green', 'orange'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -49,11 +49,11 @@
       function drawVisualization112578578() {
         google.visualization.drawChart({
           "containerId": "visualization_div_112578578",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=112578578',
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=112578578&id=3470692084',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Outside Wind Speed 2 min avg',
-            "colors": ['blue'],
+            "title": 'Wind Speed',
+            "colors": ['blue', 'green'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -63,26 +63,6 @@
         });
       }
       google.setOnLoadCallback(drawVisualization112578578);
-    </script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization1596290393() {
-        google.visualization.drawChart({
-          "containerId": "visualization_div_1596290393",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=1596290393',
-          "chartType": "AnnotationChart",
-          "options": {
-            "title": 'Outside Wind Direction 2 min avg',
-            "colors": ['blue'],
-            "scaleType": 'maximized',
-            "thickness": 2,
-            "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "##.00"
-          }
-        });
-      }
-      google.setOnLoadCallback(drawVisualization1596290393);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
@@ -270,9 +250,6 @@
           <br>
           <h3>Outside Wind Speed 2 min avg</h3>
           <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Wind Direction 2 min avg</h3>
-          <div id="visualization_div_1596290393" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Rain Current</h3>
           <div id="visualization_div_1714117207" style="width: 90%; height: 200px;"></div>

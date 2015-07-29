@@ -43,7 +43,7 @@ public class DisplaySourceServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     log.log(Level.INFO, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
     if (request.getPathInfo() == null) {
       return;
@@ -80,6 +80,7 @@ public class DisplaySourceServlet extends HttpServlet {
     ObjectMapper om = new ObjectMapper();
     om.writeValue(out, forecasts);
   }
+
   private void doListDeviceTypes(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     if (request.getRemoteAddr().equals("127.0.0.1")) {
@@ -88,7 +89,7 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     Controller.Type[] types = Controller.Type.values();
     ControllerHelper ch[] = new ControllerHelper[types.length];
-    for (int i=0; i < types.length; i++) {
+    for (int i = 0; i < types.length; i++) {
       ch[i] = new ControllerHelper();
       ch[i].ordinal = types[i].ordinal();
       ch[i].name = types[i].toString();
@@ -155,7 +156,7 @@ public class DisplaySourceServlet extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+          throws ServletException, IOException {
     log.log(Level.INFO, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
 //    Enumeration<String> es = request.getParameterNames();
 //    while (es.hasMoreElements()) {
@@ -184,7 +185,18 @@ public class DisplaySourceServlet extends HttpServlet {
         log.log(Level.INFO, "updated all controllers");
       } else { // an individual light
         Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
-        controller.setDesiredState(request.getParameter("desiredState"));
+        String state = request.getParameter("desiredState");
+        if (state == null) {
+          state = request.getParameter("desiredStatePriority");
+          if ("AUTO".equals(state)) {
+            controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+          } else if ("MANUAL".equals(state)) {
+            controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+          }
+        } else {
+          controller.setDesiredState(state);
+          controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        }
         ofy().save().entity(controller);
         log.log(Level.INFO, "updated controller: " + controller.toString());
         response.sendError(HttpServletResponse.SC_NO_CONTENT);

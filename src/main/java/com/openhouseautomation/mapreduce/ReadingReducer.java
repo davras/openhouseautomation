@@ -30,6 +30,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     } else if (key.startsWith("WINDSPEED")) {
       reduceHigh(key, values);
     }
+    // TODO reduce rain volume
   }
 
   public void reduceHighLow(String key, ReducerInput<String> values) {

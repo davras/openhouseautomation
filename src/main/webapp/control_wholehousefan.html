@@ -1,17 +1,26 @@
 <form>
   <div ng-repeat="device in devices.data">
     <h4>{{device.name}}:</h4>
-      <div class="btn-group">
-        <label class="btn btn-primary"
-               ng-model="device.desiredState"
-               ng-repeat="state in device.validStates"
-               btn-radio="'{{state}}'"
-               ng-value="state"
-               ng-disabled="device.actualState == state"
-               ng-click="processForm(device.id, state)">
-          {{state}}
-        </label>
-        <label ng-hide="device.desiredState == device.actualState">Setting to {{device.desiredState}}...</label>
-      </div>
-  </div>
+    <div class="btn-group">
+      <label class="btn btn-primary"
+             ng-model="device.desiredState"
+             ng-repeat="state in device.validStates"
+             btn-radio="'{{state}}'"
+             ng-value="state"
+             ng-disabled="device.actualState == state"
+             ng-click="processForm(device.id, state)">
+        {{state}}
+      </label>
+      <label ng-hide="device.desiredState == device.actualState">Setting to {{device.desiredState}}...</label>
+    </div>
+    <div>
+      <label class="btn btn-primary"
+             ng-model="device.desiredStatePriority"
+             btn-radio="'{{device.desiredStatePriorty}}'"
+             ng-value="statepriority"
+             ng-disabled="device.desiredStatePriority == 'AUTO'"
+             ng-click="processFormDSP(device.id, 'AUTO')">
+        {{device.desiredStatePriority}}
+      </label>
+    </div>
 </form>

@@ -33,24 +33,26 @@ public class ListenServlet extends HttpServlet {
    * Verified that an Objectify.save() will update Memcache, now how to read
    * from Memcache for the latest value?.
    *
-   * Doesn't work: regular Objectify load()
-   * Why: Reads from session cache don't reflect other thread's modifications (doesn't normally read Memcache)
-   * 
-   * Doesn't work: Objectify load with cache(false)
-   * Why: Bypasses memcache and reads from Datastore
-   * 
-   * Doesn't work: Transactions in Objectify
-   * Why: Bypasses memcache and reads from Datastore
-   * Docs state: Starting a transaction creates a new Objectify instance with a fresh, empty session cache
-   * Which implies that memcache is used, but later docs state:
-   * (Transactional) Reads and writes bypass the memcache
-   * 
-   * Works!!!: Use Objectify.clear() between each read to clear the session cache, but still read from Memcache
+   * Doesn't work: regular Objectify load() Why: Reads from session cache don't
+   * reflect other thread's modifications (doesn't normally read Memcache)
+   *
+   * Doesn't work: Objectify load with cache(false) Why: Bypasses memcache and
+   * reads from Datastore
+   *
+   * Doesn't work: Transactions in Objectify Why: Bypasses memcache and reads
+   * from Datastore Docs state: Starting a transaction creates a new Objectify
+   * instance with a fresh, empty session cache Which implies that memcache is
+   * used, but later docs state: (Transactional) Reads and writes bypass the
+   * memcache
+   *
+   * Works!!!: Use Objectify.clear() between each read to clear the session
+   * cache, but still read from Memcache
    */
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ListenServlet.class.getName());
   long timeout = 8000L; // stop looping when this many ms are left in the request timer
   long pollinterval = 1000L; // poll for changes once per second
+
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
    * methods.
@@ -78,6 +80,12 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+          // this block should handle memcache flushes
+          if (controllernew == null) {
+            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            return;
+          }
           String newval = controllernew.getDesiredState();
           if (!controllercompareinitial.getDesiredState().equals(newval)) {
             foundachange = true;
@@ -160,7 +168,7 @@ public class ListenServlet extends HttpServlet {
 // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
-    log.log(Level.FINE, "request path:" + reqpath);
+    log.log(Level.INFO, "request path:" + reqpath);
 
     if (reqpath.startsWith("/lights")) {
       doLightsListen(request, response);
@@ -194,7 +202,8 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)) {
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+                && !c.getDesiredState().equals(c.getActualState())) {
           log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
@@ -223,7 +232,17 @@ public class ListenServlet extends HttpServlet {
       // walk the ArrayList, load each Controller, compare values against original
       ofy().clear(); // clear the session cache
       for (Controller controllercompareinitial : cinitial) {
-        Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+        Controller controllernew = null;
+        try {
+          controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
+        } catch (Exception e) {
+          // This will catch Memcache flushes and return so the client can
+          // reconnect and listen again.
+          out.print(new String(toret));
+          out.flush();
+          out.close();
+          return;
+        }
         String newval = controllernew.getDesiredState();
         if (!controllercompareinitial.getDesiredState().equals(newval)) {
           foundachange = true;
