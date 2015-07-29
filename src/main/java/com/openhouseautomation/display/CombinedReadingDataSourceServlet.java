@@ -11,10 +11,10 @@ import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
 //import java.util.GregorianCalendar; // DO NOT USE
-import com.ibm.icu.util.GregorianCalendar;
+//import com.ibm.icu.util.GregorianCalendar;
 // converts java.util.GregorianCalendar (as returned by JodaTime.getGregorianCalendar)
 // to com.ibm.icu.util.GregorianCalendar (as needed by Google Visualization Library)
-import com.openhouseautomation.GregorianCalendarCopy;
+import com.openhouseautomation.GregorianCalendar;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Reading;
@@ -64,7 +64,7 @@ public class CombinedReadingDataSourceServlet extends DataSourceServlet {
       // without a timezone of GMT, you will get:
       // can't create DateTimeValue from GregorianCalendar that is not GMT.
       // and if you want your graph in a TZ other than GMT? Nope.
-      GregorianCalendar cal = GregorianCalendarCopy.convert(dt.toGregorianCalendar());
+      GregorianCalendar cal = new GregorianCalendar(dt.toGregorianCalendar());
       try {
         data.addRowFromValues(cal, null, new Double(readinghist.getHigh()), new Double(readinghist.getLow()));
       } catch (TypeMismatchException e) {
@@ -79,7 +79,7 @@ public class CombinedReadingDataSourceServlet extends DataSourceServlet {
       // without a timezone of GMT, you will get:
       // can't create DateTimeValue from GregorianCalendar that is not GMT.
       // and if you want your graph in a TZ other than GMT? Nope.
-      GregorianCalendar calz = GregorianCalendarCopy.convert(dt.toGregorianCalendar());
+      GregorianCalendar calz = new GregorianCalendar(dt.toGregorianCalendar());
       try {
         data.addRowFromValues(calz, new Double(reading.getValue()), null, null);
       } catch (TypeMismatchException e) {
