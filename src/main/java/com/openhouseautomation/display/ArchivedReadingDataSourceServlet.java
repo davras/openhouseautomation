@@ -14,10 +14,10 @@ import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
 //import java.util.GregorianCalendar; // DO NOT USE
-import com.ibm.icu.util.GregorianCalendar;
+//import com.ibm.icu.util.GregorianCalendar;
 // converts java.util.GregorianCalendar (as returned by JodaTime.getGregorianCalendar)
 // to com.ibm.icu.util.GregorianCalendar (as needed by Google Visualization Library)
-import com.openhouseautomation.GregorianCalendarCopy;
+import com.openhouseautomation.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -72,7 +72,7 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
         // without a timezone of GMT, you will get:
         // can't create DateTimeValue from GregorianCalendar that is not GMT.
         // and if you want your graph in a TZ other than GMT? Nope.
-        GregorianCalendar cal = GregorianCalendarCopy.convert(dt.toGregorianCalendar());
+        GregorianCalendar cal = new GregorianCalendar(dt.toGregorianCalendar());
         if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
           data.addRowFromValues(cal, new Double(reading.getHigh()), new Double(reading.getLow()));
         } else if (sensor.getType() == Sensor.Type.LIGHT) {
