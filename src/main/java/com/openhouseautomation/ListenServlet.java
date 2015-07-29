@@ -82,6 +82,7 @@ public class ListenServlet extends HttpServlet {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
           // this block should handle memcache flushes
           if (controllernew == null) {
+            // prevent errors from causing frequent retry requests
             try { Thread.sleep(5000); } catch (InterruptedException e) {}
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             return;
