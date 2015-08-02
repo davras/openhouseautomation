@@ -142,9 +142,9 @@ public class ControllerServlet extends HttpServlet {
         controller.setActualState(controllervalue);
         // if desiredstatelastchange is more than 60 secs old and
         // the desiredstate is not the actual state, this is a local override.
-        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 120000)
                 && !controller.getDesiredState().equals(controller.getActualState())) {
-          log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
+          log.log(Level.WARNING, "POST /device, lastdes is > 120 secs old, going into manual");
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
@@ -166,7 +166,7 @@ public class ControllerServlet extends HttpServlet {
         return;
       } else {
         // it's a manual setting
-        log.log(Level.INFO, "POST /display, manual setting:{0}", controllervalue);
+        log.log(Level.WARNING, "POST /display, manual setting:{0}", controllervalue);
         controller.setDesiredState(controllervalue);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         ofy().save().entity(controller);
@@ -214,9 +214,9 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 120000)
                 && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
+          log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
