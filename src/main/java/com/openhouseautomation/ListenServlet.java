@@ -133,6 +133,7 @@ public class ListenServlet extends HttpServlet {
       if ("auth".equals(controllerid)) {
         continue; // the auth isn't a controller
       }
+      ofy().clear(); // clear the session cache, not the memcache
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       ebs.add(controller);
       log.log(Level.INFO, "arrange listener:{0}", controller);
@@ -189,6 +190,7 @@ public class ListenServlet extends HttpServlet {
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
+    ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     boolean dirty = false;
     for (Controller c : lights) {
@@ -202,7 +204,7 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 120000)
+         if (c.getLastDesiredStateChange().minusMinutes(2).isBeforeNow()
                 && !c.getDesiredState().equals(c.getActualState())) {
           log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
           c.setDesiredState(curstate);

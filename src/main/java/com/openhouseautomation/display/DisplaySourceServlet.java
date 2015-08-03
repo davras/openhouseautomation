@@ -177,6 +177,7 @@ public class DisplaySourceServlet extends HttpServlet {
     log.log(Level.INFO, "going to update controller:" + controllerid);
     if (null != controllerid && !"".equals(controllerid)) {
       if (controllerid.equals("100")) { // all lights
+        ofy().clear(); // clear the session cache, not the memcache
         List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
         for (Controller c : lights) {
           c.setDesiredState(request.getParameter("desiredState"));
@@ -184,6 +185,7 @@ public class DisplaySourceServlet extends HttpServlet {
         ofy().save().entities(lights);
         log.log(Level.INFO, "updated all controllers");
       } else { // an individual light
+        ofy().clear(); // clear the session cache, not the memcache
         Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
         String state = request.getParameter("desiredState");
         if (state == null) {
