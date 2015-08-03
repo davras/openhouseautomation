@@ -76,6 +76,7 @@ private static final long serialVersionUID = 1L;
       hash.update(cont.getZone().getBytes());
       cont.setId(hash.getValue());
 
+      ofy().clear(); // clear the session cache, not the memcache
       Controller contexists = ofy().load().type(Controller.class).id(cont.getId()).now();
 
       if (contexists == null) {

@@ -53,7 +53,7 @@ public class ControllerServlet extends HttpServlet {
     log.info("1. authorization checked");
     log.log(Level.INFO, "k={0}", controllerid);
     // load the controller entity
-
+    ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
@@ -113,6 +113,7 @@ public class ControllerServlet extends HttpServlet {
     String auth = request.getParameter("auth");
     final String controllerid = request.getParameter("k");
     final String controllervalue = request.getParameter("v");
+    ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     // TODO cleanup the anonymous inner class
     log.log(Level.INFO, "k={0},v={1}", new Object[]{controllerid, controllervalue});
@@ -138,13 +139,19 @@ public class ControllerServlet extends HttpServlet {
         controller.setDesiredState(controllervalue);
       }
       if (!controller.getActualState().equals(controllervalue)) {
-        log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
+        log.log(Level.INFO, "POST /device, D:{0} @{1}",
+                new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
         controller.setActualState(controllervalue);
         // if desiredstatelastchange is more than 60 secs old and
         // the desiredstate is not the actual state, this is a local override.
-        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+        if (controller.getLastDesiredStateChange().minusMinutes(2).isBeforeNow()
                 && !controller.getDesiredState().equals(controller.getActualState())) {
-          log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
+          log.log(Level.WARNING, "POST /device, lastdes is > 120 secs old, going into manual");
+          log.log(Level.WARNING, "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
+                  new Object[]{controller.getLastDesiredStateChange(),
+                    controller.getDesiredState(),
+                    controller.getActualState()
+                  });
           controller.setDesiredState(controllervalue);
           controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
@@ -166,7 +173,7 @@ public class ControllerServlet extends HttpServlet {
         return;
       } else {
         // it's a manual setting
-        log.log(Level.INFO, "POST /display, manual setting:{0}", controllervalue);
+        log.log(Level.WARNING, "POST /display, manual setting:{0}", controllervalue);
         controller.setDesiredState(controllervalue);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         ofy().save().entity(controller);
@@ -203,6 +210,7 @@ public class ControllerServlet extends HttpServlet {
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
+    ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
@@ -214,9 +222,9 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
+        if (c.getLastDesiredStateChange().minusMinutes(2).isBeforeNow()
                 && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
+          log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
