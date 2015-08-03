@@ -130,12 +130,12 @@ public class TestHouseFan {
 
   }
 
-  @Test
+  //@Test
   public void testConsiderSlope() {
     // setup historical temperature readings
     DateTime now = new DateTime();
     DateTime nowlesshour = now.minusHours(1);
     DateTime nowlesstwohour = now.minusHours(2).plusMinutes(5);
-    
+
   }
 }
