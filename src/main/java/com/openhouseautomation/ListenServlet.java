@@ -205,7 +205,7 @@ public class ListenServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-         if (c.getLastDesiredStateChange().minusMinutes(2).isBeforeNow()
+         if (c.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
                 && !c.getDesiredState().equals(c.getActualState())) {
           log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
           c.setDesiredState(curstate);
