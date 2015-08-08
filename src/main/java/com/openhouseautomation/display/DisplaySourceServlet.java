@@ -96,6 +96,7 @@ public class DisplaySourceServlet extends HttpServlet {
       ch[i].display = false;
       ch[i].link = types[i].name();
     }
+    // doesn't change frequently, no need to clear ofy() session cache
     Query<Controller> q = ofy().load().type(Controller.class).project("type").distinct(true);
     QueryResultIterator<Controller> iterator = q.iterator();
     while (iterator.hasNext()) {
@@ -135,6 +136,7 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     // production
     String type = request.getParameter("type");
+    // doesn't change frequently, no need to clear ofy() session cache
     Query<Controller> query = ofy().load().type(Controller.class).filter("type", type);
     QueryResultIterator<Controller> iterator = query.iterator();
     List controllers = new ArrayList();

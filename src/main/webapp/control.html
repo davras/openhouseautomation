@@ -47,24 +47,27 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li>Overview</li>
+            <li class="nav-header"><a href="/index.html">Overview</a></li>
             <li class="divider"></li>
             <li class="nav-header"><a href="/status.html">Status</a></li>
             <li class="divider"></li>
-            <li class="nav-header active">Control</li>
+            <li class="nav-header">Control</li>
             <li class="divider"></li>
-            <li class="nav-header"><a href="/scenes/">Scenes</a></li>
+            <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
             <li class="divider"></li>
-            <li class="nav-header"><a href="/manage/">Manage</a></li>
+            <li class="nav-header"><a href="/charts.html">Charts</a></li>
+            <li class="divider"></li>
+            <li class="nav-header"><a href="/manage.html">Manage</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-controller="DeviceController as devices">
           <div class="jumbotron"><h2>Control</h2></div>
           <section class="tab">
             <ul class="nav nav-pills">
-              <li role="presentation"
-                  ng-repeat="devicetype in devices.list"
+              <li role="presentation" 
+                  class="{ active: devices.isSet(devicetype.link) }"
                   ng-class="{ active: devices.isSet(devicetype.link) }"
+                  ng-repeat="devicetype in devices.list"
                   ng-show="devicetype.display">
                 <a href ng-click="devices.setTab(devicetype.link)">{{devicetype.name}}</a>
               </li>

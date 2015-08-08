@@ -48,6 +48,7 @@ public class HouseFan {
   }
 
   public boolean setup() {
+    ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
       log.log(Level.INFO, "null controller");
@@ -99,10 +100,10 @@ public class HouseFan {
     // decrease fan speed if outside is warming up
     double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
     wd.addElement("Outside Temperature Slope", 1000, tempslope);
-    if (tempslope >= 0.2) {
+    if (tempslope >= 0.1) {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
-      // to avoid hysteresis, make sure the slope is > 0.2 (increasing)
-      wd.addElement("Outside Temperature Slope", 10, -1);
+      // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
+      wd.addElement("Outside Temperature Slope", 10, 0);
     }
   }
 
