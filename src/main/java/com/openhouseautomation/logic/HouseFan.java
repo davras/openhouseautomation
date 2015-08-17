@@ -58,6 +58,11 @@ public class HouseFan {
   }
 
   public boolean considerStatePriority() {
+    if (controller == null) {
+      if (!setup()) {
+        return false;
+      }
+    }
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
       wd.addElement("DesiredStatePriority", 1, 5); // full speed
@@ -68,6 +73,11 @@ public class HouseFan {
   }
 
   public boolean considerControlMode() {
+    if (controller == null) {
+      if (!setup()) {
+        return false;
+      }
+    }
     // skip everything if the controller is not in AUTO
     if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
       wd.addElement("DesiredStatePriority", 1000, "Not in " + Controller.DesiredStatePriority.AUTO.name());
@@ -103,7 +113,10 @@ public class HouseFan {
     if (tempslope >= 0.1) {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
       // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
-      wd.addElement("Outside Temperature Slope", 10, 0);
+      // but don't slow fan if outside is much colder than inside
+      if ((Utilities.getDoubleReading("Outside Temperature") + 5) > Utilities.getDoubleReading("Inside Temperature")) {
+        wd.addElement("Outside Temperature Slope", 10, 0);
+      }
     }
   }
 
@@ -145,7 +158,7 @@ public class HouseFan {
       newfanspeed--;
     }
     // bounds checking
-    newfanspeed = ensureRange(newfanspeed,0, 5);
+    newfanspeed = ensureRange(newfanspeed, 0, 5);
 
     // if no changes are necessary
     log.log(Level.INFO, wd.toString());
@@ -161,9 +174,9 @@ public class HouseFan {
   }
 
   public int ensureRange(int value, int min, int max) {
-   return Math.min(Math.max(value, min), max);
-}
-  
+    return Math.min(Math.max(value, min), max);
+  }
+
   public void sendNotification() {
     // if fan speed changed, send notification
     // yes, it will send a lot of debug mail during this testing phase

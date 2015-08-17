@@ -13,6 +13,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.Sensor;
 import org.joda.time.DateTime;
+import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +48,11 @@ public class TestHouseFan {
     insidesensor.setName("Inside Temperature");
   }
 
+  @After
+  public void tearDown() {
+    helper.tearDown();
+  }
+
   @Test
   public void testSetup() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
@@ -64,68 +70,87 @@ public class TestHouseFan {
   }
 
   @Test
-  public void testConsiderControlMode() {
+  public void testConsiderControlModeAuto() {
+    // master slave datastore mock is holding state between runs
+    // breaking the tests
+    hftester.setup();
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
     ofy().save().entity(controller).now();
-    hftester.setup();
-    assertEquals(true, hftester.considerControlMode());
+    assertTrue(hftester.considerControlMode());
+  }
 
+  @Test
+  public void testConsiderControlModeManual() {
     // test the positives as well
+    hftester.setup();
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
     ofy().save().entity(controller).now();
+    assertFalse(hftester.considerControlMode());
+  }
+
+  @Test
+  public void testConsiderControlModeLocal() {
     hftester.setup();
-    assertEquals(false, hftester.considerControlMode());
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.LOCAL);
     ofy().save().entity(controller).now();
+    assertFalse(hftester.considerControlMode());
+  }
+
+  @Test
+  public void testConsiderControlModeEmergency() {
     hftester.setup();
-    assertEquals(false, hftester.considerControlMode());
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
     ofy().save().entity(controller).now();
-    hftester.setup();
-    assertEquals(false, hftester.considerControlMode());
+    assertFalse(hftester.considerControlMode());
   }
 
   @Test
   public void testConsiderTemperatures() {
     // should return false for ridiculous readings
     //test outside sensor
+    hftester.setup();
     outsidesensor.setLastReading("-200");
     ofy().save().entity(outsidesensor).now();
     insidesensor.setLastReading("75");
     ofy().save().entity(insidesensor).now();
-    hftester.setup();
     assertFalse(hftester.considerTemperatures());
+
+    hftester.setup();
     outsidesensor.setLastReading("65");
     ofy().save().entity(outsidesensor).now();
-    hftester.setup();
-    assertTrue(hftester.considerTemperatures());
-    
-    // test inside sensor
-    insidesensor.setLastReading("-200");
-    ofy().save().entity(insidesensor).now();
-    hftester.setup();
-    assertFalse(hftester.considerTemperatures());
-    insidesensor.setLastReading("85");
-    ofy().save().entity(insidesensor).now();
-    hftester.setup();
-    assertTrue(hftester.considerTemperatures());
-    
-    // test outside > inside
     insidesensor.setLastReading("75");
     ofy().save().entity(insidesensor).now();
+    assertTrue(hftester.considerTemperatures());
+
+    // test inside sensor
     hftester.setup();
-    outsidesensor.setLastReading("85");
+    outsidesensor.setLastReading("65");
     ofy().save().entity(outsidesensor).now();
-    hftester.setup();
+    insidesensor.setLastReading("-200");
+    ofy().save().entity(insidesensor).now();
     assertFalse(hftester.considerTemperatures());
-    
-    // test outside < inside
+
+    hftester.setup();
+    outsidesensor.setLastReading("65");
+    ofy().save().entity(outsidesensor).now();
     insidesensor.setLastReading("85");
     ofy().save().entity(insidesensor).now();
+    assertTrue(hftester.considerTemperatures());
+
+    // test outside > inside
     hftester.setup();
+    insidesensor.setLastReading("75");
+    ofy().save().entity(insidesensor).now();
+    outsidesensor.setLastReading("85");
+    ofy().save().entity(outsidesensor).now();
+    assertFalse(hftester.considerTemperatures());
+
+    // test outside < inside
+    hftester.setup();
+    insidesensor.setLastReading("85");
+    ofy().save().entity(insidesensor).now();
     outsidesensor.setLastReading("75");
     ofy().save().entity(outsidesensor).now();
-    hftester.setup();
     assertTrue(hftester.considerTemperatures());
 
   }
