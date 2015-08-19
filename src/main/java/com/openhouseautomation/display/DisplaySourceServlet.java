@@ -7,6 +7,8 @@ package com.openhouseautomation.display;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.googlecode.objectify.cmd.Query;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
@@ -64,10 +66,22 @@ public class DisplaySourceServlet extends HttpServlet {
       doListDeviceTypes(request, response);
       return;
     }
+    if (request.getPathInfo().startsWith("/login")) {
+      doLoginRequest(request, response);
+      return;
+    }
     log.log(Level.WARNING, "unsupported path: " + request.getPathInfo());
     response.getWriter().println("path not supported");
   }
 
+  private void doLoginRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // if the user is logged in, populate username
+    if (request.getUserPrincipal() != null) {
+      response.getWriter().print("[{\"username\":\"" + request.getUserPrincipal().getName() + "\"}]");
+    } else {
+      response.getWriter().print("[{\"redirecturl\":\"" + UserServiceFactory.getUserService().createLoginURL("/control.html") + "\"}]");
+    }
+  }
   private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);

@@ -18,8 +18,16 @@
              ng-model="device.desiredStatePriority"
              btn-radio="'{{device.desiredStatePriorty}}'"
              ng-value="statepriority"
-             ng-disabled="device.desiredStatePriority == 'AUTO'"
-             ng-click="processFormDSP(device.id, 'AUTO')">
+             ng-click="processFormDSP(device.id, 'AUTO')"
+             ng-hide="device.desiredStatePriority == 'AUTO'">
+        {{device.desiredStatePriority}}
+      </label>
+      <label class="btn btn-primary"
+             ng-model="device.desiredStatePriority"
+             btn-radio="'{{device.desiredStatePriorty}}'"
+             ng-value="statepriority"
+             ng-click="processFormDSP(device.id, 'MANUAL')"
+             ng-hide="device.desiredStatePriority == 'MANUAL'">
         {{device.desiredStatePriority}}
       </label>
     </div>

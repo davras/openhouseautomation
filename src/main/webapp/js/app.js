@@ -29,6 +29,25 @@
    * @const
    */
   SCENE_STATUS_UPDATE_URL = "/status/scenes/update";
+  /**
+   * @const
+   */
+  LOGIN_STATUS_URL = "/status/login";
+  
+  app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
+    var userdetails=this;
+    userdetails.username = null;
+    userdetails.redirecturl = null;
+    $http.get(LOGIN_STATUS_URL).success(function(data) {
+      userdetails=data;
+      console.log("loading user login: " + userdetails);
+    });
+    this.getLogin = function() {
+      if (userdetails.username != null) return userdetails.username;
+      if (userdetails.redirecturl != null) return userdetails.redirecturl;
+      return "ERROR";
+    };
+  }]);
   
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
@@ -102,7 +121,7 @@
             }
           });
         }
-      }, 2500);
+      }, 30000);
       $scope.$on('$destroy', function() {
         $interval.cancel(devicePromise);
       });
