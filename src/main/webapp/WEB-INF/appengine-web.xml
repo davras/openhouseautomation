@@ -23,5 +23,4 @@
   <inbound-services>
     <service>mail</service>
   </inbound-services>
-
 </appengine-web-app>

@@ -170,7 +170,9 @@ public class HouseFan {
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
-    sendNotification();
+    if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+      sendNotification();
+    }
   }
 
   public int ensureRange(int value, int min, int max) {
