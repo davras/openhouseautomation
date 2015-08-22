@@ -68,25 +68,30 @@ public class ControllerServlet extends HttpServlet {
       out.println(controller.toString());
       log.log(Level.INFO, "sent display:{0}", controller.toString());
     } else if (reqpath.startsWith("/initialize")) {
-      List vs = new ArrayList();
-      // this should be some sort of ENUM, but it is controller-type specific
-      // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
-      if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
-        vs.add("0");
-        vs.add("1");
-        vs.add("2");
-        vs.add("3");
-        vs.add("4");
-        vs.add("5");
-      } else if (controller.type == Controller.Type.ALARM) {
-        vs.add("DISARM");
-        vs.add("HOME");
-        vs.add("AWAY");
-      }
-      controller.setValidStates(vs);
-      ofy().save().entity(controller);
+      initializeController(controller);
       out.println(controller);
     }
+  }
+
+  public void initializeController(Controller controller) {
+    List vs = new ArrayList();
+      // this should be some sort of ENUM, but it is controller-type specific
+    // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
+    if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
+      vs.add("0");
+      vs.add("1");
+      vs.add("2");
+      vs.add("3");
+      vs.add("4");
+      vs.add("5");
+    } else if (controller.type == Controller.Type.ALARM) {
+      vs.add("DISARM");
+      vs.add("HOME");
+      vs.add("AWAY");
+    }
+    controller.setValidStates(vs);
+    ofy().save().entity(controller);
+
   }
 
   /**
@@ -105,10 +110,13 @@ public class ControllerServlet extends HttpServlet {
     final String reqpath = request.getPathInfo();
     log.log(Level.INFO, "request path:" + reqpath);
 
+    // lights handle 16 at a time vs one, split out early
     if (reqpath.startsWith("/lights")) {
       doLights(request, response);
       return;
     }
+    // this point on, only one controller per device
+
     // extract values from request
     PrintWriter out = response.getWriter();
     String auth = request.getParameter("auth");
@@ -141,8 +149,6 @@ public class ControllerServlet extends HttpServlet {
     // handle device requests
     if (reqpath.startsWith("/device")) {
       out.println(handleDevice(controller, controllervalue));
-    } else if (reqpath.startsWith("/display")) {
-      handleDisplay(controller, controllervalue);
     } else if (reqpath.startsWith("/fan")) {
       log.info("doPost Controller");
     } else {
@@ -150,7 +156,14 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
-  private String handleDevice(Controller controller, String controllervalue) {
+  /**
+   * A controller calls this path to update the actual state of a device If the
+   * actual state changes with no desired change, someone overrode it locally
+   * So, will go into manual mode. Window is 3 mins.
+   *
+   * @return a String containing servlet description
+   */
+  public String handleDevice(Controller controller, String controllervalue) {
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
@@ -173,30 +186,6 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
     return controller.getDesiredState();
   }
-  
-/**
-   * Returns a short description of the servlet.
-   *
-   * @return a String containing servlet description
-   */
-  private String handleDisplay(Controller controller, String controllervalue) {
-    log.log(Level.INFO, "POST /display:" + controllervalue);
-    // display is setting a value
-    if (controllervalue.equals("AUTO")) {
-      controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-      ofy().save().entity(controller);
-      log.log(Level.INFO, "POST /display, saved controller setting:{0}", controller.toString());
-      return "AUTO\nOK";
-    } else {
-      // it's a manual setting
-      log.log(Level.WARNING, "POST /display, manual setting:{0}", controllervalue);
-      controller.setDesiredState(controllervalue);
-      controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-      ofy().save().entity(controller);
-      log.log(Level.INFO, "POST /display, saved controller setting:{0}", controller.toString());
-      return "MANUAL: " + controller.getDesiredState() + "\nOK";
-    }
-  }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
     log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c, value, authhash});
@@ -214,6 +203,13 @@ public class ControllerServlet extends HttpServlet {
     return "Handles sensor reads and updates";
   }
 
+  /**
+   * Handles an X10 light controller, 16 lights at a time
+   *
+   * @param request
+   * @param response
+   * @throws IOException
+   */
   public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
@@ -226,8 +222,7 @@ public class ControllerServlet extends HttpServlet {
     // then someone has locally overridden the setting.
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
     ofy().clear(); // clear the session cache, not the memcache
-    List<Controller> lights = ofy().load().type(Controller.class
-    ).filter("type", "LIGHTS").list();
+    List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
@@ -238,13 +233,14 @@ public class ControllerServlet extends HttpServlet {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
+        if (c.getLastDesiredStateChange().minusMinutes(1).isBeforeNow()
                 && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
+          log.log(Level.WARNING, "POST /lights, lastdes is > 60 secs old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
       }
+      // only set the values from network request that make sense
       if (c.getDesiredState().equals("1")) {
         toret[lightnum] = '1';
       }
@@ -253,14 +249,10 @@ public class ControllerServlet extends HttpServlet {
       }
     }
 
-    ofy()
-            .save().entities(lights);
-    log.log(Level.INFO,
-            "returning " + new String(toret));
-    out.print(
-            new String(toret));
+    ofy().save().entities(lights);
+    log.log(Level.INFO, "returning " + new String(toret));
+    out.print(new String(toret));
     out.flush();
-
     return;
   }
 }
