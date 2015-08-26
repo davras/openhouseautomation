@@ -273,9 +273,6 @@ public class Controller {
     this.lastdesiredstatechange = lastdesiredstatechange;
   }
 
-  public void setLastDesiredStateChange(java.util.Date lastdesiredstatechange) {
-    this.lastdesiredstatechange = new DateTime(lastdesiredstatechange);
-  }
   /**
    * @return the lastactualstatechange
    */
