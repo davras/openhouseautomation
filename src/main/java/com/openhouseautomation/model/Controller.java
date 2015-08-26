@@ -7,6 +7,7 @@ import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Subclass;
 import java.util.List;
 
 /**
@@ -272,6 +273,9 @@ public class Controller {
     this.lastdesiredstatechange = lastdesiredstatechange;
   }
 
+  public void setLastDesiredStateChange(java.util.Date lastdesiredstatechange) {
+    this.lastdesiredstatechange = new DateTime(lastdesiredstatechange);
+  }
   /**
    * @return the lastactualstatechange
    */

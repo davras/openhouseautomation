@@ -5,20 +5,19 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.google.appengine.repackaged.org.joda.time.LocalDateTime;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+//import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.*;
 
 /**
  *
@@ -30,6 +29,7 @@ public class ControllerServletTest {
   ControllerServlet cs;
 
   public ControllerServletTest() {
+    //JodaTimeTranslators.add(ObjectifyService.factory());
     ObjectifyService.register(Controller.class);
   }
   private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
@@ -52,10 +52,12 @@ public class ControllerServletTest {
 
   @Test
   public void testJodaDateTime() {
-    LocalDateTime ldt = new LocalDateTime();
-    DateTime dt = ldt.toDateTime();
     ofy().save().entity(c).now();
-    c.setLastDesiredStateChange(dt);
+    c.setLastDesiredStateChange(new java.util.Date());
+    // fails here with com.googlecode.objectify.SaveException: Error saving com.openhouseautomation.model.Controller{
+    //   id=1, owner=null, location=null, zone=null, type=null, name=Whole House Fan, desiredstate=0, actualstate=null,
+    //   desiredstatepriority=null, lastdesiredstatechange=2015-08-25T19:57:44.126-07:00, lastactualstatechange=null, 
+    //   validstates=null}: Class 'class org.joda.time.chrono.ISOChronology' is not a registered @Subclass
     ofy().save().entity(c).now();
   }
 
