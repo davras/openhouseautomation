@@ -164,7 +164,7 @@ public class DisplaySourceServlet extends HttpServlet {
       // make a new scene based on current controller settings
       Scene initscene = new Scene();
       initscene.setName("Example Scene " + (int) (Math.random() * 100));
-      Query<Controller> query = ofy().cache(false).load().type(Controller.class);
+      Query<Controller> query = ofy().cache(false).load().type(Controller.class).chunkAll();
       QueryResultIterator<Controller> iterator = query.iterator();
       List<SceneController> controllers = new ArrayList();
       while (iterator.hasNext()) {

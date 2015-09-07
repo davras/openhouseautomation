@@ -149,6 +149,8 @@ public class ControllerServlet extends HttpServlet {
     // handle device requests
     if (reqpath.startsWith("/device")) {
       out.println(handleDevice(controller, controllervalue));
+    } else if (reqpath.startsWith("/fan")) {
+      log.info("doPost Controller");
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "path not found");
     }

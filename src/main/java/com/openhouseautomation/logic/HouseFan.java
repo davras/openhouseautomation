@@ -116,6 +116,10 @@ public class HouseFan {
       // but don't slow fan if outside is much colder than inside
       if ((Utilities.getDoubleReading("Outside Temperature") + 5) > Utilities.getDoubleReading("Inside Temperature")) {
         wd.addElement("Outside Temperature Slope", 10, 0);
+      } else {
+        if (Integer.parseInt(controller.getActualState()) > 0) {
+          wd.addElement("Colder outside, no fan speed change", 20, controller.getActualState());
+        }
       }
     }
   }
