@@ -62,19 +62,20 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-controller="SceneController as scenes">
           <div class="jumbotron"><h2>Scenes</h2></div>
-          <section class="tab">
-            <ul class="nav nav-pills">
-              <li role="presentation"
-                  ng-repeat="scene in scenes.list"
-                  ng-class="{ active: scenes.isSet(scene.id) }"
-                  >
-                <a href ng-click="processForm(scene.id)">{{scene.name}}</a>
-              </li>
-            </ul>
-          </section>
+          <div  ng-repeat="scene in scenes.list">
+            <h4>
+              <button
+                      class="btn btn-primary btn-lg"
+                      ng-click="processForm(scene.id)"
+                      ng-class="{ active: scenes.isSet(scene.id) }"
+                      >
+                {{scene.name}}
+              </button>
+            </h4>
+          </div>
         </div>
       </div>
-    </div>
+      </div>
 
   </body>
 </html>

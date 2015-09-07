@@ -20,7 +20,7 @@
   /**
    * @const
    */
-  SCENE_LIST_URL = "/status/sceneslist";
+  SCENE_LIST_URL = "/status/display/scenes";
   /**
    * @const
    */
@@ -28,27 +28,30 @@
   /**
    * @const
    */
-  SCENE_STATUS_UPDATE_URL = "/status/scenes/update";
+  SCENE_STATUS_UPDATE_URL = "/status/scenes/set";
   /**
    * @const
    */
   LOGIN_STATUS_URL = "/status/login";
-  
+
   app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
-    var userdetails=this;
-    userdetails.username = null;
-    userdetails.redirecturl = null;
-    $http.get(LOGIN_STATUS_URL).success(function(data) {
-      userdetails=data;
-      console.log("loading user login: " + userdetails);
-    });
-    this.getLogin = function() {
-      if (userdetails.username != null) return userdetails.username;
-      if (userdetails.redirecturl != null) return userdetails.redirecturl;
-      return "ERROR";
-    };
-  }]);
-  
+      var userdetails = this;
+      userdetails.username = null;
+      userdetails.redirecturl = null;
+      $http.get(LOGIN_STATUS_URL).success(function(data) {
+        userdetails = data;
+        console.log("loading user login: ");
+        console.log(userdetails);
+      });
+      this.getLogin = function() {
+        if (userdetails.username != null)
+          return userdetails.username;
+        if (userdetails.redirecturl != null)
+          return userdetails.redirecturl;
+        return "ERROR";
+      };
+    }]);
+
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
       sensors.data = [];
@@ -153,7 +156,7 @@
         });
         devices.fastpull = true;
       };
-      
+
       $scope.processFormDSP = function(id, state) {
         $scope.id = id;
         $scope.state = state;
@@ -186,13 +189,13 @@
       var scenes = this;
       scenes.list = [];
       scenes.active = 0;
-      console.log("loading scenes data");
 
       $http.get(SCENE_LIST_URL).success(function(data) {
         scenes.list = data;
         console.log("get scenes");
+        console.log(scenes.list);
       });
-      
+
       $scope.processForm = function(id) {
         $scope.id = id;
         scenes.active = id;
@@ -201,7 +204,13 @@
           method: 'post',
           url: SCENE_STATUS_UPDATE_URL,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          data: {id: $scope.id}
+          transformRequest: function(obj) {
+            var str = [];
+            for (var p in obj)
+              str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            return str.join("&");
+          },
+          data: { id: $scope.id }
         }).success(function() {
           // should check for a 200 return
         });
