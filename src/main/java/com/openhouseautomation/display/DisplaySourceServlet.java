@@ -13,6 +13,7 @@ import com.googlecode.objectify.cmd.Query;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
+import com.openhouseautomation.model.Event;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.Scene;
 import com.openhouseautomation.model.SceneController;
@@ -253,9 +254,21 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     ofy().clear(); // clear the session cache, not the memcache
     Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
+
+    // log the event
+    Event etl = new Event();
+    etl.setIp(request.getRemoteAddr());
+    etl.setNewState(scene.getName());
+    etl.setPreviousState("");
+    etl.setType("User change scene");
+    etl.setUser(request.getRemoteUser());
+    ofy().save().entity(etl);
+
+    // parse and set the controller settings
     String config = scene.getConfig();
     ObjectMapper mapper = new ObjectMapper();
-    TypeReference tr = new TypeReference<List<SceneController>>() { };
+    TypeReference tr = new TypeReference<List<SceneController>>() {
+    };
     List<SceneController> scconts = mapper.readValue(config, tr);
     //List<SceneController> scconts = mapper.readValue(config, List.class);
     for (SceneController scdes : scconts) {
@@ -269,7 +282,7 @@ public class DisplaySourceServlet extends HttpServlet {
       ofy().save().entity(controller);
       log.log(Level.INFO, "updated controller: " + controller.toString());
     }
-    response.sendError(HttpServletResponse.SC_NO_CONTENT);
+    response.sendError(HttpServletResponse.SC_OK);
   }
 
   public void doControllerUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -290,6 +303,7 @@ public class DisplaySourceServlet extends HttpServlet {
     } else { // an individual light
       ofy().clear(); // clear the session cache, not the memcache
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
+      String oldcontroller = controller.toString();
       String state = request.getParameter("desiredState");
       if (state == null) {
         state = request.getParameter("desiredStatePriority");
@@ -304,7 +318,15 @@ public class DisplaySourceServlet extends HttpServlet {
       }
       ofy().save().entity(controller);
       log.log(Level.INFO, "updated controller: " + controller.toString());
-      response.sendError(HttpServletResponse.SC_NO_CONTENT);
+      // log the event
+      Event etl = new Event();
+      etl.setIp(request.getRemoteAddr());
+      etl.setNewState(controller.toString());
+      etl.setPreviousState(oldcontroller);
+      etl.setType("User change controller");
+      etl.setUser(request.getRemoteUser());
+      ofy().save().entity(etl);
+      response.sendError(HttpServletResponse.SC_OK);
     }
   }
   String testDeviceTypes = "[{\"name\":\"Thermostat\",\"link\":\"THERMOSTAT\",\"ordinal\":0,\"display\":false},{\"name\":\"Garage Door\",\"link\":\"GARAGEDOOR\",\"ordinal\":1,\"display\":false},{\"name\":\"Alarm\",\"link\":\"ALARM\",\"ordinal\":2,\"display\":true},{\"name\":\"Lights\",\"link\":\"LIGHTS\",\"ordinal\":3,\"display\":true},{\"name\":\"Sprinkler\",\"link\":\"SPRINKLER\",\"ordinal\":4,\"display\":false},{\"name\":\"Whole House Fan\",\"link\":\"WHOLEHOUSEFAN\",\"ordinal\":5,\"display\":true}]";

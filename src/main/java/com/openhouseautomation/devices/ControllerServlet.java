@@ -7,6 +7,7 @@ package com.openhouseautomation.devices;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.Event;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -148,7 +149,7 @@ public class ControllerServlet extends HttpServlet {
 
     // handle device requests
     if (reqpath.startsWith("/device")) {
-      out.println(handleDevice(controller, controllervalue));
+      handleDevice(controller, controllervalue, request, response);
     } else if (reqpath.startsWith("/fan")) {
       log.info("doPost Controller");
     } else {
@@ -163,7 +164,7 @@ public class ControllerServlet extends HttpServlet {
    *
    * @return a String containing servlet description
    */
-  public String handleDevice(Controller controller, String controllervalue) {
+  public String handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
@@ -172,12 +173,19 @@ public class ControllerServlet extends HttpServlet {
       // the desiredstate is not the actual state, this is a local override.
       if (controller.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
               && !controller.getDesiredState().equals(controller.getActualState())) {
-        log.log(Level.WARNING, "POST /device, lastdes is > 120 secs old, going into manual");
+        log.log(Level.WARNING, "POST /device, lastdes is > 180 secs old, going into manual");
         log.log(Level.WARNING, "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
                 new Object[]{controller.getLastDesiredStateChange(),
                   controller.getDesiredState(),
                   controller.getActualState()
                 });
+        Event etl = new Event();
+        etl.setIp(request.getRemoteAddr());
+        etl.setNewState("MANUAL," + controllervalue);
+        etl.setPreviousState(controller.getDesiredStatePriority().toString());
+        etl.setType("Controller transition to manual");
+        etl.setUser(request.getRemoteUser());
+        ofy().save().entity(etl);
         controller.setDesiredState(controllervalue);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
