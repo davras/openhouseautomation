@@ -3,6 +3,7 @@ package com.openhouseautomation.logic;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
+import com.openhouseautomation.model.Event;
 import com.openhouseautomation.notification.MailNotification;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -170,6 +171,15 @@ public class HouseFan {
       log.log(Level.INFO, "No changes needed");
       return;
     }
+    // log the event
+    Event etl = new Event();
+    etl.setIp("127.0.0.1");
+    etl.setNewState(Integer.toString(newfanspeed));
+    etl.setPreviousState(Integer.toString(olddesiredfanspeed));
+    etl.setType("Auto change fan speed");
+    etl.setUser(this.getClass().getName());
+    ofy().save().entity(etl);
+
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
