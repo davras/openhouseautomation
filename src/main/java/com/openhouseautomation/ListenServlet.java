@@ -77,7 +77,7 @@ public class ListenServlet extends HttpServlet {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
         ofy().clear(); // clear the session cache, not the memcache
-        log.log(Level.INFO, "cleared cache");
+        //log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
           // this block should handle memcache flushes
@@ -112,8 +112,7 @@ public class ListenServlet extends HttpServlet {
       }
       // if you get to this point (timeout), the value didn't change
       response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-      // returns 204, no content, which tells the client to
-      // immediately reconnect
+      // returns 204, no content, which tells the client to immediately reconnect
     }
   }
 
@@ -128,13 +127,13 @@ public class ListenServlet extends HttpServlet {
   public ArrayList<Controller> arrangeRequest(HttpServletRequest req) throws IOException {
     log.log(Level.INFO, "Starting arrangeRequest");
     ArrayList<Controller> ebs = new ArrayList<>();
+    ofy().clear(); // clear the session cache, not the memcache
     for (Enumeration<String> paramNames = req.getParameterNames(); paramNames.hasMoreElements();) {
       String controllerid = paramNames.nextElement();
       log.log(Level.INFO, "got an id:{0}", controllerid);
       if ("auth".equals(controllerid)) {
         continue; // the auth isn't a controller
       }
-      ofy().clear(); // clear the session cache, not the memcache
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       ebs.add(controller);
       log.log(Level.INFO, "arrange listener:{0}", controller);

@@ -12,7 +12,7 @@ package com.openhouseautomation.model;
  */
 public class SceneController {
   public Long id; //id from CRC32 hash of owner, location, zone, and salt.
-  public String desiredstate; //What the controller wants the state to be
+  public String desiredState; //What the controller wants the state to be
   public String name; // The name of the device
 
   /**
@@ -33,14 +33,14 @@ public class SceneController {
    * @return the desiredstate
    */
   public String getDesiredState() {
-    return desiredstate;
+    return desiredState;
   }
 
   /**
-   * @param desiredstate the desiredstate to set
+   * @param desiredState the desiredstate to set
    */
-  public void setDesiredState(String desiredstate) {
-    this.desiredstate = desiredstate;
+  public void setDesiredState(String desiredState) {
+    this.desiredState = desiredState;
   }
 
   /**

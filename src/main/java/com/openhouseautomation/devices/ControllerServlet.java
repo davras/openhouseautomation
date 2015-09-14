@@ -89,6 +89,9 @@ public class ControllerServlet extends HttpServlet {
       vs.add("DISARM");
       vs.add("HOME");
       vs.add("AWAY");
+    } else if (controller.type == Controller.Type.PROJECTOR) {
+      vs.add("1");
+      vs.add("0");
     }
     controller.setValidStates(vs);
     ofy().save().entity(controller);

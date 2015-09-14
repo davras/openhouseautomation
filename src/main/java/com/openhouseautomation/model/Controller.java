@@ -25,11 +25,12 @@ public class Controller {
    */
   public enum Type {
 
-    THERMOSTAT("Thermostat"),
-    GARAGEDOOR("Garage Door"),
     ALARM("Alarm"),
+    GARAGEDOOR("Garage Door"),
     LIGHTS("Lights"),
+    PROJECTOR("Projector"),
     SPRINKLER("Sprinkler"),
+    THERMOSTAT("Thermostat"),
     WHOLEHOUSEFAN("Whole House Fan");
 
     private final String text;
@@ -42,6 +43,7 @@ public class Controller {
     public String toString() {
       return text;
     }
+
     public static Type getTypebyName(String longname) {
       for (Type t : Type.values()) {
         if (t.toString().equals(longname)) {
@@ -67,12 +69,18 @@ public class Controller {
   public String zone; //Zone where the device is located
   public Type type; //The type of device
   public String name; // The name of the device
-  @JsonIgnore public String desiredstate; //What the controller wants the state to be
-  @JsonIgnore public String actualstate; //The actual state of the device in real life
-  @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
-  @JsonIgnore public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
-  @JsonIgnore public DateTime lastactualstatechange; // The Date the last time the desired state changed
-  @JsonIgnore public List validstates; // the list of valid states for the desired and actual states
+  @JsonIgnore
+  public String desiredstate; //What the controller wants the state to be
+  @JsonIgnore
+  public String actualstate; //The actual state of the device in real life
+  @JsonIgnore
+  public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
+  @JsonIgnore
+  public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
+  @JsonIgnore
+  public DateTime lastactualstatechange; // The Date the last time the desired state changed
+  @JsonIgnore
+  public List validstates; // the list of valid states for the desired and actual states
 
   /**
    * Empty constructor for objectify.
@@ -189,29 +197,29 @@ public class Controller {
 
     Controller otherController = (Controller) obj;
     return Objects.equal(this.getId(), otherController.getId())
-        && Objects.equal(this.getOwner(), otherController.getOwner())
-        && Objects.equal(this.getLocation(), otherController.getLocation())
-        && Objects.equal(this.getZone(), otherController.getZone())
-        && Objects.equal(this.getType(), otherController.getType())
-        && Objects.equal(this.getName(), otherController.getName());
+            && Objects.equal(this.getOwner(), otherController.getOwner())
+            && Objects.equal(this.getLocation(), otherController.getLocation())
+            && Objects.equal(this.getZone(), otherController.getZone())
+            && Objects.equal(this.getType(), otherController.getType())
+            && Objects.equal(this.getName(), otherController.getName());
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(getClass().getName())
-        .add("id", getId())
-        .add("owner", getOwner())
-        .add("location", getLocation())
-        .add("zone", getZone())
-        .add("type", getType())
-        .add("name", getName())
-        .add("desiredstate", getDesiredState())
-        .add("actualstate", getActualState())
-        .add("desiredstatepriority", getDesiredStatePriority())
-        .add("lastdesiredstatechange", getLastDesiredStateChange())
-        .add("lastactualstatechange", getLastActualStateChange())
-        .add("validstates", getValidStates())
-        .toString();
+            .add("id", getId())
+            .add("owner", getOwner())
+            .add("location", getLocation())
+            .add("zone", getZone())
+            .add("type", getType())
+            .add("name", getName())
+            .add("desiredstate", getDesiredState())
+            .add("actualstate", getActualState())
+            .add("desiredstatepriority", getDesiredStatePriority())
+            .add("lastdesiredstatechange", getLastDesiredStateChange())
+            .add("lastactualstatechange", getLastActualStateChange())
+            .add("validstates", getValidStates())
+            .toString();
   }
 
   /**

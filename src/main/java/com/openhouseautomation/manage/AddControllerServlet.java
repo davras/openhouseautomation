@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.openhouseautomation.manage;
 
 import org.joda.time.DateTime;
@@ -15,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static com.openhouseautomation.OfyService.ofy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -22,8 +23,10 @@ import java.util.logging.Logger;
  * @author dave
  */
 public class AddControllerServlet extends HttpServlet {
-private static final long serialVersionUID = 1L;
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(AddControllerServlet.class.getName());
+
   /**
    * Handles the HTTP <code>GET</code> method.
    *
@@ -54,8 +57,8 @@ private static final long serialVersionUID = 1L;
     String salt = "abc123";
 
     // has the form been submitted with a setpoint change?
-    boolean formvalid =
-        ((request.getParameter("owner") != null) && (!"".equals(request.getParameter("owner"))));
+    boolean formvalid
+            = ((request.getParameter("owner") != null) && (!"".equals(request.getParameter("owner"))));
 
     if (formvalid) {
       cont.setOwner(request.getParameter("owner"));
@@ -68,6 +71,27 @@ private static final long serialVersionUID = 1L;
       cont.setActualState("0");
       cont.setLastDesiredStateChange(new DateTime());
       cont.setLastActualStateChange(new DateTime());
+
+      // initialize the controller with some default valid states
+      List vs = new ArrayList();
+      // this should be some sort of ENUM, but it is controller-type specific
+      // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
+      if (cont.type == Controller.Type.WHOLEHOUSEFAN) {
+        vs.add("0");
+        vs.add("1");
+        vs.add("2");
+        vs.add("3");
+        vs.add("4");
+        vs.add("5");
+      } else if (cont.type == Controller.Type.ALARM) {
+        vs.add("DISARM");
+        vs.add("HOME");
+        vs.add("AWAY");
+      } else if (cont.type == Controller.Type.PROJECTOR) {
+        vs.add("0");
+        vs.add("1");
+      }
+      cont.setValidStates(vs);
 
       CRC32 hash = new CRC32();
       hash.update(salt.getBytes());
