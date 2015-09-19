@@ -21,7 +21,8 @@ public class HouseFan {
   int olddesiredfanspeed;
   int newfanspeed;
   boolean tocontinue;
-
+  double setpoint;
+  double outsidetemp;
   public static final Logger log = Logger.getLogger(HouseFan.class.getName());
 
   // for testing
@@ -81,7 +82,7 @@ public class HouseFan {
     }
     // skip everything if the controller is not in AUTO
     if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
-      wd.addElement("DesiredStatePriority", 1000, "Not in " + Controller.DesiredStatePriority.AUTO.name());
+      wd.addElement("Reading DesiredStatePriority", 1000, "Not in " + Controller.DesiredStatePriority.AUTO.name());
       log.log(Level.INFO, wd.toString());
       return false;
     }
@@ -90,17 +91,17 @@ public class HouseFan {
 
   public boolean considerTemperatures() {
     // get the inside and outside temperatures
-    double outsidetemp = Utilities.getDoubleReading("Outside Temperature");
-    wd.addElement("Outside Temperature", 1000, outsidetemp);
+    outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+    wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
     insidetemp = Utilities.getDoubleReading("Inside Temperature");
-    wd.addElement("Inside Temperature", 1000, insidetemp);
+    wd.addElement("Reading Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
       log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
       return false;
     }
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
-      wd.addElement("Outside vs Inside Temperature", 5, 0);
+      wd.addElement("It is hotter outside than inside", 5, 0);
       log.log(Level.INFO, wd.toString());
       return false;
     }
@@ -110,7 +111,7 @@ public class HouseFan {
   public void considerSlope() {
     // decrease fan speed if outside is warming up
     double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
-    wd.addElement("Outside Temperature Slope", 1000, tempslope);
+    wd.addElement("Reading Outside Temperature Slope", 1000, tempslope);
     if (tempslope >= 0.1) {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
       // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
@@ -128,28 +129,44 @@ public class HouseFan {
   public void considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
     forecasthigh = Utilities.getForecastHigh("95376");
-    wd.addElement("Forecast High", 1000, forecasthigh);
+    wd.addElement("Reading Forecast High", 1000, forecasthigh);
     if (forecasthigh == 0 || forecasthigh < -100 || forecasthigh > 150) {
       log.log(Level.INFO, "bad forecasthigh: {0}", forecasthigh);
       return;
     }
     if (forecasthigh < 80) {
-      wd.addElement("Forecast High", 5, 0);
+      wd.addElement("Forecast High < 80F", 5, 0);
     }
   }
 
   public void computeDesiredSpeed() {
     // compute setpoint based on forecast high for tomorrow
-    double setpoint = (forecasthigh * -2 / 5) + 102;
+    setpoint = (forecasthigh * -2 / 5) + 102;
     int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
-    wd.addElement("Setpoint", 1000, setpoint);
+    wd.addElement("Recording Setpoint", 1000, setpoint);
     wd.addElement("Fan Speed from Forecast", 20, desiredfanspeedtemperatureforecast);
+  }
+
+  public boolean shouldTurnOff() {
+    // only turn the fan off if insidetemperature is more than 2 deg below setpoint
+    if ((insidetemp + 2) < setpoint) {
+      wd.addElement("Door Wear Prevention", newfanspeed, log);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean shouldTurnOn() {
+    if ((insidetemp - 2) > setpoint) {
+      return true;
+    }
+    return false;
   }
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
     olddesiredfanspeed = Integer.parseInt(controller.getDesiredState());
-    wd.addElement("Old Fan Speed", 1000, olddesiredfanspeed);
+    wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
@@ -164,7 +181,12 @@ public class HouseFan {
     }
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-
+    // motor wear checking
+    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn()) ||
+    (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
+      newfanspeed = olddesiredfanspeed;
+      wd.addElement("Motor Wear Inhibit", 8, newfanspeed);
+    }
     // if no changes are necessary
     log.log(Level.INFO, wd.toString());
     if (olddesiredfanspeed == newfanspeed) {
@@ -184,9 +206,9 @@ public class HouseFan {
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
-    if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+    //if (olddesiredfanspeed == 0 || newfanspeed == 0) {
       sendNotification();
-    }
+    //}
   }
 
   public int ensureRange(int value, int min, int max) {

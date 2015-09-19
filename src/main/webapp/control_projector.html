@@ -1,6 +1,12 @@
 <div ng-repeat="device in devices.data">
   <div ng-hide="device.desiredState == device.actualState">
-    <h2>Changing from {{device.actualState}} to {{device.desiredState}}...please wait</h2>
+    <div ng-hide="device.desiredState == '1'">
+      <h2>Turning projector on </h2>
+    </div>
+    <div ng-hide="device.desiredState == '0'">
+      <h2> Turning projector off </h2>
+    </div>
+    <!-- <h2>Changing from {{device.actualState}} to {{device.desiredState}}...please wait</h2> -->
   </div>
   <h4>
     <button type="button" class="btn btn-lg btn-default light-off"
