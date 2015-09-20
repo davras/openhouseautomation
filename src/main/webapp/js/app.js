@@ -34,7 +34,7 @@
    */
   LOGIN_STATUS_URL = "/status/login";
 
-  app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
+  /**app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
       var userdetails = this;
       userdetails.username = null;
       userdetails.redirecturl = null;
@@ -48,9 +48,10 @@
           return userdetails.username;
         if (userdetails.redirecturl != null)
           return userdetails.redirecturl;
-        return "ERROR";
+        return "<h2>Checking</h2>";
       };
     }]);
+    */
 
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
@@ -124,7 +125,7 @@
             }
           });
         }
-      }, 30000);
+      }, 5000);
       $scope.$on('$destroy', function() {
         $interval.cancel(devicePromise);
       });

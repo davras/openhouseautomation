@@ -27,11 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthFilter implements Filter {
 
   private static final Logger log = Logger.getLogger(AuthFilter.class.getName());
-  private ServletContext context;
 
   @Override
   public void init(FilterConfig fConfig) throws ServletException {
-    this.context = fConfig.getServletContext();
     log.log(Level.INFO, "AuthenticationFilter initialized");
   }
 
@@ -42,19 +40,34 @@ public class AuthFilter implements Filter {
     UserService userService = UserServiceFactory.getUserService();
     String thisURL = req.getRequestURI();
     // if the user is logged in, populate username
+    log.log(Level.INFO, "Auth: " + userService.getCurrentUser() + ": isAdmin()=" + userService.isUserAdmin());
     log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
-    if (req.getUserPrincipal() == null) {
-      if ("/login".equals(req.getPathInfo())) {
-        res.getWriter().print("[{\"redirecturl\":\"" + UserServiceFactory.getUserService().createLoginURL(req.getPathInfo()) + "\"}]");
-      } else {
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "[\"Unauthorized\"]");
-      }
-    } else {
-      // pass the request along the filter chain
-      this.context.log("Auth: " + userService.getCurrentUser() + ": isAdmin()=" + userService.isUserAdmin());
-      chain.doFilter(request, response);
+    log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
+    log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
+    log.log(Level.INFO, "getSourceIP()={0}", req.getUserPrincipal());
+    // if source ip is home
+    boolean approved = false;
+    /**
+    if ("50.194.29.173".equals(req.getRemoteAddr())) {
+      log.log(Level.WARNING, "approved by source ip");
+      approved = true;
     }
-
+    * */
+    //if ("/status/display/devices".equals(req.getPathInfo())) {
+      // needs a user logged in
+      if (req.getUserPrincipal() != null) {
+        log.log(Level.WARNING, "approved by user principle");
+        approved=true;
+      }
+    //}
+    
+    
+    // pass the request along the filter chain
+    if (approved) {
+      chain.doFilter(request, response);
+    } else {
+      res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    }
   }
 
   @Override

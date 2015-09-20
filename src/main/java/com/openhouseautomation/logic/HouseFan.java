@@ -181,7 +181,7 @@ public class HouseFan {
     }
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-    // motor wear checking
+    // create hysteresis to prevent damper door motor wear
     if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn()) ||
     (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
       newfanspeed = olddesiredfanspeed;
