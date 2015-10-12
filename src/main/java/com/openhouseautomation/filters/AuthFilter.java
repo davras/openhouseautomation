@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -40,24 +39,25 @@ public class AuthFilter implements Filter {
     UserService userService = UserServiceFactory.getUserService();
     String thisURL = req.getRequestURI();
     // if the user is logged in, populate username
-    log.log(Level.INFO, "Auth: " + userService.getCurrentUser() + ": isAdmin()=" + userService.isUserAdmin());
+    log.log(Level.INFO, "Auth: " + userService.getCurrentUser());
+    if (userService.getCurrentUser() != null) {
+      log.log(Level.INFO,"isAdmin()=" + userService.isUserAdmin());
+    }
     log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
     log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
     log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
-    log.log(Level.INFO, "getSourceIP()={0}", req.getUserPrincipal());
     // if source ip is home
     boolean approved = false;
-    /**
     if ("50.194.29.173".equals(req.getRemoteAddr())) {
       log.log(Level.WARNING, "approved by source ip");
       approved = true;
     }
-    * */
     //if ("/status/display/devices".equals(req.getPathInfo())) {
       // needs a user logged in
       if (req.getUserPrincipal() != null) {
-        log.log(Level.WARNING, "approved by user principle");
+        log.log(Level.INFO, "approved by user principle");
         approved=true;
+        // TODO put in user auth
       }
     //}
     

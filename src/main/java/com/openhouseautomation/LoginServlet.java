@@ -36,10 +36,10 @@ public class LoginServlet extends HttpServlet {
       UserService userService = UserServiceFactory.getUserService();
       response.setContentType("text/html");
       if (request.getUserPrincipal() != null) {
-        out.println("<h1>" + request.getUserPrincipal().getName() + "</h1>");
-        out.println("<h2><a href=\"" + userService.createLogoutURL(request.getRequestURI()) + "\">Logout</a></h2>");
+        out.println(request.getUserPrincipal().getName());
+        out.println("<a href=\"" + userService.createLogoutURL(request.getRequestURI()) + "\">Logout</a>");
       } else {
-        out.println("<h1><a href=\"" + userService.createLoginURL(request.getRequestURI()) + "\">Login</a></h1>");
+        out.println("<a href=\"" + userService.createLoginURL(request.getRequestURI()) + "\">Login</a>");
       }
     }
   }

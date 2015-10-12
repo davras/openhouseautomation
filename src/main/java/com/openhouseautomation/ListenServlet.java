@@ -206,7 +206,7 @@ public class ListenServlet extends HttpServlet {
         // if desiredstatelastchange is more than 60 secs old, this is a local override.
          if (c.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
                 && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.WARNING, "POST /lights, lastdes is > 120 secs old, going into manual");
+          log.log(Level.WARNING, "POST /lights, lastdes is > 3 mins old, going into manual");
           c.setDesiredState(curstate);
           c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
         }
@@ -232,10 +232,10 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
-      ofy().clear(); // clear the session cache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {
+          ofy().clear(); // clear the session cache
           controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
         } catch (Exception e) {
           // This will catch Memcache flushes and return so the client can
@@ -250,7 +250,6 @@ public class ListenServlet extends HttpServlet {
           foundachange = true;
           int index = -1;
           index = Integer.parseInt(controllernew.getZone());
-          String desiredstate = controllernew.getDesiredState();
           toret[index] = newval.charAt(0);
         }
       }
