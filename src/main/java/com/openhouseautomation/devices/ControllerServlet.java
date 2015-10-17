@@ -185,7 +185,7 @@ public class ControllerServlet extends HttpServlet {
         Event etl = new Event();
         etl.setIp(request.getRemoteAddr());
         etl.setNewState("MANUAL," + controllervalue);
-        etl.setPreviousState(controller.getDesiredStatePriority().toString());
+        etl.setPreviousState(controller.getDesiredStatePriority().toString() + "," + controller.getDesiredState());
         etl.setType("Controller transition to manual");
         etl.setUser(request.getRemoteUser());
         ofy().save().entity(etl);
