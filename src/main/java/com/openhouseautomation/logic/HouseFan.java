@@ -149,7 +149,7 @@ public class HouseFan {
 
   public boolean shouldTurnOff() {
     // only turn the fan off if insidetemperature is more than 2 deg below setpoint
-    if ((insidetemp + 2) < setpoint) {
+    if ((insidetemp + 1) < setpoint) {
       wd.addElement("Door Wear Prevention", newfanspeed, log);
       return true;
     }
@@ -157,7 +157,7 @@ public class HouseFan {
   }
 
   public boolean shouldTurnOn() {
-    if ((insidetemp - 2) > setpoint) {
+    if ((insidetemp - 1) > setpoint) {
       return true;
     }
     return false;
