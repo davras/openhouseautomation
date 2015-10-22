@@ -54,6 +54,7 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
+            <li ng-include src="'/login.html'"></li>
             <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
           </ul>
         </div>
@@ -95,12 +96,12 @@
               while (iterator.hasNext()) {
                 Sensor sens = (Sensor) iterator.next();
             %>
-            <tr<% if (sens.isExpired()) {%> style="background-color:red"<% } %>><td align="right">
+            <tr<% if (sens.isExpired()) {%> style="background-color:red"<% }%>><td align="right">
                 <%= sens.getName()%>:
               </td><td>
                 <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
               </td><td align="center">
-                <%= sens.getHumanAge() %>
+                <%= sens.getHumanAge()%>
               </td>
               </td>
             </tr>

@@ -7,7 +7,7 @@ package com.openhouseautomation.devices;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
-import com.openhouseautomation.model.Event;
+import com.openhouseautomation.model.EventLog;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -182,7 +182,7 @@ public class ControllerServlet extends HttpServlet {
                   controller.getDesiredState(),
                   controller.getActualState()
                 });
-        Event etl = new Event();
+        EventLog etl = new EventLog();
         etl.setIp(request.getRemoteAddr());
         etl.setNewState("MANUAL," + controllervalue);
         etl.setPreviousState(controller.getDesiredStatePriority().toString() + "," + controller.getDesiredState());

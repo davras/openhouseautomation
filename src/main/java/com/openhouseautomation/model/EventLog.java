@@ -16,7 +16,7 @@ import org.joda.time.DateTime;
  * @author dave
  */
 @Entity
-public class Event {
+public class EventLog {
 
   @Id
   public Long id;
@@ -30,7 +30,7 @@ public class Event {
   public String previousstate;
   // the new state
   public String newstate;
-  // the time this event was logged, set automatically when the Event is saved and will not be overwritten by multiple saves
+  // the time this event was logged, set automatically when the EventLog is saved and will not be overwritten by multiple saves
   @Index
   public DateTime eventtime;
 

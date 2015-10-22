@@ -37,6 +37,7 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
+            <li ng-include src="'/login.html'"></li>
             <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
           </ul>
         </div>
@@ -65,17 +66,17 @@
           <div  ng-repeat="scene in scenes.list">
             <h4>
               <button
-                      class="btn btn-primary btn-lg"
-                      ng-click="processForm(scene.id)"
-                      ng-class="{ active: scenes.isSet(scene.id) }"
-                      >
+                class="btn btn-primary btn-lg"
+                ng-click="processForm(scene.id)"
+                ng-class="{ active: scenes.isSet(scene.id) }"
+                >
                 {{scene.name}}
               </button>
             </h4>
           </div>
         </div>
       </div>
-      </div>
+    </div>
 
   </body>
 </html>

@@ -13,7 +13,7 @@ import com.googlecode.objectify.cmd.Query;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
-import com.openhouseautomation.model.Event;
+import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.Scene;
 import com.openhouseautomation.model.SceneController;
@@ -256,7 +256,7 @@ public class DisplaySourceServlet extends HttpServlet {
     Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
 
     // log the event
-    Event etl = new Event();
+    EventLog etl = new EventLog();
     etl.setIp(request.getRemoteAddr());
     etl.setNewState(scene.getName());
     etl.setPreviousState("");
@@ -319,7 +319,7 @@ public class DisplaySourceServlet extends HttpServlet {
       ofy().save().entity(controller);
       log.log(Level.INFO, "updated controller: " + controller.toString());
       // log the event
-      Event etl = new Event();
+      EventLog etl = new EventLog();
       etl.setIp(request.getRemoteAddr());
       etl.setNewState(controller.toString());
       etl.setPreviousState(oldcontroller);
