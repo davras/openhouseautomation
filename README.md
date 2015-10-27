@@ -44,11 +44,15 @@ Current status:
 - Spark code done for BMP180 and DS18B20 sensors
 - Arduino+X10 controls.
 - Intelligent Whole House Fan control for energy savings (peeks at tomorrow's forecast)
+- Firmware for:
+ - https://github.com/davras/openhouseautomation-spark
+ - https://github.com/davras/openhouseautomation-arduino
 
 To do:
 ======
 - Better UI for arLCD+WiFi.
 - RPi + CM11A + Heyu for lights (is it possible?)
+- Make BOMs and wiring for existing sensors and controllers
 
 Maybe:
 ======
