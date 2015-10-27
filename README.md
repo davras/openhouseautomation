@@ -40,11 +40,12 @@ Current status:
 - Arduino code finished for Makershed arLCD + WiFi shield.
 - Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
 - Spark code done for BMP180 and DS18B20 sensors
+- Arduino+X10 controls.
+- Intelligent Whole House Fan control for energy savings (peeks at tomorrow's forecast)
 
 To do:
 ======
 - Better UI for arLCD+WiFi.
-- Arduino+X10 controls.
 - RPi + CM11A + Heyu for lights (is it possible?)
 
 Maybe:
