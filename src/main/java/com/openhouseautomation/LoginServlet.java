@@ -36,11 +36,12 @@ public class LoginServlet extends HttpServlet {
       UserService userService = UserServiceFactory.getUserService();
       response.setContentType("text/html");
       if (request.getUserPrincipal() != null) {
-        out.print("<h3 class=\"navbar-brand\">" + request.getUserPrincipal().getName() + "</h3>");
-        out.println("<a class=\"navbar-brand\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("login.html", "")) + "\">Logout</a>");
+        out.print("<li class=\"navbar-brand\">" + request.getUserPrincipal().getName() + "</li>");
+        out.println("<li><a href=\"" + userService.createLogoutURL(request.getRequestURI().replace("login.html", "")) + "\">Logout</a></li>");
       } else {
-        out.println("<h3><a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("login.html", "")) + "\">Login</a></h2>");
+        out.println("<li><a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("login.html", "")) + "\">Login</a></li>");
       }
+      out.println("<li><a class=\"navbar-brand\" href=\"https://code.google.com/p/gautoard/wiki/DesignConcepts\">Help</a></li>");
     }
   }
 
