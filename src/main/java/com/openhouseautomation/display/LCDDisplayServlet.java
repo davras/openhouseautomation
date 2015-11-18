@@ -50,7 +50,10 @@ public class LCDDisplayServlet extends HttpServlet {
      * You can use .# to specify the precision of a sensor's reading
      */
     try (PrintWriter out = response.getWriter()) {
-      out.println(replaceTokens(lcdd.getDisplayString()));
+      String original = lcdd.getDisplayString();
+      String toret = replaceTokens(original);
+      out.println(toret);
+      //out.println(replaceTokens(lcdd.getDisplayString()));
     }
   }
 
