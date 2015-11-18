@@ -54,6 +54,9 @@ public class LCDDisplayServlet extends HttpServlet {
       String toret = replaceTokens(original);
       out.println(toret);
       //out.println(replaceTokens(lcdd.getDisplayString()));
+      String s = replaceTokens(lcdd.getDisplayString());
+      log.info("(" + s.length() + " bytes sent):" + s);
+      out.println(s);
     }
   }
 
