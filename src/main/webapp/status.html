@@ -25,71 +25,54 @@
     <![endif]-->
   </head>
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Open House Automation</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li ng-include src="'/login.html'"></li>
-            <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>          </ul>
-        </div>
-      </div>
-    </div>
+  <ng-include src="'/navbar.html'"></ng-include>
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            <li class="nav-header"><a href="/index.html">Overview</a></li>
-            <li class="divider"></li>
-            <li class="nav-header">Status</li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/control.html">Control</a></li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/charts.html">Charts</a></li>
-            <li class="divider"></li>
-            <li class="nav-header"><a href="/manage.html">Manage</a></li>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li class="nav-header"><a href="/index.html">Overview</a></li>
+          <li class="divider"></li>
+          <li class="nav-header">Status</li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/control.html">Control</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/charts.html">Charts</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/manage.html">Manage</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="jumbotron">
+          <div><h2>
+              Status
+            </h2></div>
+        </div>
+        <div class="container-fluid list-group" ng-controller="SensorController as sensors">
+          <!-- Sensor current readings go here -->
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="sensor in sensors.data">{{ sensor.name}}:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
+              <i ng-class='{red : sensor.expired, black : !sensor.expired}'>{{sensor.humanAge}}</i>
+            </li>
           </ul>
+          <hr/>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <div class="jumbotron">
-            <div><h2>
-                Status
-              </h2></div>
-          </div>
-          <div class="container-fluid list-group" ng-controller="SensorController as sensors">
-            <!-- Sensor current readings go here -->
-            <ul class="list-group">
-              <li class="list-group-item" ng-repeat="sensor in sensors.data">{{ sensor.name}}:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
-                <i ng-class='{red : sensor.expired, black : !sensor.expired}'>{{sensor.humanAge}}</i>
-              </li>
-            </ul>
-            <hr/>
-          </div>
-          <div class="table-condensed" ng-controller="ForecastController as forecasts">
-            <table class="table">
-              <thead>
-                <tr><th>Zipcode</th><th>High</th><th>Low</th><th>PoP</th>
-              </thead>
-              <tr ng-repeat="forecast in forecasts.data">
-                <td>{{ forecast.zipCode }}</td><td>{{forecast.forecastHigh}}F</td>
-                <td>{{forecast.forecastLow}}F</td><td>{{forecast.forecastPop}}%</td>
-              </tr>
-            </table>
-          </div>
+        <div class="table-condensed" ng-controller="ForecastController as forecasts">
+          <table class="table">
+            <thead>
+              <tr><th>Zipcode</th><th>High</th><th>Low</th><th>PoP</th>
+            </thead>
+            <tr ng-repeat="forecast in forecasts.data">
+              <td>{{ forecast.zipCode}}</td><td>{{forecast.forecastHigh}}F</td>
+              <td>{{forecast.forecastLow}}F</td><td>{{forecast.forecastPop}}%</td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
+  </div>
 
-  </body>
+</body>
 </html>
