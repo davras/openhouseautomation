@@ -40,28 +40,29 @@ public class AuthFilter implements Filter {
     String thisURL = req.getRequestURI();
     // if the user is logged in, populate username
     log.log(Level.INFO, "Auth: " + userService.getCurrentUser());
-    if (userService.getCurrentUser() != null) {
-      log.log(Level.INFO,"isAdmin()=" + userService.isUserAdmin());
+    if (userService.isUserLoggedIn()) {
+      log.log(Level.INFO, "isAdmin()=" + userService.isUserAdmin());
+    } else {
+      log.log(Level.INFO, "not an Admin: ");
     }
     log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
     log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
     log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
-    // if source ip is home
+    
     boolean approved = false;
-    if ("50.194.29.173".equals(req.getRemoteAddr())) {
-      log.log(Level.WARNING, "approved by source ip");
+    if (req.getUserPrincipal() != null) {
+      //if ("/status/display/devices".equals(req.getPathInfo())) {
+      // needs a user logged in
+      log.log(Level.INFO, "approved by user principle");
+      approved = userService.isUserAdmin();
+      // you have to be an admin to control the house
+    }
+    if (!approved && "50.194.29.173".equals(req.getRemoteAddr())) {
+      // or be in the house (source ip is home)
+      log.log(Level.INFO, "approved by source ip");
       approved = true;
     }
-    //if ("/status/display/devices".equals(req.getPathInfo())) {
-      // needs a user logged in
-      if (req.getUserPrincipal() != null) {
-        log.log(Level.INFO, "approved by user principle");
-        approved=true;
-        // TODO put in user auth
-      }
-    //}
-    
-    
+
     // pass the request along the filter chain
     if (approved) {
       chain.doFilter(request, response);
