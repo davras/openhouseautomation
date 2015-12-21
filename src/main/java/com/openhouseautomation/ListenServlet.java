@@ -83,7 +83,10 @@ public class ListenServlet extends HttpServlet {
           // this block should handle memcache flushes
           if (controllernew == null) {
             // prevent errors from causing frequent retry requests
-            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+            }
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             return;
           }
@@ -188,7 +191,8 @@ public class ListenServlet extends HttpServlet {
     }
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
-    // then someone has locally overridden the setting.
+    // then return desired setting (x10 is one-way for now)
+    // TODO listen for x10 signals and report them from microcontroller
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
     ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
@@ -200,16 +204,10 @@ public class ListenServlet extends HttpServlet {
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
-      if (!c.getActualState().equals(curstate)) {
+      if (!c.getActualState().equals(c.getDesiredState())) {
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
-        // if desiredstatelastchange is more than 60 secs old, this is a local override.
-         if (c.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
-                && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.WARNING, "POST /lights, lastdes is > 3 mins old, going into manual");
-          c.setDesiredState(curstate);
-          c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        }
+        c.setDesiredState(curstate);
         dirty = true;
       }
       if (c.getDesiredState().equals("1")) {
@@ -232,10 +230,10 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
+      ofy().clear(); // clear the session cache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {
-          ofy().clear(); // clear the session cache
           controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
         } catch (Exception e) {
           // This will catch Memcache flushes and return so the client can
@@ -264,8 +262,6 @@ public class ListenServlet extends HttpServlet {
         return;
       }
 
-      // TODO(dras): how to detect if client disconnected?
-      //log.log(Level.INFO, "{0} seconds left in request timer", ApiProxy.getCurrentEnvironment().getRemainingMillis());
       try {
         Thread.sleep(pollinterval);
       } catch (InterruptedException e) {
