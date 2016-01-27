@@ -37,11 +37,11 @@ public class LoginServlet extends HttpServlet {
       response.setContentType("text/html");
       if (request.getUserPrincipal() != null) {
         out.print("<li class=\"navbar-brand\">" + request.getUserPrincipal().getName() + "</li>");
-        out.println("<li><a href=\"" + userService.createLogoutURL(request.getRequestURI().replace("login.html", "")) + "\">Logout</a></li>");
+        out.println("<li class=\"navbar-brand\"><a href=\"" + userService.createLogoutURL(request.getRequestURI().replace("login.html", "")) + "\">Logout</a></li>");
       } else {
-        out.println("<li><a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("login.html", "")) + "\">Login</a></li>");
+        out.println("<li class=\"navbar-brand\"><a href=\"" + userService.createLoginURL(request.getRequestURI().replace("login.html", "")) + "\">Login</a></li>");
       }
-      out.println("<li><a class=\"navbar-brand\" href=\"https://code.google.com/p/gautoard/wiki/DesignConcepts\">Help</a></li>");
+      out.println("<li class=\"navbar-brand\"><a href=\"https://code.google.com/p/gautoard/wiki/DesignConcepts\">Help</a></li>");
     }
   }
 

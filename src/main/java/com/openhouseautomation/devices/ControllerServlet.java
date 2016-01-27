@@ -76,7 +76,7 @@ public class ControllerServlet extends HttpServlet {
 
   public void initializeController(Controller controller) {
     List vs = new ArrayList();
-      // this should be some sort of ENUM, but it is controller-type specific
+    // this should be some sort of ENUM, but it is controller-type specific
     // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
     if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
       vs.add("0");
@@ -236,20 +236,18 @@ public class ControllerServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
+      // get 
       String curstate = actualstate.substring(lightnum, lightnum + 1);
+      
+      // safely handle new lights by setting to off
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
-        c.setDesiredState(curstate);
+        c.setDesiredState("0");
       }
+      
       if (!c.getActualState().equals(curstate)) {
+        // a new update for the actual state of a light
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
-        // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().minusMinutes(1).isBeforeNow()
-                && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.WARNING, "POST /lights, lastdes is > 60 secs old, going into manual");
-          c.setDesiredState(curstate);
-          c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        }
       }
       // only set the values from network request that make sense
       if (c.getDesiredState().equals("1")) {
