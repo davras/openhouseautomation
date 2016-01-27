@@ -80,8 +80,8 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MailNotification</servlet-name>
-        <servlet-class>com.openhouseautomation.notification.MailNotificationTestServlet</servlet-class>
+        <servlet-name>NotificationTest</servlet-name>
+        <servlet-class>com.openhouseautomation.notification.NotificationTestServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>
@@ -191,8 +191,8 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <url-pattern>/status</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>MailNotification</servlet-name>
-        <url-pattern>/mail</url-pattern>
+        <servlet-name>NotificationTest</servlet-name>
+        <url-pattern>/notificationtest</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>

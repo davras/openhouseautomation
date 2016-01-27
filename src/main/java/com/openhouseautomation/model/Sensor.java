@@ -11,6 +11,8 @@ import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class representing a sensor device.
@@ -21,6 +23,8 @@ import com.openhouseautomation.Convutils;
 @Index
 @Cache
 public class Sensor {
+  private static final long serialVersionUID = 1L;
+  private static final Logger log = Logger.getLogger(Sensor.class.getName());
 
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
@@ -85,12 +89,13 @@ public class Sensor {
       RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
       Queue queue = QueueFactory.getQueue("tasks");
       queue.add(
-              TaskOptions.Builder.withUrl("/tasks/newsensor")
+              TaskOptions.Builder.withUrl("/tasks/newsensorreading")
               .param("kind", "Sensor")
               .param("id", Long.toString(id))
               .retryOptions(retry)
               .method(TaskOptions.Method.GET)
       );
+      log.log(Level.INFO, "Postprocessing " + id + "/" + name);
     }
   }
 

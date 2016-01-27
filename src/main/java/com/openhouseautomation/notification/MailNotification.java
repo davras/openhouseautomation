@@ -21,13 +21,13 @@ import javax.mail.internet.MimeMessage;
 public class MailNotification {
 
   public void send(NotificationHandler nh) {
-    String sender = nh.getSender();
+    String sender = DatastoreConfig.getValueForKey("e-mail sender", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)");
     String recipient = nh.getRecipient();
     
     if ("".equals(sender)) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
-      sender = DatastoreConfig.getValueForKey("e-mail sender", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)");
+      return;
     }
     // TODO don't send frequent notifications (> 1/hr)
     try {

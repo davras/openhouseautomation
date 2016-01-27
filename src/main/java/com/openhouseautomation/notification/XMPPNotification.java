@@ -21,13 +21,13 @@ import com.openhouseautomation.model.DatastoreConfig;
 public class XMPPNotification {
 
   public boolean send(NotificationHandler nh) {
-    String sender = nh.getSender();
+    String sender = DatastoreConfig.getValueForKey("xmpp sender", "chat@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotchat.com");
     String recipient = nh.getRecipient();
     
     if ("".equals(sender)) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
-      sender = DatastoreConfig.getValueForKey("xmpp sender", "chat@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotchat.com");
+      return false;
     }
     // TODO don't send frequent notifications (> 1/hr)
     JID jidsender = new JID(sender);

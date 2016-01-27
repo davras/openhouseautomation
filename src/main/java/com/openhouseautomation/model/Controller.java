@@ -13,7 +13,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnSave;
-import com.googlecode.objectify.annotation.Subclass;
+import com.googlecode.objectify.annotation.Unindex;
 import java.util.List;
 
 /**
@@ -22,7 +22,6 @@ import java.util.List;
  * @author jfmontesdeoca@google.com (Jose Montes de Oca)
  */
 @Entity
-@Index
 @Cache
 public class Controller {
 
@@ -74,19 +73,13 @@ public class Controller {
   public String location; //Place where the device is located
   public String zone; //Zone where the device is located
   public Type type; //The type of device
-  public String name; // The name of the device
-  @JsonIgnore
-  public String desiredstate; //What the controller wants the state to be
-  @JsonIgnore
-  public String actualstate; //The actual state of the device in real life
-  @JsonIgnore
-  public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
-  @JsonIgnore
-  public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
-  @JsonIgnore
-  public DateTime lastactualstatechange; // The Date the last time the desired state changed
-  @JsonIgnore
-  public List validstates; // the list of valid states for the desired and actual states
+  @Index public String name; // The name of the device
+  @JsonIgnore public String desiredstate; //What the controller wants the state to be
+  @JsonIgnore public String actualstate; //The actual state of the device in real life
+  @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
+  @JsonIgnore public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public DateTime lastactualstatechange; // The Date the last time the desired state changed
+  @JsonIgnore public List validstates; // the list of valid states for the desired and actual states
 
   /**
    * Empty constructor for objectify.

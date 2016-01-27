@@ -55,7 +55,7 @@ public class SensorServlet extends HttpServlet {
         return;
         // TODO: move auth to filter servlet
       }
-      log.info("1. authorization checked");
+      log.log(Level.INFO, "1. authorization checked");
       String sensorid = request.getParameter("k");
       log.log(Level.INFO, "k={0}", sensorid);
       // load the sensor entity

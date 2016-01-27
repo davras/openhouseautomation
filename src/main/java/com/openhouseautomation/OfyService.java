@@ -10,6 +10,7 @@ import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Location;
+import com.openhouseautomation.model.NotificationLog;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.ReadingHistory;
 import com.openhouseautomation.model.Scene;
@@ -33,6 +34,7 @@ public class OfyService {
     factory().register(DatastoreConfig.class);
     factory().register(Scene.class);
     factory().register(EventLog.class);
+    factory().register(NotificationLog.class);
   }
 
   public static Objectify ofy() {
