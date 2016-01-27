@@ -20,26 +20,10 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailNotification {
 
-  String body = "";
-  String recipient = "";
-  String sender = "";
-  String subject = "";
-
-  public void setBody(String s) {
-    this.body = s;
-  }
-  public String getBody() {
-    return body;
-  }
-  public void setRecipient(String s) {
-    this.recipient = s;
-  }
-
-  public void setSubject(String s) {
-    this.subject = s;
-  }
-
-  public void sendNotification() {
+  public void send(NotificationHandler nh) {
+    String sender = nh.getSender();
+    String recipient = nh.getRecipient();
+    
     if ("".equals(sender)) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
@@ -52,8 +36,8 @@ public class MailNotification {
       Message msg = new MimeMessage(session);
       msg.setFrom(new InternetAddress(sender));
       msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-      msg.setSubject(subject);
-      msg.setText(body);
+      msg.setSubject(nh.getSubject());
+      msg.setText(nh.getBody());
       Transport.send(msg);
       // put in a log of successful notification
     } catch (Exception e) {

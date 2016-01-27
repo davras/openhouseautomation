@@ -4,7 +4,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.EventLog;
-import com.openhouseautomation.notification.MailNotification;
+import com.openhouseautomation.notification.NotificationHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -223,10 +223,11 @@ public class HouseFan {
     if (!tosend) {
       return;
     }
-    MailNotification mnotif = new MailNotification();
-    mnotif.setBody(wd.toMessage());
-    mnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-    mnotif.setSubject("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
-    mnotif.sendNotification();
+    NotificationHandler nhnotif = new NotificationHandler();
+    nhnotif.setBody(wd.toMessage());
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
+    nhnotif.setSubject("Fan Speed change");
+    nhnotif.setBody("Fan Speed change: \n  Old:" + olddesiredfanspeed + " -> New: " + newfanspeed);
+    nhnotif.send();
   }
 }

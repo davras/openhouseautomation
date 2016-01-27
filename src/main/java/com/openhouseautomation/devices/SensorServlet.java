@@ -119,17 +119,6 @@ public class SensorServlet extends HttpServlet {
         reading.setValue(sensorval);
         ofy().save().entity(reading);
         log.log(Level.INFO, "logged reading:{0}", reading);
-        // TODO make a boolean in sensor for firing events "Someone's listening to me"
-        if (sensor.getId() == 2154791004L || sensor.getId() == 28131427L) {
-          RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
-          Queue queue = QueueFactory.getQueue("tasks");
-          queue.add(
-                  TaskOptions.Builder.withUrl("/tasks/newsensorreadinghandler")
-                  .param("sensor", Long.toString(sensor.getId()))
-                  .retryOptions(retry)
-                  .method(TaskOptions.Method.GET)
-          );
-        }
         return sensor;
       }
     });

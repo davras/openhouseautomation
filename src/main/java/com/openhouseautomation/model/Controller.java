@@ -1,12 +1,18 @@
 package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.RetryOptions;
+import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.OnSave;
 import com.googlecode.objectify.annotation.Subclass;
 import java.util.List;
 
@@ -86,6 +92,38 @@ public class Controller {
    * Empty constructor for objectify.
    */
   public Controller() {
+  }
+
+  @JsonIgnore
+  private boolean postprocessing = false;
+
+  @OnSave
+  void handlePostProcessing() {
+    if (needsPostprocessing()) {
+      RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
+      Queue queue = QueueFactory.getQueue("tasks");
+      queue.add(
+              TaskOptions.Builder.withUrl("/tasks/newcontrollervalue")
+              .param("kind", "Controller")
+              .param("id", Long.toString(id))
+              .retryOptions(retry)
+              .method(TaskOptions.Method.GET)
+      );
+    }
+  }
+
+  /**
+   * @return the postprocessing
+   */
+  public boolean needsPostprocessing() {
+    return postprocessing;
+  }
+
+  /**
+   * @param postprocessing the postprocessing to set
+   */
+  public void setPostprocessing(boolean postprocessing) {
+    this.postprocessing = postprocessing;
   }
 
   /**
