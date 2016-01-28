@@ -16,11 +16,11 @@ import org.joda.time.DateTime;
  * @author dras
  */
 @Entity
+@Index
 @Cache
 public class NotificationLog {
 
-  @Id
-  public Long id; //id for the log event, automatic
+  @Id private Long id; //id for the log event, automatic
   private String recipient; // Who got the notification
   private DateTime lastnotification; // The Date the last time the notification was sent
   private String subject;
@@ -71,6 +71,20 @@ public class NotificationLog {
    */
   public void setSubject(String subject) {
     this.subject = subject;
+  }
+
+  /**
+   * @return the id
+   */
+  public Long getId() {
+    return id;
+  }
+
+  /**
+   * @param id the id to set
+   */
+  public void setId(Long id) {
+    this.id = id;
   }
   
   

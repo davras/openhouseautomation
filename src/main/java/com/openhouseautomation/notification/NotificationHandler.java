@@ -49,8 +49,9 @@ public class NotificationHandler {
   }
 
   public void send() {
+    log.log(Level.INFO, "starting send()");
     if (checkForNotificationInhibit()) {
-      log.log(Level.INFO, "Not notifying");
+      log.log(Level.WARNING, "Not notifying, inhibited");
       return;
     }
     // send xmpp first
@@ -62,6 +63,7 @@ public class NotificationHandler {
       mnotif.send(this);
     }
     // assuming one of the above was successful, add it to the notif log
+    log.log(Level.INFO, "saving log entry for {0}", subject);
     NotificationLog nl = new NotificationLog();
     nl.setLastnotification(new DateTime());
     nl.setRecipient(recipient);
@@ -80,10 +82,13 @@ public class NotificationHandler {
             .first()
             .now();
     if (nl == null) {
-      return true;
+      log.log(Level.INFO, "no previous log found");
+      return false; // make this the first entry then
     }
+    log.log(Level.INFO, "comparing {0} to {1}", new Object[]{nl.getLastnotification(), new DateTime()});
     if (nl.getLastnotification().plusHours(1).isAfterNow()) {
-      return false;
+      // don't notify > 1/hr
+      return true;
     }
     return false;
   }

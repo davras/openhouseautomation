@@ -79,7 +79,6 @@ public class TaskHandler extends HttpServlet {
       log.log(Level.INFO, "sensor not found:{0}", controllerid);
       return;
     }
-    log.log(Level.INFO, "notifying");
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
     nhnotif.setSubject("Controller Change");
@@ -105,8 +104,7 @@ public class TaskHandler extends HttpServlet {
       return;
     }
 
-    if (sensor.getName()
-            .equals("Outside Temperature")) {
+    if (sensor.getName().equals("Outside Temperature")) {
       log.log(Level.INFO, "notifying");
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));

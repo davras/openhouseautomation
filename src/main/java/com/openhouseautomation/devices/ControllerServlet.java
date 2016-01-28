@@ -52,7 +52,6 @@ public class ControllerServlet extends HttpServlet {
       // TODO: move auth to filter servlet
     }
     log.info("1. authorization checked");
-    log.log(Level.INFO, "k={0}", controllerid);
     // load the controller entity
     ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
@@ -60,6 +59,7 @@ public class ControllerServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
+    log.log(Level.INFO, "id={0},name={1}", new Object[] { controller.getId(), controller.getName() });
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
       out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
