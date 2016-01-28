@@ -50,7 +50,19 @@ public class NotificationHandler {
 
   public void send() {
     log.log(Level.INFO, "starting send()");
-    if (checkForNotificationInhibit()) {
+    // get the notification entry for this subject
+    NotificationLog nl = ofy().load().type(NotificationLog.class)
+            .filter("subject", subject).first().now();
+    if (nl == null) {
+      log.log(Level.INFO, "no previous log found, creating one");
+      nl = new NotificationLog();
+      nl.setLastnotification(new DateTime());
+      nl.setRecipient(recipient);
+      nl.setSubject(subject);
+      ofy().save().entity(nl).now();
+    }
+    if (nl.getLastnotification().plusHours(1).isAfterNow()) {
+      // have not reached new notification timeout
       log.log(Level.WARNING, "Not notifying, inhibited");
       return;
     }
@@ -62,34 +74,8 @@ public class NotificationHandler {
       MailNotification mnotif = new MailNotification();
       mnotif.send(this);
     }
-    // assuming one of the above was successful, add it to the notif log
-    log.log(Level.INFO, "saving log entry for {0}", subject);
-    NotificationLog nl = new NotificationLog();
+    // update the last notification time
     nl.setLastnotification(new DateTime());
-    nl.setRecipient(recipient);
-    nl.setSubject(subject);
     ofy().save().entity(nl).now();
-  }
-
-  public boolean checkForNotificationInhibit() {
-    // returning true aborts the notification
-    // query for the last notification
-    NotificationLog nl = ofy()
-            .load()
-            .type(NotificationLog.class)
-            .filter("subject", subject)
-            .order("-lastnotification")
-            .first()
-            .now();
-    if (nl == null) {
-      log.log(Level.INFO, "no previous log found");
-      return false; // make this the first entry then
-    }
-    log.log(Level.INFO, "comparing {0} to {1}", new Object[]{nl.getLastnotification(), new DateTime()});
-    if (nl.getLastnotification().plusHours(1).isAfterNow()) {
-      // don't notify > 1/hr
-      return true;
-    }
-    return false;
   }
 }

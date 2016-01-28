@@ -16,14 +16,13 @@ import org.joda.time.DateTime;
  * @author dras
  */
 @Entity
-@Index
 @Cache
 public class NotificationLog {
 
   @Id private Long id; //id for the log event, automatic
   private String recipient; // Who got the notification
   private DateTime lastnotification; // The Date the last time the notification was sent
-  private String subject;
+  @Index private String subject;
 
   /**
    * Empty constructor for objectify.

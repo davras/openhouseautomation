@@ -72,7 +72,7 @@ public class Controller {
   public String owner;//Owner of the device
   public String location; //Place where the device is located
   public String zone; //Zone where the device is located
-  public Type type; //The type of device
+  @Index public Type type; //The type of device
   @Index public String name; // The name of the device
   @JsonIgnore public String desiredstate; //What the controller wants the state to be
   @JsonIgnore public String actualstate; //The actual state of the device in real life
