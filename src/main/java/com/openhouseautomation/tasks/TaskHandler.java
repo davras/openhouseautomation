@@ -8,9 +8,11 @@ package com.openhouseautomation.tasks;
 import com.googlecode.objectify.Key;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
+import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.Sensor;
+import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -40,26 +42,16 @@ public class TaskHandler extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    if ("/newsensorreadinghandler".equals(request.getPathInfo().trim())) {
+    if ("/newsensorreading".equals(request.getPathInfo().trim())) {
       log.log(Level.INFO, "new sensor reading handler");
       doNewSensorReading(request, response);
       return;
     }
-    PrintWriter out = response.getWriter();
-    /* TODO output your page here. You may use following sample code. */
-    out.println("<!DOCTYPE html>");
-    out.println("<html>");
-    out.println("<head>");
-    out.println("<title>Servlet TestServlet</title>");
-    out.println("</head>");
-    out.println("<body>");
-    out.println("<h1>Servlet TestServlet</h1>");
-    out.println("<br>Request context path:" + request.getContextPath());
-    out.println("<br>Request URI: " + request.getRequestURI());
-    out.println("<br>Request path info: " + request.getPathInfo());
-    out.println("<br>Request path info translated: " + request.getPathTranslated());
-    out.println("</body>");
-    out.println("</html>");
+    if ("/newcontrollervalue".equals(request.getPathInfo().trim())) {
+      log.log(Level.INFO, "new controller reading handler");
+      doNewControllerReading(request, response);
+    }
+    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   /**
@@ -72,10 +64,32 @@ public class TaskHandler extends HttpServlet {
     return "Short description";
   }
 
+  public void doNewControllerReading(HttpServletRequest request, HttpServletResponse response)
+          throws IOException {
+    // TODO make a helper class to extract request params
+    final String controllerid = request.getParameter("id");
+    if (null == controllerid || "".equals(controllerid)) {
+      response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing value");
+      return;
+    }
+    log.log(Level.INFO, "loading: {0}", controllerid);
+    Key<Controller> ck = Key.create(Controller.class, Long.parseLong(controllerid));
+    Controller controller = ofy().load().now(ck);
+    if (controller == null) {
+      log.log(Level.INFO, "sensor not found:{0}", controllerid);
+      return;
+    }
+    NotificationHandler nhnotif = new NotificationHandler();
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
+    nhnotif.setSubject("Controller Change");
+    nhnotif.setBody(controller.getName() + ":" + controller.getActualState());
+    nhnotif.send();
+  }
+
   public void doNewSensorReading(HttpServletRequest request, HttpServletResponse response)
           throws IOException {
     // TODO make a helper class to extract request params
-    final String sensorid = request.getParameter("sensor");
+    final String sensorid = request.getParameter("id");
     if (null == sensorid || "".equals(sensorid)) {
       response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing value");
       return;
@@ -84,11 +98,23 @@ public class TaskHandler extends HttpServlet {
     // TODO make helper class to load and save sensors
     Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
     Sensor sensor = ofy().load().now(sk);
-    if (sensor == null) {
+    if (sensor
+            == null) {
       log.log(Level.INFO, "sensor not found:{0}", sensorid);
       return;
     }
-    if (sensor.getName().equals("Outside Temperature") || sensor.getName().equals("Inside Temperature")) {
+
+    if (sensor.getName().equals("Outside Temperature")) {
+      log.log(Level.INFO, "notifying");
+      NotificationHandler nhnotif = new NotificationHandler();
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
+      nhnotif.setSubject("Outside Temperature");
+      nhnotif.setBody("Outside: " + sensor.getLastReading() + sensor.getUnit());
+      nhnotif.send();
+    }
+
+    if (sensor.getName()
+            .equals("Outside Temperature") || sensor.getName().equals("Inside Temperature")) {
       log.log(Level.INFO, "processing: {0}", sensor.getName());
       new HouseFan().process();
     } else {

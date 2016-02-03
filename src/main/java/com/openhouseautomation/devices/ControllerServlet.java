@@ -7,6 +7,7 @@ package com.openhouseautomation.devices;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.EventLog;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -51,14 +52,14 @@ public class ControllerServlet extends HttpServlet {
       // TODO: move auth to filter servlet
     }
     log.info("1. authorization checked");
-    log.log(Level.INFO, "k={0}", controllerid);
     // load the controller entity
-
+    ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
+    log.log(Level.INFO, "id={0},name={1}", new Object[] { controller.getId(), controller.getName() });
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
       out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
@@ -68,25 +69,33 @@ public class ControllerServlet extends HttpServlet {
       out.println(controller.toString());
       log.log(Level.INFO, "sent display:{0}", controller.toString());
     } else if (reqpath.startsWith("/initialize")) {
-      List vs = new ArrayList();
-      // this should be some sort of ENUM, but it is controller-type specific
-      // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
-      if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
-        vs.add("0");
-        vs.add("1");
-        vs.add("2");
-        vs.add("3");
-        vs.add("4");
-        vs.add("5");
-      } else if (controller.type == Controller.Type.ALARM) {
-        vs.add("DISARM");
-        vs.add("HOME");
-        vs.add("AWAY");
-      }
-      controller.setValidStates(vs);
-      ofy().save().entity(controller);
+      initializeController(controller);
       out.println(controller);
     }
+  }
+
+  public void initializeController(Controller controller) {
+    List vs = new ArrayList();
+    // this should be some sort of ENUM, but it is controller-type specific
+    // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
+    if (controller.type == Controller.Type.WHOLEHOUSEFAN) {
+      vs.add("0");
+      vs.add("1");
+      vs.add("2");
+      vs.add("3");
+      vs.add("4");
+      vs.add("5");
+    } else if (controller.type == Controller.Type.ALARM) {
+      vs.add("DISARM");
+      vs.add("HOME");
+      vs.add("AWAY");
+    } else if (controller.type == Controller.Type.PROJECTOR) {
+      vs.add("1");
+      vs.add("0");
+    }
+    controller.setValidStates(vs);
+    ofy().save().entity(controller);
+
   }
 
   /**
@@ -105,81 +114,94 @@ public class ControllerServlet extends HttpServlet {
     final String reqpath = request.getPathInfo();
     log.log(Level.INFO, "request path:" + reqpath);
 
+    // lights handle 16 at a time vs one, split out early
     if (reqpath.startsWith("/lights")) {
       doLights(request, response);
       return;
     }
+    // this point on, only one controller per device
+
+    // extract values from request
     PrintWriter out = response.getWriter();
     String auth = request.getParameter("auth");
-    final String controllerid = request.getParameter("k");
-    final String controllervalue = request.getParameter("v");
+    String controllerid = request.getParameter("k");
+    String controllervalue = request.getParameter("v");
+    log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{controllerid, controllervalue, auth});
+
+    // load the controller
+    ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
-    // TODO cleanup the anonymous inner class
-    log.log(Level.INFO, "k={0},v={1}", new Object[]{controllerid, controllervalue});
-    log.log(Level.INFO, "checking siphash auth: {0}", auth);
-    SipHashHelper shh = new SipHashHelper();
-    if (!shh.validateHash(controllerid, controllervalue, auth)) {
-      log.log(Level.WARNING, "hash validation failed");
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
-      return;
-    } else {
-      log.log(Level.INFO, "Hash validated");
-    }
+
+    // check that everything looks good
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
 
-    if (reqpath.startsWith("/device")) {
-      // always sets actual state
-      // if the actual setting is not the same as the desired setting,
-      // then someone has locally overridden the setting.
-      if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
-        controller.setDesiredState(controllervalue);
-      }
-      if (!controller.getActualState().equals(controllervalue)) {
-        log.log(Level.INFO, "POST /device, D:" + controller.getActualState() + " @" + controller.getLastActualStateChange());
-        controller.setActualState(controllervalue);
-        // if desiredstatelastchange is more than 60 secs old and
-        // the desiredstate is not the actual state, this is a local override.
-        if (controller.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
-                && !controller.getDesiredState().equals(controller.getActualState())) {
-          log.log(Level.INFO, "POST /device, lastdes is > 60 secs old, going into manual");
-          controller.setDesiredState(controllervalue);
-          controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        }
-      }
-      ofy().save().entity(controller);
-      log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
-      out.println(controller.getDesiredState());
+    // check the auth validation
+    if (!checkValidation(controller, controllervalue, auth)) {
+      log.log(Level.WARNING, "hash validation failed");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
       return;
+    }
 
-    } else if (reqpath.startsWith("/display")) {
-      log.log(Level.INFO, "POST /display:" + controllervalue);
-      // display is setting a value
-      if (controllervalue.equals("AUTO")) {
-        controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-        ofy().save().entity(controller);
-        log.log(Level.INFO, "POST /display, saved controller setting:{0}", controller.toString());
-        out.println("AUTO");
-        out.println("OK");
-        return;
-      } else {
-        // it's a manual setting
-        log.log(Level.INFO, "POST /display, manual setting:{0}", controllervalue);
-        controller.setDesiredState(controllervalue);
-        controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        ofy().save().entity(controller);
-        log.log(Level.INFO, "POST /display, saved controller setting:{0}", controller.toString());
-        out.println("MANUAL: " + controller.getDesiredState());
-        out.println("OK");
-      }
+    // handle brand new controllers
+    if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
+      controller.setDesiredState(controllervalue);
+    }
 
+    // handle device requests
+    if (reqpath.startsWith("/device")) {
+      handleDevice(controller, controllervalue, request, response);
     } else if (reqpath.startsWith("/fan")) {
       log.info("doPost Controller");
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "path not found");
     }
+  }
+
+  /**
+   * A controller calls this path to update the actual state of a device If the
+   * actual state changes with no desired change, someone overrode it locally
+   * So, will go into manual mode. Window is 3 mins.
+   *
+   * @return a String containing servlet description
+   */
+  public String handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
+    if (!controller.getActualState().equals(controllervalue)) {
+      log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
+              new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
+      controller.setActualState(controllervalue);
+      // if desiredstatelastchange is more than 60 secs old and
+      // the desiredstate is not the actual state, this is a local override.
+      if (controller.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
+              && !controller.getDesiredState().equals(controller.getActualState())) {
+        log.log(Level.WARNING, "POST /device, lastdes is > 180 secs old, going into manual");
+        log.log(Level.WARNING, "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
+                new Object[]{controller.getLastDesiredStateChange(),
+                  controller.getDesiredState(),
+                  controller.getActualState()
+                });
+        EventLog etl = new EventLog();
+        etl.setIp(request.getRemoteAddr());
+        etl.setNewState("MANUAL," + controllervalue);
+        etl.setPreviousState(controller.getDesiredStatePriority().toString() + "," + controller.getDesiredState());
+        etl.setType("Controller transition to manual");
+        etl.setUser(request.getRemoteUser());
+        ofy().save().entity(etl);
+        controller.setDesiredState(controllervalue);
+        controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+      }
+    }
+    ofy().save().entity(controller);
+    log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
+    return controller.getDesiredState();
+  }
+
+  private boolean checkValidation(Controller c, String value, String authhash) {
+    log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c, value, authhash});
+    SipHashHelper shh = new SipHashHelper();
+    return shh.validateHash(c.getId().toString(), value, authhash);
   }
 
   /**
@@ -192,6 +214,13 @@ public class ControllerServlet extends HttpServlet {
     return "Handles sensor reads and updates";
   }
 
+  /**
+   * Handles an X10 light controller, 16 lights at a time
+   *
+   * @param request
+   * @param response
+   * @throws IOException
+   */
   public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
@@ -203,24 +232,24 @@ public class ControllerServlet extends HttpServlet {
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
+    ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
+      // get 
       String curstate = actualstate.substring(lightnum, lightnum + 1);
+      
+      // safely handle new lights by setting to off
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
-        c.setDesiredState(curstate);
+        c.setDesiredState("0");
       }
+      
       if (!c.getActualState().equals(curstate)) {
+        // a new update for the actual state of a light
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
-        // if desiredstatelastchange is more than 60 secs old, this is a local override.
-        if (c.getLastDesiredStateChange().getMillis() < (System.currentTimeMillis() - 60000)
-                && !c.getDesiredState().equals(c.getActualState())) {
-          log.log(Level.INFO, "POST /lights, lastdes is > 60 secs old, going into manual");
-          c.setDesiredState(curstate);
-          c.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        }
       }
+      // only set the values from network request that make sense
       if (c.getDesiredState().equals("1")) {
         toret[lightnum] = '1';
       }
@@ -228,6 +257,7 @@ public class ControllerServlet extends HttpServlet {
         toret[lightnum] = '0';
       }
     }
+
     ofy().save().entities(lights);
     log.log(Level.INFO, "returning " + new String(toret));
     out.print(new String(toret));

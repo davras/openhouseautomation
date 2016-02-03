@@ -26,9 +26,9 @@ import javax.mail.internet.MimeMessage;
  *
  * @author dras
  */
-public class MailNotificationTestServlet extends HttpServlet {
+public class NotificationTestServlet extends HttpServlet {
 
-  private static final Logger log = Logger.getLogger(MailNotificationTestServlet.class.getName());
+  private static final Logger log = Logger.getLogger(NotificationTestServlet.class.getName());
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,29 +43,17 @@ public class MailNotificationTestServlet extends HttpServlet {
           throws ServletException, IOException {
     response.setContentType("text/plain");
     PrintWriter out = response.getWriter();
-    String sender = DatastoreConfig.getValueForKey("e-mail sender", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com");
-    String recipient = "rbruyere@gmail.com";
+    String recipient = DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com");
     try {
-      Properties props = new Properties();
-      Session session = Session.getDefaultInstance(props, null);
-      String msgBody = "This is a test message sent from " + sender;
-      Message msg = new MimeMessage(session);
-      // will change s~gautoard to gautoard with substring
-      // will not work on Master-Slave apps
-      msg.setFrom(new InternetAddress(sender));
-      msg.addRecipient(Message.RecipientType.TO,
-              new InternetAddress(recipient, "RyanB (Open House Automation)"));
-      // TODO pull sender from DS as config item
-      msg.setSubject("Test mail from " + sender);
-      msg.setText(msgBody);
-      Transport.send(msg);
-      out.println("SENT");
-      out.println("From: " + sender);
-      out.println("To: " + recipient);
+      NotificationHandler nhnotif = new NotificationHandler();
+      nhnotif.setRecipient(recipient);
+      nhnotif.setSubject("Test notification");
+      nhnotif.setBody("This was a test notification");
+      nhnotif.send();
+      out.println("SENT To: " + recipient);
     } catch (Exception e) {
       log.log(Level.WARNING, "error:" + e.fillInStackTrace());
       out.println("FAILED");
-      out.println("From: " + sender);
       out.println("To: " + recipient);
     }
   }

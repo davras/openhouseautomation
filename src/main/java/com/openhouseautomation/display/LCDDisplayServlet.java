@@ -42,6 +42,10 @@ public class LCDDisplayServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No k= provided, please use a display name");
     }
     LCDDisplay lcdd = ofy().load().type(LCDDisplay.class).id(displayk).now();
+    if (lcdd == null) {
+      response.sendError(response.SC_NOT_FOUND, "Display not loaded from datastore");
+      return;
+    }
     response.setContentType("text/plain");
     /**
      * I:{28131427} O:{3130021022}\n {3409600514.2}inHg {4251563943.0}%RH\n
@@ -50,7 +54,10 @@ public class LCDDisplayServlet extends HttpServlet {
      * You can use .# to specify the precision of a sensor's reading
      */
     try (PrintWriter out = response.getWriter()) {
-      out.println(replaceTokens(lcdd.getDisplayString()));
+      String original = lcdd.getDisplayString();
+      String toret = replaceTokens(original);
+      out.println(toret);
+      //out.println(replaceTokens(lcdd.getDisplayString()));
     }
   }
 

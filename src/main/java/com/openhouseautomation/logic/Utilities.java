@@ -25,6 +25,7 @@ public class Utilities {
    * @return
    */
   public static double getSlope(Long id, int seconds) {
+    ofy().clear();
     // get the Sensor
     Sensor sens = ofy().load().type(Sensor.class).id(id).now();
     // get the readings for that sensor

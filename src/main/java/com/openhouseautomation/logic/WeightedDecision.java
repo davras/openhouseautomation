@@ -60,13 +60,13 @@ public class WeightedDecision {
   }
   @Override
   public String toString() {
-    String toret = "{";
+    String toret = "[";
     for (DecisionElement de: queue) {
-      toret += "[" + de.name + ", " + de.weight + ", " + de.value + "],";
+      toret += "{" + de.name + ", " + de.weight + ", " + de.value + "},";
     }
     //remove last comma
     toret = toret.substring(0,toret.length()-1);
-    return toret + "}";
+    return toret + "]";
   }
   public String toMessage() {
     String toret = "";

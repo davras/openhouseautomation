@@ -2,10 +2,17 @@ package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.RetryOptions;
+import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class representing a sensor device.
@@ -16,6 +23,9 @@ import com.openhouseautomation.Convutils;
 @Index
 @Cache
 public class Sensor {
+  private static final long serialVersionUID = 1L;
+  private static final Logger log = Logger.getLogger(Sensor.class.getName());
+
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
   /**
@@ -57,30 +67,72 @@ public class Sensor {
   String name;  // "Downstairs Temperature", "Wind Speed"
   String unit; // F, C, millibars, etc.
   String lastReading; // "89" for 89F
-  @JsonIgnore DateTime lastReadingDate; // Date lastReading was last updated
-  @JsonIgnore String secret; // the password for this sensor, used in SipHash
+  @JsonIgnore
+  DateTime lastReadingDate; // Date lastReading was last updated
+  @JsonIgnore
+  String secret; // the password for this sensor, used in SipHash
   Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
-  @Ignore String humanage;
-  @OnLoad void updateAge() {
-    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis()/1000);
+  @Ignore
+  String humanage;
+
+  @OnLoad
+  void updateAge() {
+    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
+  }
+  @JsonIgnore
+  private boolean postprocessing = false;
+
+  @OnSave
+  void handlePostProcessing() {
+    if (needsPostprocessing()) {
+      RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
+      Queue queue = QueueFactory.getQueue("tasks");
+      queue.add(
+              TaskOptions.Builder.withUrl("/tasks/newsensorreading")
+              .param("kind", "Sensor")
+              .param("id", Long.toString(id))
+              .retryOptions(retry)
+              .method(TaskOptions.Method.GET)
+      );
+      log.log(Level.INFO, "Postprocessing " + id + "/" + name);
+    }
   }
 
-  @Ignore boolean expired;
-  @OnLoad void updateExpired() {
+  @Ignore
+  boolean expired;
+
+  @OnLoad
+  void updateExpired() {
     if (expirationtime != null) {
       this.expired = new DateTime().getMillis() > (lastReadingDate.getMillis() + expirationtime * 1000);
     } else {
       this.expired = false;
     }
   }
-  
+
+  /**
+   * @return the postprocessing
+   */
+  public boolean needsPostprocessing() {
+    return postprocessing;
+  }
+
+  /**
+   * @param postprocessing the postprocessing to set
+   */
+  public void setPostprocessing(boolean postprocessing) {
+    this.postprocessing = postprocessing;
+  }
+
   public String getHumanAge() {
     return humanage;
   }
+
   public boolean isExpired() {
     return expired;
   }
+
   /**
    * Empty constructor for objectify.
    */
@@ -231,19 +283,23 @@ public class Sensor {
   }
 
   /**
-   * Returns the {@code lastReading} of the {@link Sensor} rounded to the precision
-   * A precision of zero will return no decimal or places (i.e. 2.6 -> 3, not 3.0)
+   * Returns the {@code lastReading} of the {@link Sensor} rounded to the
+   * precision A precision of zero will return no decimal or places (i.e. 2.6 ->
+   * 3, not 3.0)
+   *
    * @param precision number of decimal places to round to
    * @return String of the rounded number
    */
   public String getLastReading(int precision) {
-      double expon = Math.pow(10, precision);
-      double d = Double.parseDouble(lastReading) * expon;
-      int d2 = (int)Math.round(d);
-      double d3 = d2 / expon;
-      String s = Double.toString(d3);
-      if (precision == 0) return s.substring(0,s.indexOf("."));
-      return s;
+    double expon = Math.pow(10, precision);
+    double d = Double.parseDouble(lastReading) * expon;
+    int d2 = (int) Math.round(d);
+    double d3 = d2 / expon;
+    String s = Double.toString(d3);
+    if (precision == 0) {
+      return s.substring(0, s.indexOf("."));
+    }
+    return s;
   }
 
   /**
@@ -316,14 +372,14 @@ public class Sensor {
   @Override
   public int hashCode() {
     return Objects.hashCode(id,
-        owner,
-        location,
-        zone,
-        type,
-        name,
-        unit,
-        lastReading,
-        lastReadingDate);
+            owner,
+            location,
+            zone,
+            type,
+            name,
+            unit,
+            lastReading,
+            lastReadingDate);
   }
 
   @Override
@@ -334,29 +390,29 @@ public class Sensor {
 
     Sensor otherSensor = (Sensor) obj;
     return Objects.equal(this.id, otherSensor.getId())
-        && Objects.equal(this.owner, otherSensor.getOwner())
-        && Objects.equal(this.location, otherSensor.getLocation())
-        && Objects.equal(this.zone, otherSensor.getZone())
-        && Objects.equal(this.type, otherSensor.getType())
-        && Objects.equal(this.name, otherSensor.getName())
-        && Objects.equal(this.unit, otherSensor.getUnit())
-        && Objects.equal(this.lastReading, otherSensor.getLastReading())
-        && Objects.equal(this.lastReadingDate, otherSensor.getLastReadingDate());
+            && Objects.equal(this.owner, otherSensor.getOwner())
+            && Objects.equal(this.location, otherSensor.getLocation())
+            && Objects.equal(this.zone, otherSensor.getZone())
+            && Objects.equal(this.type, otherSensor.getType())
+            && Objects.equal(this.name, otherSensor.getName())
+            && Objects.equal(this.unit, otherSensor.getUnit())
+            && Objects.equal(this.lastReading, otherSensor.getLastReading())
+            && Objects.equal(this.lastReadingDate, otherSensor.getLastReadingDate());
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(getClass().getName())
-        .add("id", id)
-        .add("owner", owner)
-        .add("location", location)
-        .add("zone", zone)
-        .add("type", type)
-        .add("name", name)
-        .add("unit", unit)
-        .add("lastReading", lastReading)
-        .add("lastReadingDate", lastReadingDate)
-        .toString();
+            .add("id", id)
+            .add("owner", owner)
+            .add("location", location)
+            .add("zone", zone)
+            .add("type", type)
+            .add("name", name)
+            .add("unit", unit)
+            .add("lastReading", lastReading)
+            .add("lastReadingDate", lastReadingDate)
+            .toString();
   }
 
 }

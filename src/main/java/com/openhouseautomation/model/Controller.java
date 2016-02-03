@@ -1,12 +1,19 @@
 package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.RetryOptions;
+import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.OnSave;
+import com.googlecode.objectify.annotation.Unindex;
 import java.util.List;
 
 /**
@@ -15,7 +22,6 @@ import java.util.List;
  * @author jfmontesdeoca@google.com (Jose Montes de Oca)
  */
 @Entity
-@Index
 @Cache
 public class Controller {
 
@@ -24,11 +30,12 @@ public class Controller {
    */
   public enum Type {
 
-    THERMOSTAT("Thermostat"),
-    GARAGEDOOR("Garage Door"),
     ALARM("Alarm"),
+    GARAGEDOOR("Garage Door"),
     LIGHTS("Lights"),
+    PROJECTOR("Projector"),
     SPRINKLER("Sprinkler"),
+    THERMOSTAT("Thermostat"),
     WHOLEHOUSEFAN("Whole House Fan");
 
     private final String text;
@@ -41,6 +48,7 @@ public class Controller {
     public String toString() {
       return text;
     }
+
     public static Type getTypebyName(String longname) {
       for (Type t : Type.values()) {
         if (t.toString().equals(longname)) {
@@ -64,8 +72,8 @@ public class Controller {
   public String owner;//Owner of the device
   public String location; //Place where the device is located
   public String zone; //Zone where the device is located
-  public Type type; //The type of device
-  public String name; // The name of the device
+  @Index public Type type; //The type of device
+  @Index public String name; // The name of the device
   @JsonIgnore public String desiredstate; //What the controller wants the state to be
   @JsonIgnore public String actualstate; //The actual state of the device in real life
   @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
@@ -77,6 +85,38 @@ public class Controller {
    * Empty constructor for objectify.
    */
   public Controller() {
+  }
+
+  @JsonIgnore
+  private boolean postprocessing = false;
+
+  @OnSave
+  void handlePostProcessing() {
+    if (needsPostprocessing()) {
+      RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
+      Queue queue = QueueFactory.getQueue("tasks");
+      queue.add(
+              TaskOptions.Builder.withUrl("/tasks/newcontrollervalue")
+              .param("kind", "Controller")
+              .param("id", Long.toString(id))
+              .retryOptions(retry)
+              .method(TaskOptions.Method.GET)
+      );
+    }
+  }
+
+  /**
+   * @return the postprocessing
+   */
+  public boolean needsPostprocessing() {
+    return postprocessing;
+  }
+
+  /**
+   * @param postprocessing the postprocessing to set
+   */
+  public void setPostprocessing(boolean postprocessing) {
+    this.postprocessing = postprocessing;
   }
 
   /**
@@ -188,29 +228,29 @@ public class Controller {
 
     Controller otherController = (Controller) obj;
     return Objects.equal(this.getId(), otherController.getId())
-        && Objects.equal(this.getOwner(), otherController.getOwner())
-        && Objects.equal(this.getLocation(), otherController.getLocation())
-        && Objects.equal(this.getZone(), otherController.getZone())
-        && Objects.equal(this.getType(), otherController.getType())
-        && Objects.equal(this.getName(), otherController.getName());
+            && Objects.equal(this.getOwner(), otherController.getOwner())
+            && Objects.equal(this.getLocation(), otherController.getLocation())
+            && Objects.equal(this.getZone(), otherController.getZone())
+            && Objects.equal(this.getType(), otherController.getType())
+            && Objects.equal(this.getName(), otherController.getName());
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(getClass().getName())
-        .add("id", getId())
-        .add("owner", getOwner())
-        .add("location", getLocation())
-        .add("zone", getZone())
-        .add("type", getType())
-        .add("name", getName())
-        .add("desiredstate", getDesiredState())
-        .add("actualstate", getActualState())
-        .add("desiredstatepriority", getDesiredStatePriority())
-        .add("lastdesiredstatechange", getLastDesiredStateChange())
-        .add("lastactualstatechange", getLastActualStateChange())
-        .add("validstates", getValidStates())
-        .toString();
+            .add("id", getId())
+            .add("owner", getOwner())
+            .add("location", getLocation())
+            .add("zone", getZone())
+            .add("type", getType())
+            .add("name", getName())
+            .add("desiredstate", getDesiredState())
+            .add("actualstate", getActualState())
+            .add("desiredstatepriority", getDesiredStatePriority())
+            .add("lastdesiredstatechange", getLastDesiredStateChange())
+            .add("lastactualstatechange", getLastActualStateChange())
+            .add("validstates", getValidStates())
+            .toString();
   }
 
   /**

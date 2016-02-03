@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <!-- Re-enable the auth filter...maybe...later, when auth is mapped out -->
+    <filter>
+        <description>Make sure only authorized users can change house settings</description>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.openhouseautomation.filters.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <!-- controllers are authed by ip address -->
+        <url-pattern>/controller/*</url-pattern>
+        <!-- web requests are authed by user -->
+        <url-pattern>/status/controller/update*</url-pattern>
+        <url-pattern>/status/display/*</url-pattern>
+    </filter-mapping>
     <filter>
         <filter-name>ObjectifyFilter</filter-name>
         <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
@@ -10,19 +24,20 @@
     </filter-mapping>
     <!--
 Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
+  
+  <filter>
+    <filter-name>appstats</filter-name>
+    <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
+    <init-param>
+      <param-name>logMessage</param-name>
+      <param-value>Appstats available: /appstats/details?time={ID}</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>appstats</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   -->
-    <filter>
-        <filter-name>appstats</filter-name>
-        <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
-        <init-param>
-            <param-name>logMessage</param-name>
-            <param-value>Appstats available: /appstats/details?time={ID}</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>appstats</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
         <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
@@ -65,8 +80,8 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>MailNotification</servlet-name>
-        <servlet-class>com.openhouseautomation.notification.MailNotificationTestServlet</servlet-class>
+        <servlet-name>NotificationTest</servlet-name>
+        <servlet-class>com.openhouseautomation.notification.NotificationTestServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>
@@ -83,6 +98,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
     <servlet>
         <servlet-name>TaskHandler</servlet-name>
         <servlet-class>com.openhouseautomation.tasks.TaskHandler</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.LoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -172,8 +191,8 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <url-pattern>/status</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>MailNotification</servlet-name>
-        <url-pattern>/mail</url-pattern>
+        <servlet-name>NotificationTest</servlet-name>
+        <url-pattern>/notificationtest</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>
@@ -232,6 +251,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-name>TaskHandler</servlet-name>
         <url-pattern>/tasks/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login.html</url-pattern>
+    </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Admin Only</web-resource-name>
@@ -239,6 +262,7 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
             <url-pattern>/appstats/*</url-pattern>
+            <!--<url-pattern>/*.html</url-pattern>-->
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>mail</web-resource-name>
