@@ -8,6 +8,7 @@ package com.openhouseautomation.devices;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.EventLog;
+import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 /**
  *
@@ -59,7 +62,7 @@ public class ControllerServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
-    log.log(Level.INFO, "id={0},name={1}", new Object[] { controller.getId(), controller.getName() });
+    log.log(Level.INFO, "id={0},name={1}", new Object[]{controller.getId(), controller.getName()});
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
       out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
@@ -149,7 +152,21 @@ public class ControllerServlet extends HttpServlet {
     if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
       controller.setDesiredState(controllervalue);
     }
-
+    // notify if the controller is un-expiring
+    if (controller.getLastContactDate().isBefore(new DateTime().minus(Period.hours(1)))) {
+      // notify someone
+      NotificationHandler nh = new NotificationHandler();
+      nh.setSubject("Controller online");
+      nh.setBody("Controller online: " + controller.getName());
+      nh.send();
+    }
+    // always notify for alarm state changes
+    if (controller.getType() == Controller.Type.ALARM) {
+      NotificationHandler nh = new NotificationHandler();
+      nh.setSubject("Alarm: " + controller.getActualState());
+      nh.setBody("Alarm: " + controller.getActualState());
+      nh.send();
+    }
     // handle device requests
     if (reqpath.startsWith("/device")) {
       handleDevice(controller, controllervalue, request, response);
@@ -171,6 +188,7 @@ public class ControllerServlet extends HttpServlet {
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
+      controller.setLastContactDate(new DateTime());
       controller.setActualState(controllervalue);
       // if desiredstatelastchange is more than 60 secs old and
       // the desiredstate is not the actual state, this is a local override.
@@ -228,6 +246,22 @@ public class ControllerServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
       return;
     }
+    // check if unexpired
+    Controller cexpir = ofy().load().type(Controller.class).id(1234567890).now();
+    if (cexpir == null) {
+      // first time
+      cexpir = new Controller();
+      cexpir.setName("Lights");
+      cexpir.setLastContactDate(new DateTime());
+      ofy().save().entity(cexpir).now();
+    }
+    if (cexpir.getLastContactDate().isBefore(new DateTime().minus(Period.minutes(10)))) {
+            // notify someone
+      NotificationHandler nh = new NotificationHandler();
+      nh.setSubject("Light Controller online");
+      nh.setBody("Controller online: " + cexpir.getName());
+      nh.send();
+    }
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
@@ -236,14 +270,12 @@ public class ControllerServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
-      // get 
       String curstate = actualstate.substring(lightnum, lightnum + 1);
-      
       // safely handle new lights by setting to off
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState("0");
       }
-      
+
       if (!c.getActualState().equals(curstate)) {
         // a new update for the actual state of a light
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
@@ -259,9 +291,8 @@ public class ControllerServlet extends HttpServlet {
     }
 
     ofy().save().entities(lights);
-    log.log(Level.INFO, "returning " + new String(toret));
+    log.log(Level.INFO, "returning {0}", new String(toret));
     out.print(new String(toret));
     out.flush();
-    return;
   }
 }

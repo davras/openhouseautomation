@@ -5,11 +5,6 @@
  */
 package com.openhouseautomation.devices;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.RetryOptions;
-import static com.google.appengine.api.taskqueue.RetryOptions.Builder.*;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
@@ -24,6 +19,8 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import com.openhouseautomation.notification.NotificationHandler;
+import org.joda.time.Period;
 
 /**
  *
@@ -107,6 +104,14 @@ public class SensorServlet extends HttpServlet {
         if (sensor == null) {
           log.log(Level.INFO, "sensor not found:{0}", sensorid);
           return null;
+        }
+        // if the sensor was expired and is now updating
+        if (sensor.getLastReadingDate().isBefore(new DateTime().minus(Period.hours(1)))) {
+          // notify someone
+          NotificationHandler nh = new NotificationHandler();
+          nh.setSubject("Sensor online");
+          nh.setBody("Sensor online: " + sensor.getName());
+          nh.send();
         }
         // set the value
         sensor.setLastReadingDate(new DateTime());

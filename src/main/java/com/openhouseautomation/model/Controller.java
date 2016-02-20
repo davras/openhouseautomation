@@ -11,7 +11,9 @@ import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
 import com.googlecode.objectify.annotation.Unindex;
 import java.util.List;
@@ -72,15 +74,29 @@ public class Controller {
   public String owner;//Owner of the device
   public String location; //Place where the device is located
   public String zone; //Zone where the device is located
-  @Index public Type type; //The type of device
-  @Index public String name; // The name of the device
-  @JsonIgnore public String desiredstate; //What the controller wants the state to be
-  @JsonIgnore public String actualstate; //The actual state of the device in real life
-  @JsonIgnore public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
-  @JsonIgnore public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
-  @JsonIgnore public DateTime lastactualstatechange; // The Date the last time the desired state changed
-  @JsonIgnore public List validstates; // the list of valid states for the desired and actual states
-
+  @Index
+  public Type type; //The type of device
+  @Index
+  public String name; // The name of the device
+  @JsonIgnore
+  public String desiredstate; //What the controller wants the state to be
+  @JsonIgnore
+  public String actualstate; //The actual state of the device in real life
+  @JsonIgnore
+  public DesiredStatePriority desiredstatepriority;  // The priority of the desired state, lower priority changes should be ignored
+  @JsonIgnore
+  public DateTime lastdesiredstatechange; // The Date the last time the desired state changed
+  @JsonIgnore
+  public DateTime lastactualstatechange; // The Date the last time the desired state changed
+  @JsonIgnore
+  public List validstates; // the list of valid states for the desired and actual states
+  @JsonIgnore
+  public DateTime lastContactDate; // Date lastReading was last updated
+  @Ignore
+  public boolean expired;
+  @Ignore
+  public Long expirationtime; // if no update occurs within this time, the controller is 'expired'
+  
   /**
    * Empty constructor for objectify.
    */
@@ -103,6 +119,39 @@ public class Controller {
               .method(TaskOptions.Method.GET)
       );
     }
+  }
+  @OnLoad
+  void updateExpired() {
+    if (expirationtime == null) {
+      this.expired = false;
+      expirationtime = 60 * 60L; // 1 hour default
+      lastContactDate = new DateTime(0); // triggers messsage on first contact
+    }
+    if (expirationtime == 0L) {
+      this.expired = false;
+    } else {
+      this.expired = lastContactDate.isBefore(new DateTime().minus(expirationtime * 1000));
+    }
+  }
+
+  public boolean isExpired() {
+    return expired;
+  }
+  
+  // Accessors below
+
+  /**
+   * @return the lastContactDate
+   */
+  public DateTime getLastContactDate() {
+    return lastContactDate;
+  }
+
+  /**
+   * @param lastContactDate the lastContactDate to set
+   */
+  public void setLastContactDate(DateTime lastContactDate) {
+    this.lastContactDate = lastContactDate;
   }
 
   /**

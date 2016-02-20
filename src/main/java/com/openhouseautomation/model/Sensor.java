@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 @Index
 @Cache
 public class Sensor {
+
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(Sensor.class.getName());
 
@@ -75,6 +76,8 @@ public class Sensor {
   //TODO: add boolean privacy flag (if true, requires auth)
   @Ignore
   String humanage;
+  @Ignore
+  boolean expired;
 
   @OnLoad
   void updateAge() {
@@ -99,16 +102,21 @@ public class Sensor {
     }
   }
 
-  @Ignore
-  boolean expired;
-
   @OnLoad
   void updateExpired() {
-    if (expirationtime != null) {
-      this.expired = new DateTime().getMillis() > (lastReadingDate.getMillis() + expirationtime * 1000);
-    } else {
+    if (expirationtime == null) {
       this.expired = false;
+      expirationtime = 60 * 60L; // 1 hour default
     }
+    if (expirationtime == 0L) {
+      this.expired = false;
+    } else {
+      this.expired = lastReadingDate.isBefore(new DateTime().minus(expirationtime * 1000));
+    }
+  }
+
+  public boolean isExpired() {
+    return expired;
   }
 
   /**
@@ -127,10 +135,6 @@ public class Sensor {
 
   public String getHumanAge() {
     return humanage;
-  }
-
-  public boolean isExpired() {
-    return expired;
   }
 
   /**

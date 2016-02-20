@@ -125,7 +125,7 @@
             }
           });
         }
-      }, 5000);
+      }, 2000);
       $scope.$on('$destroy', function() {
         $interval.cancel(devicePromise);
       });

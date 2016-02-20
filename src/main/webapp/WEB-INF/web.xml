@@ -103,6 +103,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>com.openhouseautomation.LoginServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExpirationCheck</servlet-name>
+        <servlet-class>com.openhouseautomation.cron.ExpirationCheck</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
         <url-pattern>/cron/getforecast</url-pattern>
@@ -254,6 +258,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExpirationCheck</servlet-name>
+        <url-pattern>/ExpirationCheck</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
