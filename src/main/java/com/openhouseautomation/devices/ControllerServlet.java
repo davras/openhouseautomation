@@ -159,6 +159,7 @@ public class ControllerServlet extends HttpServlet {
       nh.setSubject("Controller online");
       nh.setBody("Controller online: " + controller.getName());
       nh.send();
+      controller.setLastContactDate(new DateTime());
     }
     // always notify for alarm state changes
     if (controller.getType() == Controller.Type.ALARM) {
@@ -211,7 +212,7 @@ public class ControllerServlet extends HttpServlet {
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
     }
-    ofy().save().entity(controller);
+    ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
     return controller.getDesiredState();
   }
@@ -247,10 +248,11 @@ public class ControllerServlet extends HttpServlet {
       return;
     }
     // check if unexpired
-    Controller cexpir = ofy().load().type(Controller.class).id(1234567890).now();
+    Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
     if (cexpir == null) {
       // first time
       cexpir = new Controller();
+      cexpir.setId(1234567890L);
       cexpir.setName("Lights");
       cexpir.setLastContactDate(new DateTime());
       ofy().save().entity(cexpir).now();

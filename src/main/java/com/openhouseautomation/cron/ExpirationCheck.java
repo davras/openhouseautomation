@@ -41,7 +41,7 @@ public class ExpirationCheck extends HttpServlet {
       if (s.isExpired()) {
         // it's expired, notify someone
         NotificationHandler nh = new NotificationHandler();
-        nh.setSubject("Sensor OFFLINE");
+        nh.setSubject("Sensor OFFLINE: " + s.getName());
         nh.setBody("Sensor OFFLINE: " + s.getName());
         nh.send();
       }
@@ -57,7 +57,7 @@ public class ExpirationCheck extends HttpServlet {
       if (c.isExpired()) {
         // it's expired, notify someone
         NotificationHandler nh = new NotificationHandler();
-        nh.setSubject("Conroller OFFLINE");
+        nh.setSubject("Controller OFFLINE: " + c.getName());
         nh.setBody("Controller OFFLINE: " + c.getName());
         nh.send();
       }

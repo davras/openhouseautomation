@@ -15,7 +15,6 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
-import com.googlecode.objectify.annotation.Unindex;
 import java.util.List;
 
 /**

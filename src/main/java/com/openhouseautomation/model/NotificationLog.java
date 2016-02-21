@@ -23,6 +23,7 @@ public class NotificationLog {
   private String recipient; // Who got the notification
   private DateTime lastnotification; // The Date the last time the notification was sent
   @Index private String subject;
+  private String body;
 
   /**
    * Empty constructor for objectify.
@@ -30,6 +31,10 @@ public class NotificationLog {
   public NotificationLog() {
   }
 
+  public void setBody(String body) {
+    this.body = body;
+  }
+  
   /**
    * @return the recipient of the notification
    */
