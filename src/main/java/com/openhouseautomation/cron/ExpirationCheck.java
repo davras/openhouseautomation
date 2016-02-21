@@ -7,9 +7,11 @@ package com.openhouseautomation.cron;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.NotificationLog;
 import com.openhouseautomation.model.Sensor;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,7 +67,14 @@ public class ExpirationCheck extends HttpServlet {
     }
     
     // remove old notifications
-    XJAKSDFKJAKJDSF
+    List<NotificationLog> notifications = ofy().load().type(NotificationLog.class).list();
+    ArrayList<NotificationLog> toclear = new ArrayList();
+    for (NotificationLog nl : notifications) {
+      if (nl.getLastnotification().plusDays(1).isBeforeNow()) { // 24 hours default
+        toclear.add(nl);
+      }
+    }
+    ofy().delete().entities(toclear).now();
   }
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

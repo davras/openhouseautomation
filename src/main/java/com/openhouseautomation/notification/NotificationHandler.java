@@ -55,23 +55,20 @@ public class NotificationHandler {
     // get the notification entry for this subject
     NotificationLog nl = ofy().load().type(NotificationLog.class)
             .filter("subject", subject).first().now();
+    if (nl != null) {
+      log.log(Level.INFO, "Not notifying, last notification was {0}", Convutils.timeAgoToString(nl.getLastnotification().getMillis() / 1000L));
+      return;
+    }
     if (recipient == null || "".equals(recipient)) {
       recipient = DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com");
     }
-    if (nl == null) {
-      log.log(Level.INFO, "no previous log found, creating one");
-      nl = new NotificationLog();
-      nl.setLastnotification(new DateTime().minusMonths(1));
-      nl.setRecipient(recipient);
-      nl.setSubject(subject);
-      nl.setBody(body);
-      ofy().save().entity(nl).now();
-    }
-    if (nl.getLastnotification().plusHours(1).isAfterNow()) {
-      // have not reached new notification timeout
-      log.log(Level.INFO, "Not notifying, last notification was {0}", Convutils.timeAgoToString(nl.getLastnotification().getMillis()/1000L));
-      return;
-    }
+    log.log(Level.INFO, "no previous notification found, creating one");
+    nl = new NotificationLog();
+    nl.setLastnotification(new DateTime().minusMonths(1));
+    nl.setRecipient(recipient);
+    nl.setSubject(subject);
+    nl.setBody(body);
+    ofy().save().entity(nl).now();
     // send xmpp first
     // if that fails, send e-mail
     XMPPNotification xmppnotif = new XMPPNotification();
