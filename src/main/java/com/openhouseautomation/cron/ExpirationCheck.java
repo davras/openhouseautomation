@@ -50,7 +50,8 @@ public class ExpirationCheck extends HttpServlet {
     // do all the controllers
     List<Controller> controllers = ofy().load().type(Controller.class).list();
     for (Controller c : controllers) {
-      if (c.getType() == Controller.Type.LIGHTS) {
+      if (c.getType() == Controller.Type.LIGHTS
+              && !c.getOwner().equals("SYSTEM")) {
         // skip it, covered by controller named "Lights", id=1234567890
         continue;
       }
@@ -62,6 +63,9 @@ public class ExpirationCheck extends HttpServlet {
         nh.send();
       }
     }
+    
+    // remove old notifications
+    XJAKSDFKJAKJDSF
   }
 
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -26,7 +26,7 @@ import java.util.List;
 @Cache
 public class Controller {
 
-  /**
+   /**
    * Enum for the Device type
    */
   public enum Type {
@@ -121,15 +121,15 @@ public class Controller {
   }
   @OnLoad
   void updateExpired() {
-    if (expirationtime == null) {
+    if (getExpirationtime() == null) {
       this.expired = false;
-      expirationtime = 60 * 60L; // 1 hour default
-      lastContactDate = new DateTime(0); // triggers messsage on first contact
+      setExpirationtime(60L*60L); // 1 hour default between notifications
+      lastContactDate = new DateTime().minusMonths(1); // triggers messsage on first contact
     }
-    if (expirationtime == 0L) {
+    if (getExpirationtime() == 0L) {
       this.expired = false;
     } else {
-      this.expired = lastContactDate.isBefore(new DateTime().minus(expirationtime * 1000));
+      this.expired = lastContactDate.isBefore(new DateTime().minus(getExpirationtime() * 1000L));
     }
   }
 
@@ -138,6 +138,20 @@ public class Controller {
   }
   
   // Accessors below
+
+   /**
+   * @return the expirationtime in seconds
+   */
+  public Long getExpirationtime() {
+    return expirationtime;
+  }
+
+  /**
+   * @param expirationtime the expirationtime in seconds to set
+   */
+  public void setExpirationtime(Long expirationtime) {
+    this.expirationtime = expirationtime;
+  }
 
   /**
    * @return the lastContactDate

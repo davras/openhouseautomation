@@ -156,13 +156,14 @@ public class ControllerServlet extends HttpServlet {
     if (controller.getLastContactDate().isBefore(new DateTime().minus(Period.hours(1)))) {
       // notify someone
       NotificationHandler nh = new NotificationHandler();
-      nh.setSubject("Controller online");
+      nh.setSubject("Controller online: " + controller.getName());
       nh.setBody("Controller online: " + controller.getName());
       nh.send();
-      controller.setLastContactDate(new DateTime());
     }
+    controller.setLastContactDate(new DateTime());
     // always notify for alarm state changes
-    if (controller.getType() == Controller.Type.ALARM) {
+    if (controller.getType() == Controller.Type.ALARM
+            && !controller.getActualState().equals(controllervalue)) {
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Alarm: " + controller.getActualState());
       nh.setBody("Alarm: " + controller.getActualState());
@@ -186,10 +187,12 @@ public class ControllerServlet extends HttpServlet {
    * @return a String containing servlet description
    */
   public String handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
+    // TODO put this into an objectify transaction
+    controller.setLastContactDate(new DateTime());
+    ofy().save().entity(controller).now();
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
-      controller.setLastContactDate(new DateTime());
       controller.setActualState(controllervalue);
       // if desiredstatelastchange is more than 60 secs old and
       // the desiredstate is not the actual state, this is a local override.
@@ -250,15 +253,27 @@ public class ControllerServlet extends HttpServlet {
     // check if unexpired
     Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
     if (cexpir == null) {
-      // first time
+      log.log(Level.WARNING, "Making a new light expiration controller");
       cexpir = new Controller();
+      cexpir.setOwner("SYSTEM");
+      cexpir.setLocation("SYSTEM");
+      cexpir.setZone("SYSTEM");
+      cexpir.setType(Controller.Type.LIGHTS);
+      cexpir.setDesiredState("0");
+      cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+      cexpir.setActualState("0");
+      cexpir.setLastDesiredStateChange(new DateTime());
+      cexpir.setLastActualStateChange(new DateTime());
       cexpir.setId(1234567890L);
       cexpir.setName("Lights");
       cexpir.setLastContactDate(new DateTime());
       ofy().save().entity(cexpir).now();
+    } else {
+      cexpir.setLastContactDate(new DateTime());
+      ofy().save().entity(cexpir).now();
     }
-    if (cexpir.getLastContactDate().isBefore(new DateTime().minus(Period.minutes(10)))) {
-            // notify someone
+    if (cexpir.getLastContactDate().isBefore(new DateTime().minusMinutes(10))) {
+      // notify someone
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Light Controller online");
       nh.setBody("Controller online: " + cexpir.getName());
