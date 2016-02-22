@@ -26,7 +26,7 @@ import java.util.List;
 @Cache
 public class Controller {
 
-   /**
+  /**
    * Enum for the Device type
    */
   public enum Type {
@@ -90,12 +90,12 @@ public class Controller {
   @JsonIgnore
   public List validstates; // the list of valid states for the desired and actual states
   @JsonIgnore
-  public DateTime lastContactDate; // Date lastReading was last updated
+  public DateTime lastcontactdate; // Date lastReading was last updated
   @Ignore
   public boolean expired;
   @Ignore
-  public Long expirationtime; // if no update occurs within this time, the controller is 'expired'
-  
+  public Integer expirationtime; // if no update occurs within this time, the controller is 'expired'
+
   /**
    * Empty constructor for objectify.
    */
@@ -119,52 +119,54 @@ public class Controller {
       );
     }
   }
+
   @OnLoad
   void updateExpired() {
-    if (getExpirationtime() == null) {
-      this.expired = false;
-      setExpirationtime(60L*60L); // 1 hour default between notifications
-      lastContactDate = new DateTime().minusMonths(1); // triggers messsage on first contact
+    if (lastcontactdate == null) {
+      setLastContactDate(new DateTime().minusMonths(1));
     }
-    if (getExpirationtime() == 0L) {
+    if (expirationtime == null) {
+      this.expired = false;
+      expirationtime = 60 * 60; // 1 hour default
+    }
+    if (expirationtime == 0) {
       this.expired = false;
     } else {
-      this.expired = lastContactDate.isBefore(new DateTime().minus(getExpirationtime() * 1000L));
+      this.expired = lastcontactdate.plusSeconds(getExpirationTime()).isBeforeNow();
     }
   }
 
   public boolean isExpired() {
     return expired;
   }
-  
-  // Accessors below
 
-   /**
+  // Accessors below
+  /**
    * @return the expirationtime in seconds
    */
-  public Long getExpirationtime() {
+  public Integer getExpirationTime() {
     return expirationtime;
   }
 
   /**
    * @param expirationtime the expirationtime in seconds to set
    */
-  public void setExpirationtime(Long expirationtime) {
+  public void setExpirationtime(Integer expirationtime) {
     this.expirationtime = expirationtime;
   }
 
   /**
-   * @return the lastContactDate
+   * @return the lastcontactdate
    */
   public DateTime getLastContactDate() {
-    return lastContactDate;
+    return lastcontactdate;
   }
 
   /**
-   * @param lastContactDate the lastContactDate to set
+   * @param lastcontactdate the lastcontactdate to set
    */
-  public void setLastContactDate(DateTime lastContactDate) {
-    this.lastContactDate = lastContactDate;
+  public void setLastContactDate(DateTime lastcontactdate) {
+    this.lastcontactdate = lastcontactdate;
   }
 
   /**
@@ -311,7 +313,9 @@ public class Controller {
             .add("desiredstatepriority", getDesiredStatePriority())
             .add("lastdesiredstatechange", getLastDesiredStateChange())
             .add("lastactualstatechange", getLastActualStateChange())
+            .add("lastcontactdate", getLastContactDate())
             .add("validstates", getValidStates())
+            .add("expirationtime", getExpirationTime())
             .toString();
   }
 

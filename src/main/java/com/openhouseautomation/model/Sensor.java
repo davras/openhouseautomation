@@ -72,7 +72,7 @@ public class Sensor {
   DateTime lastReadingDate; // Date lastReading was last updated
   @JsonIgnore
   String secret; // the password for this sensor, used in SipHash
-  Long expirationtime; // if no update occurs within this time, the sensor is 'expired'
+  Integer expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
   @Ignore
   String humanage;
@@ -104,14 +104,17 @@ public class Sensor {
 
   @OnLoad
   void updateExpired() {
+    if (lastReadingDate == null) {
+      setLastReadingDate(new DateTime().minusMonths(1));
+    }
     if (expirationtime == null) {
       this.expired = false;
-      expirationtime = 60 * 60L; // 1 hour default
+      expirationtime = 60 * 60; // 1 hour default
     }
-    if (expirationtime == 0L) {
+    if (expirationtime == 0) {
       this.expired = false;
     } else {
-      this.expired = lastReadingDate.isBefore(new DateTime().minus(expirationtime * 1000));
+      this.expired = lastReadingDate.plusSeconds(getExpirationTime()).isBeforeNow();
     }
   }
 
@@ -360,7 +363,7 @@ public class Sensor {
    * @param expirationtime in seconds since last sensor reading
    */
   @JsonIgnore
-  public void setExpirationTime(Long expirationtime) {
+  public void setExpirationTime(Integer expirationtime) {
     this.expirationtime = expirationtime;
   }
 
@@ -369,7 +372,7 @@ public class Sensor {
    *
    * @return Integer expiration time in seconds
    */
-  public Long getExpirationTime() {
+  public Integer getExpirationTime() {
     return expirationtime;
   }
 

@@ -96,37 +96,33 @@ public class SensorServlet extends HttpServlet {
     } else {
       log.log(Level.INFO, "Hash validated");
     }
-    ofy().transact(new Work<Sensor>() {
-      @Override
-      public Sensor run() {
-        Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
-        Sensor sensor = ofy().load().now(sk);
-        if (sensor == null) {
-          log.log(Level.INFO, "sensor not found:{0}", sensorid);
-          return null;
-        }
-        // if the sensor was expired and is now updating
-        if (sensor.getLastReadingDate().isBefore(new DateTime().minus(Period.hours(1)))) {
-          // notify someone
-          NotificationHandler nh = new NotificationHandler();
-          nh.setSubject("Sensor online");
-          nh.setBody("Sensor online: " + sensor.getName());
-          nh.send();
-        }
-        // set the value
-        sensor.setLastReadingDate(new DateTime());
-        sensor.setLastReading(sensorval);
-        ofy().save().entity(sensor);
-        log.log(Level.INFO, "saved sensor:{0}", sensor);
-        Reading reading = new Reading();
-        reading.setSensor(sk);
-        reading.setTimestamp(new DateTime());
-        reading.setValue(sensorval);
-        ofy().save().entity(reading);
-        log.log(Level.INFO, "logged reading:{0}", reading);
-        return sensor;
-      }
-    });
+    Key<Sensor> sk = Key.create(Sensor.class, Long.parseLong(sensorid));
+    Sensor sensor = ofy().load().now(sk);
+    if (sensor == null) {
+      log.log(Level.INFO, "sensor not found:{0}", sensorid);
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Sensor not found");
+      return;
+    }
+    // if the sensor was expired and is now updating
+    if (sensor.getLastReadingDate().plusSeconds(sensor.getExpirationTime()).isBeforeNow()) {
+      // notify someone
+      NotificationHandler nh = new NotificationHandler();
+      nh.setSubject("Sensor online");
+      nh.setBody("Sensor online: " + sensor.getName());
+      nh.send();
+    }
+    // set the value
+    sensor.setLastReadingDate(new DateTime());
+    sensor.setLastReading(sensorval);
+    ofy().save().entity(sensor);
+    log.log(Level.INFO, "saved sensor:{0}", sensor);
+    Reading reading = new Reading();
+    reading.setSensor(sk);
+    reading.setTimestamp(new DateTime());
+    reading.setValue(sensorval);
+    ofy().save().entity(reading);
+    log.log(Level.INFO, "logged reading:{0}", reading);
+
     out.println("OK");
 
     // TODO: move auth to filter servlet

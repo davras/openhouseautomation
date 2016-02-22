@@ -153,7 +153,7 @@ public class ControllerServlet extends HttpServlet {
       controller.setDesiredState(controllervalue);
     }
     // notify if the controller is un-expiring
-    if (controller.getLastContactDate().isBefore(new DateTime().minus(Period.hours(1)))) {
+    if (controller.getLastContactDate().plusSeconds(controller.getExpirationTime()).isBeforeNow()) {
       // notify someone
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Controller online: " + controller.getName());
@@ -161,6 +161,7 @@ public class ControllerServlet extends HttpServlet {
       nh.send();
     }
     controller.setLastContactDate(new DateTime());
+    ofy().save().entity(controller).now();
     // always notify for alarm state changes
     if (controller.getType() == Controller.Type.ALARM
             && !controller.getActualState().equals(controllervalue)) {

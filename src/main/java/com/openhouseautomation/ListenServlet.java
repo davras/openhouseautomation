@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -77,6 +78,27 @@ public class ListenServlet extends HttpServlet {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
         ofy().clear(); // clear the session cache, not the memcache
+        Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
+        if (cexpir == null) {
+          log.log(Level.WARNING, "Making a new light expiration controller");
+          cexpir = new Controller();
+          cexpir.setOwner("SYSTEM");
+          cexpir.setLocation("SYSTEM");
+          cexpir.setZone("SYSTEM");
+          cexpir.setType(Controller.Type.LIGHTS);
+          cexpir.setDesiredState("0");
+          cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+          cexpir.setActualState("0");
+          cexpir.setLastDesiredStateChange(new DateTime());
+          cexpir.setLastActualStateChange(new DateTime());
+          cexpir.setId(1234567890L);
+          cexpir.setName("Lights");
+          cexpir.setLastContactDate(new DateTime());
+          ofy().save().entity(cexpir).now();
+        } else {
+          cexpir.setLastContactDate(new DateTime());
+          ofy().save().entity(cexpir).now();
+        }
         //log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
