@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>gautoard</application>
-  <version>14</version>
+  <version>27d</version>
  
   <!-- Allows App Engine to send multiple requests to one instance in parallel: -->
   <threadsafe>true</threadsafe>
@@ -23,4 +23,11 @@
   <inbound-services>
     <service>mail</service>
   </inbound-services>
+  <automatic-scaling>
+    <min-pending-latency>12000ms</min-pending-latency>
+  </automatic-scaling>
+  <static-files>
+    <include path="/**.js" />
+    <include path="/**.html" />
+  </static-files>
 </appengine-web-app>
