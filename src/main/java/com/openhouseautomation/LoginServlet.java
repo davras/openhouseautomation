@@ -41,7 +41,6 @@ public class LoginServlet extends HttpServlet {
       } else {
         out.println("<li class=\"navbar-brand\"><a href=\"" + userService.createLoginURL(request.getRequestURI().replace("login.html", "")) + "\">Login</a></li>");
       }
-      out.println("<li class=\"navbar-brand\"><a href=\"https://code.google.com/p/gautoard/wiki/DesignConcepts\">Help</a></li>");
     }
   }
 

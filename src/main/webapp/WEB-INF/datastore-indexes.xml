@@ -7,8 +7,4 @@
   <datastore-index kind="ReadingHistory" ancestor="true" source="manual">
     <property name="timestamp" direction="asc"/>
   </datastore-index>
-  <datastore-index kind="NotificationLog" ancestor="false" source="manual">
-    <property name="subject" direction="asc"/>
-    <property name="lastnotification" direction="desc"/>
-  </datastore-index>
 </datastore-indexes>
