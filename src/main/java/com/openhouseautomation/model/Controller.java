@@ -26,6 +26,8 @@ import java.util.List;
 @Cache
 public class Controller {
 
+  private static final long serialVersionUID = 27L;
+
   /**
    * Enum for the Device type
    */
