@@ -78,27 +78,6 @@ public class ListenServlet extends HttpServlet {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
         ofy().clear(); // clear the session cache, not the memcache
-        Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
-        if (cexpir == null) {
-          log.log(Level.WARNING, "Making a new light expiration controller");
-          cexpir = new Controller();
-          cexpir.setOwner("SYSTEM");
-          cexpir.setLocation("SYSTEM");
-          cexpir.setZone("SYSTEM");
-          cexpir.setType(Controller.Type.LIGHTS);
-          cexpir.setDesiredState("0");
-          cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-          cexpir.setActualState("0");
-          cexpir.setLastDesiredStateChange(new DateTime());
-          cexpir.setLastActualStateChange(new DateTime());
-          cexpir.setId(1234567890L);
-          cexpir.setName("Lights");
-          cexpir.setLastContactDate(new DateTime());
-          ofy().save().entity(cexpir).now();
-        } else {
-          cexpir.setLastContactDate(new DateTime());
-          ofy().save().entity(cexpir).now();
-        }
         //log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
@@ -220,6 +199,7 @@ public class ListenServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     boolean dirty = false;
     for (Controller c : lights) {
+
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
       // handle brand new controllers
@@ -238,9 +218,15 @@ public class ListenServlet extends HttpServlet {
       if (c.getDesiredState().equals("0")) {
         toret[lightnum] = '0';
       }
+      if (c.getLastContactDate().plusMinutes(20).isBeforeNow()) {
+        // update only once per hour to save DS writes
+        // expiration alert after 1 hour
+        c.setLastContactDate(new DateTime());
+        dirty = true;
+      }
     }
     if (dirty) {
-      ofy().save().entities(lights);
+      ofy().save().entities(lights).now();
       log.log(Level.INFO, "returning " + new String(toret));
       out.print(new String(toret));
       out.flush();

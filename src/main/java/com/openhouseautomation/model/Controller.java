@@ -95,7 +95,6 @@ public class Controller {
   public DateTime lastcontactdate; // Date lastReading was last updated
   @Ignore
   public boolean expired;
-  @Ignore
   public Integer expirationtime; // if no update occurs within this time, the controller is 'expired'
 
   /**

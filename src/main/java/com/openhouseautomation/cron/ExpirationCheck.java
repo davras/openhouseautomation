@@ -52,11 +52,6 @@ public class ExpirationCheck extends HttpServlet {
     // do all the controllers
     List<Controller> controllers = ofy().load().type(Controller.class).list();
     for (Controller c : controllers) {
-      if (c.getType() == Controller.Type.LIGHTS
-              && !c.getOwner().equals("SYSTEM")) {
-        // skip it, covered by controller named "Lights", id=1234567890
-        continue;
-      }
       if (c.isExpired()) {
         // it's expired, notify someone
         NotificationHandler nh = new NotificationHandler();
