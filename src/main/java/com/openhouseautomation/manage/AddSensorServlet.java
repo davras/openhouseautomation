@@ -6,6 +6,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Sensor;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
@@ -44,7 +45,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setUnit("F");
       sens.setLastReading("99");
       sens.setLastReadingDate(new DateTime());
-      sens.setExpirationTime(new Long(3600));
+      sens.setExpirationTime(3600);
 
       CRC32 hash = new CRC32();
       hash.update(salt.getBytes());
@@ -61,7 +62,7 @@ public class AddSensorServlet extends HttpServlet {
         req.setAttribute("messageLevel", "success");
         req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       } else {
-        log.warning("Sensor already exists with id: " + sens.getId());
+        log.log(Level.WARNING, "Sensor already exists with id: {0}", sens.getId());
         req.setAttribute("message", "Sensor already exists with id: " + sens.getId());
         req.setAttribute("messageLevel", "danger");
         req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);

@@ -199,17 +199,19 @@ public class ListenServlet extends HttpServlet {
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     boolean dirty = false;
     for (Controller c : lights) {
-
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
       // handle brand new controllers
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
-      if (!c.getActualState().equals(c.getDesiredState())) {
-        log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
-        c.setActualState(curstate);
-        c.setDesiredState(curstate);
+      if (!curstate.equals(c.getDesiredState())) {
+        // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
+        if (!curstate.equals("x")) {
+          log.log(Level.INFO, "POST /lights, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
+          c.setActualState(curstate);
+          c.setDesiredState(curstate);
+        }
         dirty = true;
       }
       if (c.getDesiredState().equals("1")) {
