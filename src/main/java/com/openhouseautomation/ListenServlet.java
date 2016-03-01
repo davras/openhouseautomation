@@ -205,7 +205,7 @@ public class ListenServlet extends HttpServlet {
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
-      if (!curstate.equals(c.getDesiredState())) {
+      if (!c.getActualState().equals(c.getDesiredState())) {
         // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
         if (!curstate.equals("x")) {
           log.log(Level.INFO, "POST /lights, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
@@ -240,10 +240,10 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
-      ofy().clear(); // clear the session cache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {
+          ofy().clear(); // clear the session cache
           controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
         } catch (Exception e) {
           // This will catch Memcache flushes and return so the client can
