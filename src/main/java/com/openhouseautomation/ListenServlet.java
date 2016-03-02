@@ -205,10 +205,10 @@ public class ListenServlet extends HttpServlet {
       if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
         c.setDesiredState(curstate);
       }
-      if (!c.getActualState().equals(c.getDesiredState())) {
+      if (!curstate.equals(c.getActualState())) {
         // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
         if (!curstate.equals("x")) {
-          log.log(Level.INFO, "POST /lights, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
+          log.log(Level.INFO, "updating actual and desired state, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
           c.setActualState(curstate);
           c.setDesiredState(curstate);
         }
@@ -221,15 +221,16 @@ public class ListenServlet extends HttpServlet {
         toret[lightnum] = '0';
       }
       if (c.getLastContactDate().plusMinutes(20).isBeforeNow()) {
-        // update only once per hour to save DS writes
+        // update only 3x per hour to save DS writes
         // expiration alert after 1 hour
+        log.log(Level.INFO, "updating last contact date");
         c.setLastContactDate(new DateTime());
         dirty = true;
       }
     }
     if (dirty) {
       ofy().save().entities(lights).now();
-      log.log(Level.INFO, "returning " + new String(toret));
+      log.log(Level.INFO, "fast returning " + new String(toret));
       out.print(new String(toret));
       out.flush();
       return;
@@ -240,10 +241,10 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
+      ofy().clear(); // clear the session cache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {
-          ofy().clear(); // clear the session cache
           controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
         } catch (Exception e) {
           // This will catch Memcache flushes and return so the client can
@@ -263,6 +264,7 @@ public class ListenServlet extends HttpServlet {
       }
       if (foundachange) {
         response.setStatus(HttpServletResponse.SC_OK);
+        log.log(Level.INFO, "delayed returning " + new String(toret));
         out.print(new String(toret));
         out.flush();
         out.close();
@@ -280,6 +282,7 @@ public class ListenServlet extends HttpServlet {
     // if you get to this point (timeout), the value didn't change, 
     // but send back desired anyway (less code for the arduino)
     out.print(new String(toret));
+    log.log(Level.INFO, "timeout returning " + new String(toret));
     out.flush();
     out.close();
     return;

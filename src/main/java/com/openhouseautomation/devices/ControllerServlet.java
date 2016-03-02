@@ -153,7 +153,7 @@ public class ControllerServlet extends HttpServlet {
       controller.setDesiredState(controllervalue);
     }
     // notify if the controller is un-expiring
-    if (controller.getLastContactDate().plusSeconds(controller.getExpirationTime()).isBeforeNow()) {
+    if (controller.getLastContactDate().plusSeconds(controller.getExpirationtime()).isBeforeNow()) {
       // notify someone
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Controller online: " + controller.getName());

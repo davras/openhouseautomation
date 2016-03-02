@@ -205,15 +205,8 @@ public class DisplaySourceServlet extends HttpServlet {
     // production
     String type = request.getParameter("type");
     // doesn't change frequently, no need to clear ofy() session cache
-    Query<Controller> query = ofy().load().type(Controller.class).filter("type", type);
-    QueryResultIterator<Controller> iterator = query.iterator();
-    List controllers = new ArrayList();
-    while (iterator.hasNext()) {
-      Controller cont = (Controller) iterator.next();
-      controllers.add(cont);
-    }
     ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, controllers);
+    om.writeValue(out, ofy().load().type(Controller.class).filter("type", type).list());
   }
 
   /**

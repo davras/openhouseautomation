@@ -133,7 +133,7 @@ public class Controller {
     if (expirationtime == 0) {
       this.expired = false;
     } else {
-      this.expired = lastcontactdate.plusSeconds(getExpirationTime()).isBeforeNow();
+      this.expired = lastcontactdate.plusSeconds(getExpirationtime()).isBeforeNow();
     }
   }
 
@@ -145,7 +145,7 @@ public class Controller {
   /**
    * @return the expirationtime in seconds
    */
-  public Integer getExpirationTime() {
+  public Integer getExpirationtime() {
     return expirationtime;
   }
 
@@ -316,7 +316,7 @@ public class Controller {
             .add("lastactualstatechange", getLastActualStateChange())
             .add("lastcontactdate", getLastContactDate())
             .add("validstates", getValidStates())
-            .add("expirationtime", getExpirationTime())
+            .add("expirationtime", getExpirationtime())
             .toString();
   }
 
