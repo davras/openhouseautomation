@@ -29,7 +29,6 @@ public class XMPPNotification {
       // will not work on Master-Slave apps
       return false;
     }
-    // TODO don't send frequent notifications (> 1/hr)
     JID jidsender = new JID(sender);
     JID jidrecipient = new JID(recipient);
     Message msg = new MessageBuilder()

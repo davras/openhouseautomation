@@ -82,4 +82,16 @@ public class NotificationHandler {
     nl.setLastnotification(new DateTime());
     ofy().save().entity(nl).now();
   }
+
+  public void sendWithoutNotificationLogging() {
+    // send xmpp first
+    // if that fails, send e-mail
+    XMPPNotification xmppnotif = new XMPPNotification();
+    if (!xmppnotif.send(this)) {
+      log.log(Level.WARNING, "XMPP send failed, using e-mail");
+      // then e-mail instead
+      MailNotification mnotif = new MailNotification();
+      mnotif.send(this);
+    }
+  }
 }
