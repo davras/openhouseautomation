@@ -5,7 +5,11 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.iftt.DeferredController;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.notification.NotificationHandler;
@@ -20,7 +24,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 /**
  *
@@ -92,6 +95,7 @@ public class ControllerServlet extends HttpServlet {
       vs.add("DISARM");
       vs.add("HOME");
       vs.add("AWAY");
+      vs.add("NOT READY");
     } else if (controller.type == Controller.Type.PROJECTOR) {
       vs.add("1");
       vs.add("0");
@@ -152,7 +156,15 @@ public class ControllerServlet extends HttpServlet {
     if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
       controller.setDesiredState(controllervalue);
     }
-    
+    // fix old controllers
+    if (controller.getType().equals(Controller.Type.ALARM)) {
+      ArrayList al = new ArrayList();
+      al.add("Disarm");
+      al.add("Home");
+      al.add("Away");
+      controller.setValidStates(al);
+    }
+
     // notify if the controller is un-expiring
     if (controller.getLastContactDate().plusSeconds(controller.getExpirationtime()).isBeforeNow()) {
       // notify someone
@@ -162,16 +174,6 @@ public class ControllerServlet extends HttpServlet {
       nh.send();
     }
     controller.setLastContactDate(new DateTime());
-    
-    // always notify for alarm state changes
-    // TODO: move to ifttt
-    if (controller.getType() == Controller.Type.ALARM
-            && !controller.getActualState().equals(controllervalue)) {
-      NotificationHandler nh = new NotificationHandler();
-      nh.setSubject("Alarm: " + controller.getActualState());
-      nh.setBody("Alarm: " + controller.getActualState());
-      nh.send();
-    }
     // handle device requests
     if (reqpath.startsWith("/device")) {
       handleDevice(controller, controllervalue, request, response);
@@ -217,8 +219,47 @@ public class ControllerServlet extends HttpServlet {
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
     }
+
+    // check for postprocessing
+    if (controller.needsPostprocessing()) {
+      // Add the task to the default queue.
+      Queue queue = QueueFactory.getDefaultQueue();
+      DeferredController dfc = null;
+      try {
+        dfc = (DeferredController) Class.forName("com.openhouseautomation.iftt."
+                + toTitleCase(controller.getType().name())).newInstance();
+        // i.e.: com.openhouseautomation.iftt.ALARM class
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        // obviously, don't enqueue the task
+        log.log(Level.WARNING, "I could not create the class needed: com.openhouseautomation.iftt.{0}" + 
+                "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
+                new Object[]{toTitleCase(controller.getType().name()), controller.getId()}
+        );
+        dfc = null;
+      }
+      if (dfc == null) {
+        // bail early
+        ofy().save().entity(controller).now();
+        return;
+      }
+
+      // grab the old controller and add the task
+      Controller cold = ofy().load().entity(controller).now();
+      dfc.setOldController(cold);
+      dfc.setNewController(controller);
+      queue.add(TaskOptions.Builder.withPayload(dfc));
+    }
     ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
+  }
+
+  public static String toTitleCase(String givenString) {
+    String[] arr = givenString.split(" ");
+    StringBuilder sb = new StringBuilder();
+    for (String arr1 : arr) {
+      sb.append(Character.toUpperCase(arr1.charAt(0))).append(arr1.substring(1)).append(" ");
+    }
+    return sb.toString().trim();
   }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
