@@ -152,6 +152,7 @@ public class ControllerServlet extends HttpServlet {
     if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
       controller.setDesiredState(controllervalue);
     }
+    
     // notify if the controller is un-expiring
     if (controller.getLastContactDate().plusSeconds(controller.getExpirationtime()).isBeforeNow()) {
       // notify someone
@@ -161,8 +162,9 @@ public class ControllerServlet extends HttpServlet {
       nh.send();
     }
     controller.setLastContactDate(new DateTime());
-    ofy().save().entity(controller).now();
+    
     // always notify for alarm state changes
+    // TODO: move to ifttt
     if (controller.getType() == Controller.Type.ALARM
             && !controller.getActualState().equals(controllervalue)) {
       NotificationHandler nh = new NotificationHandler();
@@ -187,10 +189,9 @@ public class ControllerServlet extends HttpServlet {
    *
    * @return a String containing servlet description
    */
-  public String handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
+  public void handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
     // TODO put this into an objectify transaction
-    controller.setLastContactDate(new DateTime());
-    ofy().save().entity(controller).now();
+    //ofy().save().entity(controller).now();
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
@@ -218,7 +219,6 @@ public class ControllerServlet extends HttpServlet {
     }
     ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
-    return controller.getDesiredState();
   }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
