@@ -1,7 +1,7 @@
 Goals:
 ======
 
-- Use devices to automate a house.
+- Use devices to automate a house:
  - Thermostat
  - Lights (X-10) and LED strip accent lighting
  - Home entertainment (IR LED)
@@ -40,12 +40,13 @@ Current status:
 - Arduino code finished for Makershed arLCD + WiFi shield.
 - Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
 - Spark code done for BMP180 and DS18B20 sensors
+- Shell script for controlling the Whole House Fan
+- Particle Core for remote projector
+- Arduino code for X10 (lights)
 
 To do:
 ======
-- Better UI for arLCD+WiFi.
-- Arduino+X10 controls.
-- RPi + CM11A + Heyu for lights (is it possible?)
+
 
 Maybe:
 ======
@@ -69,9 +70,13 @@ Building will run the tests, but to explicitly run tests you can use the test ta
 
     mvn test
 
-To start the app, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included.  Just run the command.
+To start the app locally, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included.  Just run the command.
 
     mvn appengine:devserver
+
+To deploy the app, run:
+    
+    mvn appengine:update
 
 To see all the available goals for the App Engine plugin, run
 

@@ -5,3 +5,4 @@ datanucleus.log
 /target/
 nb-configuration.xml
 /src/main/java/com/openhouseautomation/display/DisplaySourceServletOld.java
+/customs.json
