@@ -58,10 +58,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <description>Gets the weather forecast for the provided zipcode (either in initialization params or by URL)</description>
         <servlet-name>WeatherForecast</servlet-name>
         <servlet-class>com.openhouseautomation.cron.WeatherForecast</servlet-class>
-        <init-param>
-            <param-name>zipcode</param-name>
-            <param-value>95376</param-value>
-        </init-param>
     </servlet>
     <servlet>
         <servlet-name>LCDDisplayServlet</servlet-name>
