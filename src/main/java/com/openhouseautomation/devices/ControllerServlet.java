@@ -253,6 +253,8 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
   }
 
+  
+  // TODO move into Utilities class
   public static String toTitleCase(String givenString) {
     String[] arr = givenString.split(" ");
     StringBuilder sb = new StringBuilder();

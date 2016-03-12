@@ -216,18 +216,11 @@ public class HouseFan {
   }
 
   public void sendNotification() {
-    // if fan speed changed, send notification
-    // yes, it will send a lot of debug mail during this testing phase
-    // in the future, either send only 2 notifs/day (on and off), or use IM or pub/sub
-    boolean tosend = Boolean.parseBoolean(DatastoreConfig.getValueForKey("send mail", "true"));
-    if (!tosend) {
-      return;
-    }
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setBody(wd.toMessage());
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com"));
-    nhnotif.setSubject("Fan Speed change");
-    nhnotif.setBody("Fan Speed change: \n  Old:" + olddesiredfanspeed + " -> New: " + newfanspeed);
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+    nhnotif.setSubject("Fan Speed");
+    nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     nhnotif.send();
   }
 }

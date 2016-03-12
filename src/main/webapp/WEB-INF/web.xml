@@ -96,10 +96,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>TaskHandler</servlet-name>
-        <servlet-class>com.openhouseautomation.tasks.TaskHandler</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>com.openhouseautomation.LoginServlet</servlet-class>
     </servlet>
@@ -254,10 +250,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
     <servlet-mapping>
         <servlet-name>pipeline</servlet-name>
         <url-pattern>/_ah/pipeline/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>TaskHandler</servlet-name>
-        <url-pattern>/tasks/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>

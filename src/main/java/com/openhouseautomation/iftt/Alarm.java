@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.openhouseautomation.iftt;
 
 import com.openhouseautomation.model.DatastoreConfig;
@@ -23,7 +18,7 @@ public class Alarm extends DeferredController {
       return;
     }
     NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("notificationsto"));
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Alarm State Change");
     nhnotif.setBody("Alarm: " + super.newcontroller.actualstate);
     nhnotif.sendWithoutNotificationLogging();

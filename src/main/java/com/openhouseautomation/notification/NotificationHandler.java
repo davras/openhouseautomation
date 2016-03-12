@@ -60,7 +60,7 @@ public class NotificationHandler {
       return;
     }
     if (recipient == null || "".equals(recipient)) {
-      recipient = DatastoreConfig.getValueForKey("e-mail sender", "davras@gmail.com");
+      recipient = DatastoreConfig.getValueForKey("admin");
     }
     log.log(Level.INFO, "no previous notification found, creating one");
     nl = new NotificationLog();

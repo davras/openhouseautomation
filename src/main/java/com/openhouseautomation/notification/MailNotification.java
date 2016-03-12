@@ -21,7 +21,7 @@ import javax.mail.internet.MimeMessage;
 public class MailNotification {
 
   public void send(NotificationHandler nh) {
-    String sender = DatastoreConfig.getValueForKey("e-mail sender", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)");
+    String sender = DatastoreConfig.getValueForKey("admin", "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)");
     String recipient = nh.getRecipient();
     
     if ("".equals(sender)) {
