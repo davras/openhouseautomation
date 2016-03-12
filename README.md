@@ -81,3 +81,7 @@ To deploy the app, run:
 To see all the available goals for the App Engine plugin, run
 
     mvn help:describe -Dplugin=appengine
+
+Errata:
+===================
+My house is my dogfood.  Please be nice.
