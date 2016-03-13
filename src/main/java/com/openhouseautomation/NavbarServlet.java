@@ -46,9 +46,9 @@ public class NavbarServlet extends HttpServlet {
               + "        <span class=\"icon-bar\"></span>\n"
               + "        <span class=\"icon-bar\"></span>\n"
               + "      </button>\n"
-              + "      <a class=\"navbar-brand\" href=\"/\">Open House Automation</a>");
+      );
       if (request.getUserPrincipal() != null) {
-        out.print("<div class=\"navbar-brand\">" + request.getUserPrincipal().getName() + "</div>");
+        out.println("<a class=\"navbar-brand\" href=\"/\">" + request.getUserPrincipal().getName() + "</a>");
       } else {
         out.print("<a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("navbar.html", "")) + "\">Login</a>");
       }
@@ -57,14 +57,12 @@ public class NavbarServlet extends HttpServlet {
               + "    <!-- Collect the nav links, forms, and other content for toggling -->\n"
               + "    <div class=\"collapse navbar-collapse\" id=\"oha-navbar-collapse-1\">\n"
               + "      <ul class=\"nav navbar-nav\">\n"
-              + "        <li class=\"active\">"
       );
       if (request.getUserPrincipal() != null) {
-        out.println("<li class=\"navbar-brand\"><a href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a></li>");
+        out.println("<li class=\"active\"><a class=\"navbar-brand\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a></li>");
       }
       out.println(
-              "</li>\n"
-              + "      </ul>\n"
+              "      </ul>\n"
               + "    </div><!-- /.navbar-collapse -->\n"
               + "  </div><!-- /.container-fluid -->\n"
               + "</nav>");
