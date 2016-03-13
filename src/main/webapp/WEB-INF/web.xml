@@ -103,6 +103,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-name>XMPPIncomingHandler</servlet-name>
         <servlet-class>com.openhouseautomation.notification.XMPPIncomingHandler</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>HouseTimers</servlet-name>
+        <servlet-class>com.openhouseautomation.cron.HouseTimers</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
         <url-pattern>/cron/getforecast</url-pattern>
@@ -258,6 +262,10 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
     <servlet-mapping>
         <servlet-name>NavbarServlet</servlet-name>
         <url-pattern>/navbar.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HouseTimers</servlet-name>
+        <url-pattern>/HouseTimers</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

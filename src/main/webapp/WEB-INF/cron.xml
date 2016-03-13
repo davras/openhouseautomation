@@ -36,4 +36,10 @@
     <schedule>every 15 minutes</schedule>
     <timezone>America/Los_Angeles</timezone>
   </cron>
+  <cron>
+    <url>/HouseTimers</url>
+    <description>Runs timers for automated controls</description>
+    <schedule>every 1 minutes</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
 </cronentries>
