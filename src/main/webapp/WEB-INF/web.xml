@@ -92,8 +92,8 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LoginServlet</servlet-class>
+        <servlet-name>NavbarServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.NavbarServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExpirationCheck</servlet-name>
@@ -248,16 +248,16 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <url-pattern>/_ah/pipeline/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>LoginServlet</servlet-name>
-        <url-pattern>/login.html</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ExpirationCheck</servlet-name>
         <url-pattern>/ExpirationCheck</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>XMPPIncomingHandler</servlet-name>
         <url-pattern>/_ah/xmpp/message/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NavbarServlet</servlet-name>
+        <url-pattern>/navbar.html</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
