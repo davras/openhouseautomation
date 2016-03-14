@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.RetryOptions;
-import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
+import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.iftt.DeferredSensor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -88,18 +88,35 @@ public class Sensor {
 
   @OnSave
   void handlePostProcessing() {
-    if (needsPostprocessing()) {
-      RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
-      Queue queue = QueueFactory.getQueue("tasks");
-      queue.add(
-              TaskOptions.Builder.withUrl("/tasks/newsensorreading")
-              .param("kind", "Sensor")
-              .param("id", Long.toString(id))
-              .retryOptions(retry)
-              .method(TaskOptions.Method.GET)
-      );
-      log.log(Level.INFO, "Postprocessing " + id + "/" + name);
+    if (!needsPostprocessing()) {
+      return;
     }
+    // Add the task to the default queue.
+    Queue queue = QueueFactory.getDefaultQueue();
+    DeferredSensor dfc = null;
+    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(getType().name());
+    log.log(Level.INFO, "creating class: {0}", classtoget);
+    try {
+      dfc = (DeferredSensor) Class.forName(classtoget).newInstance();
+      // i.e.: com.openhouseautomation.iftt.ALARM class
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      // obviously, don't enqueue the task
+      log.log(Level.WARNING, "I could not create the class needed: {0}"
+              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
+              new Object[]{classtoget, this.getId()}
+      );
+      dfc = null;
+    }
+    if (dfc == null) {
+      // bail early
+      return;
+    }
+
+    // grab the old sensor and add the task
+    Sensor sold = ofy().load().entity(this).now();
+    dfc.setOldSensor(sold);
+    dfc.setNewSensor(this);
+    queue.add(TaskOptions.Builder.withPayload(dfc));
   }
 
   @OnLoad

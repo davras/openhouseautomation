@@ -109,15 +109,7 @@ public class Controller {
   @OnSave
   void handlePostProcessing() {
     if (needsPostprocessing()) {
-      RetryOptions retry = withTaskRetryLimit(1).taskAgeLimitSeconds(3600l);
-      Queue queue = QueueFactory.getQueue("tasks");
-      queue.add(
-              TaskOptions.Builder.withUrl("/tasks/newcontrollervalue")
-              .param("kind", "Controller")
-              .param("id", Long.toString(id))
-              .retryOptions(retry)
-              .method(TaskOptions.Method.GET)
-      );
+
     }
   }
 

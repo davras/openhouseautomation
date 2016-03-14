@@ -77,4 +77,14 @@ public class Convutils {
     DateTime d = fmt.parseDateTime(s);
     return d;
   }
+
+  // TODO move into Utilities class
+  public static String toTitleCase(String givenString) {
+    String[] arr = givenString.split(" ");
+    StringBuilder sb = new StringBuilder();
+    for (String arr1 : arr) {
+      sb.append(Character.toUpperCase(arr1.charAt(0))).append(arr1.substring(1)).append(" ");
+    }
+    return sb.toString().trim();
+  }
 }

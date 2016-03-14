@@ -18,9 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Work;
 import com.openhouseautomation.notification.NotificationHandler;
-import org.joda.time.Period;
 
 /**
  *
@@ -104,13 +102,15 @@ public class SensorServlet extends HttpServlet {
       return;
     }
     // if the sensor was expired and is now updating
-    if (sensor.getLastReadingDate().plusSeconds(sensor.getExpirationTime()).isBeforeNow()) {
+    if (sensor.getLastReadingDate().plusSeconds(sensor.getExpirationTime()).isBeforeNow()
+            && sensor.getExpirationTime() > 0) {
       // notify someone
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Sensor online");
       nh.setBody("Sensor online: " + sensor.getName());
       nh.send();
     }
+
     // set the value
     sensor.setLastReadingDate(new DateTime());
     sensor.setLastReading(sensorval);
@@ -122,10 +122,7 @@ public class SensorServlet extends HttpServlet {
     reading.setValue(sensorval);
     ofy().save().entity(reading);
     log.log(Level.INFO, "logged reading:{0}", reading);
-
     out.println("OK");
-
-    // TODO: move auth to filter servlet
   }
 
   /**

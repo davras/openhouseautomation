@@ -8,6 +8,7 @@ package com.openhouseautomation.devices;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredController;
 import com.openhouseautomation.model.Controller;
@@ -221,19 +222,21 @@ public class ControllerServlet extends HttpServlet {
     }
 
     // check for postprocessing
+    // TODO move to OnSave in Controller
     if (controller.needsPostprocessing()) {
       // Add the task to the default queue.
       Queue queue = QueueFactory.getDefaultQueue();
       DeferredController dfc = null;
+      String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(controller.getType().name());
+      log.log(Level.INFO, "creating class: {0}", classtoget);
       try {
-        dfc = (DeferredController) Class.forName("com.openhouseautomation.iftt."
-                + toTitleCase(controller.getType().name())).newInstance();
+        dfc = (DeferredController) Class.forName(classtoget).newInstance();
         // i.e.: com.openhouseautomation.iftt.ALARM class
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
         // obviously, don't enqueue the task
-        log.log(Level.WARNING, "I could not create the class needed: com.openhouseautomation.iftt.{0}" + 
+        log.log(Level.WARNING, "I could not create the class needed: {0}" + 
                 "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
-                new Object[]{toTitleCase(controller.getType().name()), controller.getId()}
+                new Object[]{classtoget, controller.getId()}
         );
         dfc = null;
       }
@@ -254,15 +257,6 @@ public class ControllerServlet extends HttpServlet {
   }
 
   
-  // TODO move into Utilities class
-  public static String toTitleCase(String givenString) {
-    String[] arr = givenString.split(" ");
-    StringBuilder sb = new StringBuilder();
-    for (String arr1 : arr) {
-      sb.append(Character.toUpperCase(arr1.charAt(0))).append(arr1.substring(1)).append(" ");
-    }
-    return sb.toString().trim();
-  }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
     log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c, value, authhash});

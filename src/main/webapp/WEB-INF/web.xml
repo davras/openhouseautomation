@@ -270,7 +270,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Admin Only</web-resource-name>
-            <url-pattern>/tasks/*</url-pattern>
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
             <url-pattern>/appstats/*</url-pattern>
