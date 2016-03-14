@@ -8,6 +8,7 @@ package com.openhouseautomation.cron;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,6 +42,7 @@ public class HouseTimers extends HttpServlet {
           throws ServletException, IOException {
     response.setContentType("text/plain;charset=UTF-8");
     updateTime();
+    log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
     doChargers();
     response.sendError(HttpServletResponse.SC_OK);
   }
@@ -54,18 +56,22 @@ public class HouseTimers extends HttpServlet {
   public void doChargers() {
     if (curhour == 23 && (curmin == 0 || curmin == 1)) {
       // Charger on at 11pm
+      log.log(Level.INFO, "Turning chargers on");
       setController(91125605L, "1");
     }
     if (curhour == 02 && (curmin == 0 || curmin == 1)) {
       // Charger off at 2am
+      log.log(Level.INFO, "Turning chargers off");
       setController(91125605L, "0");
     }
     if (curhour == 6 && (curmin == 0 || curmin == 1)) {
       // Charger on at 6am
+      log.log(Level.INFO, "Turning chargers on");
       setController(91125605L, "1");
     }
     if (curhour == 8 && (curmin == 0 || curmin == 1)) {
       // Charger off at 8am
+      log.log(Level.INFO, "Turning chargers off");
       setController(91125605L, "0");
     }
   }
