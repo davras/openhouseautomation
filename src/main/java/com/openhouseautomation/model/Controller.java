@@ -15,7 +15,12 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
+import com.openhouseautomation.Convutils;
+import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.iftt.DeferredController;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class representing a controller device.
@@ -27,6 +32,7 @@ import java.util.List;
 public class Controller {
 
   private static final long serialVersionUID = 27L;
+  private static final Logger log = Logger.getLogger(Controller.class.getName());
 
   /**
    * Enum for the Device type
@@ -108,9 +114,35 @@ public class Controller {
 
   @OnSave
   void handlePostProcessing() {
-    if (needsPostprocessing()) {
-
+    if (!needsPostprocessing()) {
+      return;
     }
+    // Add the task to the default queue.
+    Queue queue = QueueFactory.getDefaultQueue();
+    DeferredController dfc = null;
+    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(this.getType().name());
+    log.log(Level.INFO, "creating class: {0}", classtoget);
+    try {
+      dfc = (DeferredController) Class.forName(classtoget).newInstance();
+      // i.e.: com.openhouseautomation.iftt.ALARM class
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      // obviously, don't enqueue the task
+      log.log(Level.WARNING, "I could not create the class needed: {0}"
+              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
+              new Object[]{classtoget, this.getId()}
+      );
+      dfc = null;
+    }
+    if (dfc == null) {
+      // bail early
+      return;
+    }
+
+    // grab the old controller and add the task
+    Controller cold = ofy().load().entity(this).now();
+    dfc.setOldController(cold);
+    dfc.setNewController(this);
+    queue.add(TaskOptions.Builder.withPayload(dfc));
   }
 
   @OnLoad

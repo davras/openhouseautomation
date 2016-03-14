@@ -7,6 +7,7 @@ package com.openhouseautomation.cron;
 
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +49,7 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void updateTime() {
-    DateTime now = new DateTime(DateTimeZone.forID("America/Los_Angeles"));
+    DateTime now = new DateTime(DateTimeZone.forID(DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles")));
     this.curhour = now.getHourOfDay();
     this.curmin = now.getMinuteOfHour();
   }

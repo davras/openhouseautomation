@@ -220,38 +220,6 @@ public class ControllerServlet extends HttpServlet {
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
     }
-
-    // check for postprocessing
-    // TODO move to OnSave in Controller
-    if (controller.needsPostprocessing()) {
-      // Add the task to the default queue.
-      Queue queue = QueueFactory.getDefaultQueue();
-      DeferredController dfc = null;
-      String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(controller.getType().name());
-      log.log(Level.INFO, "creating class: {0}", classtoget);
-      try {
-        dfc = (DeferredController) Class.forName(classtoget).newInstance();
-        // i.e.: com.openhouseautomation.iftt.ALARM class
-      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-        // obviously, don't enqueue the task
-        log.log(Level.WARNING, "I could not create the class needed: {0}" + 
-                "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
-                new Object[]{classtoget, controller.getId()}
-        );
-        dfc = null;
-      }
-      if (dfc == null) {
-        // bail early
-        ofy().save().entity(controller).now();
-        return;
-      }
-
-      // grab the old controller and add the task
-      Controller cold = ofy().load().entity(controller).now();
-      dfc.setOldController(cold);
-      dfc.setNewController(controller);
-      queue.add(TaskOptions.Builder.withPayload(dfc));
-    }
     ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
   }
