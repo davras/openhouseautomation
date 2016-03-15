@@ -11,6 +11,7 @@ import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredSensor;
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,11 +23,24 @@ import java.util.logging.Logger;
 @Entity
 @Index
 @Cache
-public class Sensor {
+public class Sensor implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 101010L;
   private static final Logger log = Logger.getLogger(Sensor.class.getName());
 
+  /**
+   * @return the previousreading
+   */
+  public String getPreviousReading() {
+    return previousreading;
+  }
+
+  /**
+   * @param previousreading the previousreading to set
+   */
+  public void setPreviousReading(String previousreading) {
+    this.previousreading = previousreading;
+  }
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
   /**
@@ -78,45 +92,19 @@ public class Sensor {
   String humanage;
   @Ignore
   boolean expired;
-
+  @Ignore
+  public String previousreading; // the reading when the entity was loaded
+  @JsonIgnore
+  private boolean postprocessing = false;
+  
   @OnLoad
   void updateAge() {
     this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
   }
-  @JsonIgnore
-  private boolean postprocessing = false;
 
-  @OnSave
-  void handlePostProcessing() {
-    if (!needsPostprocessing()) {
-      return;
-    }
-    // Add the task to the default queue.
-    Queue queue = QueueFactory.getDefaultQueue();
-    DeferredSensor dfc = null;
-    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(getType().name());
-    log.log(Level.INFO, "creating class: {0}", classtoget);
-    try {
-      dfc = (DeferredSensor) Class.forName(classtoget).newInstance();
-      // i.e.: com.openhouseautomation.iftt.ALARM class
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-      // obviously, don't enqueue the task
-      log.log(Level.WARNING, "I could not create the class needed: {0}"
-              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
-              new Object[]{classtoget, this.getId()}
-      );
-      dfc = null;
-    }
-    if (dfc == null) {
-      // bail early
-      return;
-    }
-
-    // grab the old sensor and add the task
-    Sensor sold = ofy().load().entity(this).now();
-    dfc.setOldSensor(sold);
-    dfc.setNewSensor(this);
-    queue.add(TaskOptions.Builder.withPayload(dfc));
+  @OnLoad
+  void backupLastReading() {
+    setPreviousReading(getLastReading());
   }
 
   @OnLoad
@@ -132,6 +120,37 @@ public class Sensor {
       this.expired = false;
     } else {
       this.expired = lastReadingDate.plusSeconds(getExpirationTime()).isBeforeNow();
+    }
+  }
+
+  @OnSave
+  public void doPostProcessing() {
+    if (!needsPostprocessing()) {
+      return;
+    }
+    if (Objects.equal(getPreviousReading(), getLastReading())) {
+      return;
+    }
+    // Add the task to the default queue.
+    Queue queue = QueueFactory.getDefaultQueue();
+    DeferredSensor dfc = null;
+    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(getType().name());
+    log.log(Level.INFO, "creating class: {0}", classtoget);
+    try {
+      dfc = (DeferredSensor) Class.forName(classtoget).newInstance();
+      // i.e.: com.openhouseautomation.iftt.Alarm class
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      // obviously, don't enqueue the task
+      log.log(Level.WARNING, "I could not create the class needed: {0}"
+              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
+              new Object[]{classtoget, getId()}
+      );
+      dfc = null;
+    }
+    if (dfc != null) {
+      // grab the sensor and add the task
+      dfc.setSensor(this);
+      queue.add(TaskOptions.Builder.withPayload(dfc));
     }
   }
 
@@ -359,7 +378,6 @@ public class Sensor {
    *
    * @param secret String to set
    */
-  @JsonIgnore
   public void setSecret(String secret) {
     this.secret = secret;
   }
@@ -373,7 +391,7 @@ public class Sensor {
   public String getSecret() {
     return secret;
   }
-
+  
   /**
    * Sets the {@code expirationtime} for this {@link Sensor}.
    *

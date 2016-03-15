@@ -14,19 +14,12 @@ import com.openhouseautomation.model.Sensor;
  * @author dave
  */
 public abstract class DeferredSensor implements DeferredTask {
-  Sensor oldsensor;
-  Sensor newsensor;
-  public void setOldSensor(Sensor c) {
-    this.oldsensor = c;
+  Sensor sensor;
+  public void setSensor(Sensor c) {
+    this.sensor = c;
   }
-  public void setNewSensor(Sensor c) {
-    this.newsensor = c;
-  }
-  public Sensor getOldSensor() {
-    return this.oldsensor;
-  }
-  public Sensor getNewSensor() {
-    return this.newsensor;
+  public Sensor getSensor() {
+    return this.sensor;
   }
 }
 

@@ -3,8 +3,6 @@ package com.openhouseautomation.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.RetryOptions;
-import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
@@ -18,6 +16,7 @@ import com.googlecode.objectify.annotation.OnSave;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredController;
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +28,7 @@ import java.util.logging.Logger;
  */
 @Entity
 @Cache
-public class Controller {
+public class Controller implements Serializable {
 
   private static final long serialVersionUID = 27L;
   private static final Logger log = Logger.getLogger(Controller.class.getName());
@@ -102,6 +101,8 @@ public class Controller {
   @Ignore
   public boolean expired;
   public Integer expirationtime; // if no update occurs within this time, the controller is 'expired'
+  @Ignore
+  private String previousstate; // the previous actual state
 
   /**
    * Empty constructor for objectify.
@@ -117,6 +118,12 @@ public class Controller {
     if (!needsPostprocessing()) {
       return;
     }
+    if (Objects.equal(getActualState(), getPreviousState())
+            && Objects.equal(getDesiredState(), getActualState())) {
+      log.log(Level.INFO, "No changes, no task");
+      return;
+    }
+    
     // Add the task to the default queue.
     Queue queue = QueueFactory.getDefaultQueue();
     DeferredController dfc = null;
@@ -137,12 +144,13 @@ public class Controller {
       // bail early
       return;
     }
-
-    // grab the old controller and add the task
-    Controller cold = ofy().load().entity(this).now();
-    dfc.setOldController(cold);
-    dfc.setNewController(this);
+    dfc.setController(this);
     queue.add(TaskOptions.Builder.withPayload(dfc));
+  }
+
+  @OnLoad
+  void backupLastReading() {
+    setPreviousState(getActualState());
   }
 
   @OnLoad
@@ -159,6 +167,20 @@ public class Controller {
     } else {
       this.expired = lastcontactdate.plusSeconds(getExpirationtime()).isBeforeNow();
     }
+  }
+
+  /**
+   * @return the previousstate
+   */
+  public String getPreviousState() {
+    return previousstate;
+  }
+
+  /**
+   * @param previousstate the previousstate to set
+   */
+  public void setPreviousState(String previousstate) {
+    this.previousstate = previousstate;
   }
 
   public boolean isExpired() {

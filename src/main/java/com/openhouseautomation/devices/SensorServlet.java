@@ -5,6 +5,9 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import org.joda.time.DateTime;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
@@ -18,6 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.OnSave;
+import com.openhouseautomation.Convutils;
+import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.iftt.DeferredSensor;
 import com.openhouseautomation.notification.NotificationHandler;
 
 /**
@@ -114,13 +121,13 @@ public class SensorServlet extends HttpServlet {
     // set the value
     sensor.setLastReadingDate(new DateTime());
     sensor.setLastReading(sensorval);
-    ofy().save().entity(sensor);
+    ofy().save().entity(sensor).now();
     log.log(Level.INFO, "saved sensor:{0}", sensor);
     Reading reading = new Reading();
     reading.setSensor(sk);
     reading.setTimestamp(new DateTime());
     reading.setValue(sensorval);
-    ofy().save().entity(reading);
+    ofy().save().entity(reading).now();
     log.log(Level.INFO, "logged reading:{0}", reading);
     out.println("OK");
   }

@@ -14,12 +14,17 @@ import com.openhouseautomation.notification.NotificationHandler;
  */
 public class Temperature extends DeferredSensor {
 
+  @Override
   public void run() {
-    if (super.newsensor.getId() == 2154791004L) {
+    //logTestNotification();
+  }
+  
+  public void logTestNotification() {
+    if (super.sensor.getId() == 2154791004L) {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Outside Temperature");
-      nhnotif.setBody("Outside Temperature: " + super.newsensor.getLastReading());
+      nhnotif.setBody("Outside Temperature: " + super.sensor.getLastReading());
       nhnotif.sendWithoutNotificationLogging();
     }
   }

@@ -314,7 +314,7 @@ public class DisplaySourceServlet extends HttpServlet {
       }
       controller.setLastDesiredStateChange(new DateTime());
       controller.setLastContactDate(new DateTime());
-      ofy().save().entity(controller);
+      ofy().save().entity(controller).now();
       log.log(Level.INFO, "updated controller: " + controller.toString());
       // log the event
       EventLog etl = new EventLog();
@@ -323,7 +323,7 @@ public class DisplaySourceServlet extends HttpServlet {
       etl.setPreviousState(oldcontroller);
       etl.setType("User change controller");
       etl.setUser(request.getRemoteUser());
-      ofy().save().entity(etl);
+      ofy().save().entity(etl).now();
       response.sendError(HttpServletResponse.SC_OK);
     }
   }

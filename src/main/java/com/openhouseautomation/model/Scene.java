@@ -8,7 +8,6 @@ import com.googlecode.objectify.annotation.Id;
 /**
  * Class representing a scene.
  *
- * @author davras@gmail.com (David Ras)
  */
 @Entity
 @Cache

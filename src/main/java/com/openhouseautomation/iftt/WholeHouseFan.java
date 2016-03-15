@@ -16,15 +16,16 @@ public class WholeHouseFan extends DeferredSensor {
   public void run() {
     Float fold = null, fnew = null;
     try {
-      fold = Float.parseFloat(super.oldsensor.getLastReading());
-      fnew = Float.parseFloat(super.newsensor.getLastReading());
+      fold = Float.parseFloat(super.sensor.getPreviousReading());
+      fnew = Float.parseFloat(super.sensor.getLastReading());
     } catch (NumberFormatException e) {
     }
     if (Objects.equals(fold, fnew)) {
       return;
     }
 
-    if (oldsensor.getName().equals("Outside Temperature") || oldsensor.getName().equals("Inside Temperature")) {
+    if (sensor.getName().equals("Outside Temperature") 
+            || sensor.getName().equals("Inside Temperature")) {
       new HouseFan().process();
     }
   }

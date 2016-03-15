@@ -14,13 +14,13 @@ public class Alarm extends DeferredController {
 
   @Override
   public void run() {
-    if (super.oldcontroller.actualstate.equals(super.newcontroller.actualstate)) {
+    if (super.controller.getActualState().equals(super.controller.getPreviousState())) {
       return;
     }
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Alarm State Change");
-    nhnotif.setBody("Alarm: " + super.newcontroller.actualstate);
+    nhnotif.setBody("Alarm: " + super.controller.getActualState());
     nhnotif.sendWithoutNotificationLogging();
   }
 }
