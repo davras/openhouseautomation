@@ -45,6 +45,7 @@ public class HouseTimers extends HttpServlet {
     updateTime();
     log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
     doChargers();
+    doBoatPump();
     response.sendError(HttpServletResponse.SC_OK);
   }
 
@@ -54,6 +55,18 @@ public class HouseTimers extends HttpServlet {
     this.curmin = now.getMinuteOfHour();
   }
 
+  public void doBoatPump() {
+    if (curhour == 18 && (curmin == 0 || curmin == 1)) {
+      // Pump on at 6pm
+      log.log(Level.INFO, "Turning boat pump on");
+      setController(3960328784L, "1");
+    } else {
+      log.log(Level.INFO, "Turning boat pump off");
+      setController(3960328784L, "0");
+    }
+
+    
+  }
   public void doChargers() {
     if (curhour == 23 && (curmin == 0 || curmin == 1)) {
       // Charger on at 11pm

@@ -23,7 +23,7 @@
   <inbound-services>
     <service>mail</service>
     <service>xmpp_message</service>
-    <service>xmpp_presence</service>
+    <!--<service>xmpp_presence</service> -->
     <service>xmpp_subscribe</service>
     <service>xmpp_error</service>
   </inbound-services>
