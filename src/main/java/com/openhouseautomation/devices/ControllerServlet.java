@@ -5,12 +5,8 @@
  */
 package com.openhouseautomation.devices;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.iftt.DeferredController;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.notification.NotificationHandler;
@@ -174,7 +170,7 @@ public class ControllerServlet extends HttpServlet {
       nh.setBody("Controller online: " + controller.getName());
       nh.send();
     }
-    controller.setLastContactDate(new DateTime());
+    controller.setLastContactDate(Convutils.getNewDateTime());
     // handle device requests
     if (reqpath.startsWith("/device")) {
       handleDevice(controller, controllervalue, request, response);
@@ -216,15 +212,19 @@ public class ControllerServlet extends HttpServlet {
         etl.setType("Controller transition to manual");
         etl.setUser(request.getRemoteUser());
         ofy().save().entity(etl);
-        controller.setDesiredState(controllervalue);
-        controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        if (controller.getValidStates().contains(controllervalue)) {
+          controller.setDesiredState(controllervalue);
+          controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        }
       }
+    }
+    if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.MANUAL
+            && controller.getValidStates().contains(controllervalue)) {
+      controller.setDesiredState(controllervalue);
     }
     ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
   }
-
-  
 
   private boolean checkValidation(Controller c, String value, String authhash) {
     log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c, value, authhash});
@@ -268,17 +268,17 @@ public class ControllerServlet extends HttpServlet {
       cexpir.setDesiredState("0");
       cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
       cexpir.setActualState("0");
-      cexpir.setLastDesiredStateChange(new DateTime());
-      cexpir.setLastActualStateChange(new DateTime());
+      cexpir.setLastDesiredStateChange(Convutils.getNewDateTime());
+      cexpir.setLastActualStateChange(Convutils.getNewDateTime());
       cexpir.setId(1234567890L);
       cexpir.setName("Lights");
-      cexpir.setLastContactDate(new DateTime());
+      cexpir.setLastContactDate(Convutils.getNewDateTime());
       ofy().save().entity(cexpir).now();
     } else {
-      cexpir.setLastContactDate(new DateTime());
+      cexpir.setLastContactDate(Convutils.getNewDateTime());
       ofy().save().entity(cexpir).now();
     }
-    if (cexpir.getLastContactDate().isBefore(new DateTime().minusMinutes(10))) {
+    if (cexpir.getLastContactDate().isBefore(Convutils.getNewDateTime().minusMinutes(10))) {
       // notify someone
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Light Controller online");

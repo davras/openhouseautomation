@@ -53,7 +53,7 @@ public class HouseFan {
     ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
-      log.log(Level.INFO, "null controller");
+      log.log(Level.SEVERE, "null controller");
       return false;
     }
     return true;

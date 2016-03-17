@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.manage;
 
+import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
@@ -69,8 +70,8 @@ public class AddControllerServlet extends HttpServlet {
       cont.setDesiredState("0");
       cont.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
       cont.setActualState("0");
-      cont.setLastDesiredStateChange(new DateTime());
-      cont.setLastActualStateChange(new DateTime());
+      cont.setLastDesiredStateChange(Convutils.getNewDateTime());
+      cont.setLastActualStateChange(Convutils.getNewDateTime());
 
       // initialize the controller with some default valid states
       List vs = new ArrayList();

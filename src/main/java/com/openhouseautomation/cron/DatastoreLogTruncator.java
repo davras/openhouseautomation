@@ -7,11 +7,11 @@ import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
+import com.openhouseautomation.Convutils;
 import com.openhouseautomation.model.DatastoreConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +45,7 @@ public class DatastoreLogTruncator extends HttpServlet {
     PrintWriter out = response.getWriter();
     int minage = Integer.parseInt(DatastoreConfig.getValueForKey("deletereadingsolderthandays", "6"));
     try {
-      DateTime curdate = new DateTime();
+      DateTime curdate = Convutils.getNewDateTime();
       DateTime cutoffdate = curdate.minus(Period.days(minage));
       log.log(Level.INFO, "deleting keys older than {0}", cutoffdate);
       Iterable<Key<Reading>> oldreadings =

@@ -11,6 +11,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import com.openhouseautomation.Convutils;
 //import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
@@ -53,7 +54,7 @@ public class ControllerServletTest {
   //@Test
   public void testJodaDateTime() {
     ofy().save().entity(c).now();
-    c.setLastDesiredStateChange(new DateTime());
+    c.setLastDesiredStateChange(Convutils.getNewDateTime());
     // fails here with com.googlecode.objectify.SaveException: Error saving com.openhouseautomation.model.Controller{
     //   id=1, owner=null, location=null, zone=null, type=null, name=Whole House Fan, desiredstate=0, actualstate=null,
     //   desiredstatepriority=null, lastdesiredstatechange=2015-08-25T19:57:44.126-07:00, lastactualstatechange=null, 

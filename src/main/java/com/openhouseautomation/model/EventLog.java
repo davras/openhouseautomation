@@ -9,6 +9,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnSave;
+import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 
 /**
@@ -37,7 +38,7 @@ public class EventLog {
   @OnSave
   void setEventTime() {
     if (eventtime == null) {
-      eventtime = new DateTime();
+      eventtime = Convutils.getNewDateTime();
     }
   }
 

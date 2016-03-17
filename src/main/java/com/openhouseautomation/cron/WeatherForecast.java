@@ -1,5 +1,6 @@
 package com.openhouseautomation.cron;
 
+import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;
@@ -80,7 +81,7 @@ public class WeatherForecast extends HttpServlet {
               = xpath.compile("/dwml/data/parameters/probability-of-precipitation[@type='12 hour']/value[1]");
       String pop = (String) exprpop.evaluate(doc, XPathConstants.STRING);
       forecast.setForecastPop(pop);
-      forecast.setLastUpdate(new DateTime());
+      forecast.setLastUpdate(Convutils.getNewDateTime());
 
       log.log(Level.INFO, "forecast cron took {0}ms", (System.currentTimeMillis() - curtime));
       ofy().save().entity(forecast).now();

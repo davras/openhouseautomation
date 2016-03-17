@@ -14,7 +14,6 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
 import com.openhouseautomation.Convutils;
-import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredController;
 import java.io.Serializable;
 import java.util.List;
@@ -156,7 +155,7 @@ public class Controller implements Serializable {
   @OnLoad
   void updateExpired() {
     if (lastcontactdate == null) {
-      setLastContactDate(new DateTime().minusMonths(1));
+      setLastContactDate(Convutils.getNewDateTime().minusMonths(1));
     }
     if (expirationtime == null) {
       this.expired = false;
@@ -382,7 +381,7 @@ public class Controller implements Serializable {
    */
   public void setDesiredState(String desiredstate) {
     this.desiredstate = desiredstate;
-    this.lastdesiredstatechange = new DateTime();
+    this.lastdesiredstatechange = Convutils.getNewDateTime();
   }
 
   public void setDesiredStatePriority(DesiredStatePriority dsp) {
@@ -401,7 +400,7 @@ public class Controller implements Serializable {
    */
   public void setActualState(String actualstate) {
     this.actualstate = actualstate;
-    this.lastactualstatechange = new DateTime();
+    this.lastactualstatechange = Convutils.getNewDateTime();
   }
 
   /**

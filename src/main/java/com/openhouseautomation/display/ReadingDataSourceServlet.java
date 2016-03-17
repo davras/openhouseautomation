@@ -9,6 +9,7 @@ import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
+import com.openhouseautomation.Convutils;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
 //import java.util.GregorianCalendar; // DO NOT USE
 //import com.ibm.icu.util.GregorianCalendar;
@@ -65,7 +66,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
 
     // use the sensors to get the readings
     int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
-    DateTime cutoffdate = new DateTime().minus(Period.days(shortchartdays));
+    DateTime cutoffdate = Convutils.getNewDateTime().minus(Period.days(shortchartdays));
     int resolution = 5; // graph resolution in minutes
     int blocks = resolution * 60 * 1000; // blocks of time in graph (300k)
     int positions = shortchartdays * 24 * 60 * 60 * 1000 / blocks;

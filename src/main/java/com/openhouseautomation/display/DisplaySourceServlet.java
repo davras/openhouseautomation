@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.googlecode.objectify.cmd.Query;
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
@@ -291,8 +292,8 @@ public class DisplaySourceServlet extends HttpServlet {
       List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
       for (Controller c : lights) {
         c.setDesiredState(request.getParameter("desiredState"));
-        c.setLastDesiredStateChange(new DateTime());
-        c.setLastContactDate(new DateTime());
+        c.setLastDesiredStateChange(Convutils.getNewDateTime());
+        c.setLastContactDate(Convutils.getNewDateTime());
       }
       ofy().save().entities(lights);
       log.log(Level.INFO, "updated all controllers");
@@ -312,8 +313,8 @@ public class DisplaySourceServlet extends HttpServlet {
         controller.setDesiredState(state);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
-      controller.setLastDesiredStateChange(new DateTime());
-      controller.setLastContactDate(new DateTime());
+      controller.setLastDesiredStateChange(Convutils.getNewDateTime());
+      controller.setLastContactDate(Convutils.getNewDateTime());
       ofy().save().entity(controller).now();
       log.log(Level.INFO, "updated controller: " + controller.toString());
       // log the event

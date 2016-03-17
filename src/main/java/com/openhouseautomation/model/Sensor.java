@@ -9,7 +9,6 @@ import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
-import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredSensor;
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -104,13 +103,15 @@ public class Sensor implements Serializable {
 
   @OnLoad
   void backupLastReading() {
-    setPreviousReading(getLastReading());
+    previousreading = lastReading;
   }
 
   @OnLoad
   void updateExpired() {
     if (lastReadingDate == null) {
-      setLastReadingDate(new DateTime().minusMonths(1));
+      DateTime now = Convutils.getNewDateTime();
+      lastReadingDate = now.minusMinutes(15);
+      // gives a new sensor 15 mins to report
     }
     if (expirationtime == null) {
       this.expired = false;
@@ -145,7 +146,6 @@ public class Sensor implements Serializable {
               + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
               new Object[]{classtoget, getId()}
       );
-      dfc = null;
     }
     if (dfc != null) {
       // grab the sensor and add the task
@@ -351,6 +351,13 @@ public class Sensor implements Serializable {
    * @param lastReading the lastReading to set
    */
   public void setLastReading(String lastReading) {
+    if (null == lastReading || "".equals(lastReading)) {
+      return;
+    }
+    // oddly, this:
+    //setLastReadingDate(Convutils.getNewDateTime());
+    // causes:
+    // Class 'class org.joda.time.chrono.ISOChronology' is not a registered @Subclass
     this.lastReading = lastReading;
   }
 

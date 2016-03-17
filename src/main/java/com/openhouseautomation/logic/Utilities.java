@@ -1,5 +1,6 @@
 package com.openhouseautomation.logic;
 
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.Reading;
@@ -29,7 +30,7 @@ public class Utilities {
     // get the Sensor
     Sensor sens = ofy().load().type(Sensor.class).id(id).now();
     // get the readings for that sensor
-    DateTime dt = new DateTime().minusSeconds(seconds);
+    DateTime dt = Convutils.getNewDateTime().minusSeconds(seconds);
     List<Reading> readings = ofy().load().type(Reading.class)
             .ancestor(sens).filter("timestamp >", dt).list();
     // setup the linear regression

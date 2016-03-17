@@ -14,7 +14,7 @@ import com.openhouseautomation.model.DatastoreConfig;
  */
 public class Convutils {
 
-  static String timezone="UTC";
+  static String timezone = "UTC";
 
   /**
    * Converts seconds to a human-eyeball friendly format
@@ -68,12 +68,12 @@ public class Convutils {
       timezone = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
     }
     DateTimeZone zone = DateTimeZone.forID(timezone);
-    DateTime dt = new DateTime(secs*1000L,zone);
+    DateTime dt = new DateTime(secs * 1000L, zone);
     return dt.toString();
   }
 
   public static DateTime convertStringDate(String s) {
-    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd"); 
+    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
     DateTime d = fmt.parseDateTime(s);
     return d;
   }
@@ -89,4 +89,14 @@ public class Convutils {
     }
     return sb.toString().trim();
   }
+
+  public static DateTime getNewDateTime() {
+    if ("UTC".equals(timezone)) {
+      timezone = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
+    }
+    DateTimeZone zone = DateTimeZone.forID(timezone);
+    DateTime dt = new DateTime(zone);
+    return dt;
+  }
+
 }

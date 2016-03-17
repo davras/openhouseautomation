@@ -224,7 +224,7 @@ public class ListenServlet extends HttpServlet {
         // update only 3x per hour to save DS writes
         // expiration alert after 1 hour
         log.log(Level.INFO, "updating last contact date");
-        c.setLastContactDate(new DateTime());
+        c.setLastContactDate(Convutils.getNewDateTime());
         dirty = true;
       }
     }

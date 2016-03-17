@@ -9,6 +9,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.Sensor;
@@ -158,7 +159,7 @@ public class TestHouseFan {
   //@Test
   public void testConsiderSlope() {
     // setup historical temperature readings
-    DateTime now = new DateTime();
+    DateTime now = Convutils.getNewDateTime();
     DateTime nowlesshour = now.minusHours(1);
     DateTime nowlesstwohour = now.minusHours(2).plusMinutes(5);
 

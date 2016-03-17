@@ -9,6 +9,7 @@ import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
+import com.openhouseautomation.Convutils;
 // because import java.util.GregorianCalendar gives a type mismatch (wtf?)
 //import java.util.GregorianCalendar; // DO NOT USE
 //import com.ibm.icu.util.GregorianCalendar;
@@ -54,7 +55,7 @@ public class CombinedReadingDataSourceServlet extends DataSourceServlet {
     cd.add(new ColumnDescription("low", ValueType.NUMBER, "Low"));
     data.addColumns(cd);
     int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
-    DateTime cutoffdate = new DateTime().minus(Period.days(shortchartdays));
+    DateTime cutoffdate = Convutils.getNewDateTime().minus(Period.days(shortchartdays));
     // pull old readings first
     List<ReadingHistory> readingshist = ofy().load().type(ReadingHistory.class).ancestor(sensor).filter("timestamp <", cutoffdate).chunkAll().list();
     DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");

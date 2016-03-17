@@ -1,5 +1,6 @@
 package com.openhouseautomation.manage;
 
+import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 
@@ -44,7 +45,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setName(req.getParameter("name"));
       sens.setUnit("F");
       sens.setLastReading("99");
-      sens.setLastReadingDate(new DateTime());
+      sens.setLastReadingDate(Convutils.getNewDateTime());
       sens.setExpirationTime(3600);
 
       CRC32 hash = new CRC32();

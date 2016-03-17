@@ -64,7 +64,7 @@ public class NotificationHandler {
     }
     log.log(Level.INFO, "no previous notification found, creating one");
     nl = new NotificationLog();
-    nl.setLastnotification(new DateTime().minusMonths(1));
+    nl.setLastnotification(Convutils.getNewDateTime().minusMonths(1));
     nl.setRecipient(recipient);
     nl.setSubject(subject);
     nl.setBody(body);
@@ -79,7 +79,7 @@ public class NotificationHandler {
       mnotif.send(this);
     }
     // update the last notification time
-    nl.setLastnotification(new DateTime());
+    nl.setLastnotification(Convutils.getNewDateTime());
     ofy().save().entity(nl).now();
   }
 

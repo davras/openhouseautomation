@@ -119,13 +119,13 @@ public class SensorServlet extends HttpServlet {
     }
 
     // set the value
-    sensor.setLastReadingDate(new DateTime());
+    sensor.setLastReadingDate(Convutils.getNewDateTime());
     sensor.setLastReading(sensorval);
     ofy().save().entity(sensor).now();
     log.log(Level.INFO, "saved sensor:{0}", sensor);
     Reading reading = new Reading();
     reading.setSensor(sk);
-    reading.setTimestamp(new DateTime());
+    reading.setTimestamp(Convutils.getNewDateTime());
     reading.setValue(sensorval);
     ofy().save().entity(reading).now();
     log.log(Level.INFO, "logged reading:{0}", reading);
