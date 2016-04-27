@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CombinedReadingDataSourceServlet extends DataSourceServlet {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = Logger.getLogger(ReadingDataSourceServlet.class.getName());
+  private static final Logger log = Logger.getLogger(ReadingDataSourceServletOld.class.getName());
 
   // TODO: only in place for testing, not for production
   @Override

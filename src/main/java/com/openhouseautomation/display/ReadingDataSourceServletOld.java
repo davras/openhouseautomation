@@ -7,10 +7,6 @@ import com.google.visualization.datasource.DataSourceServlet;
 import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
-import com.google.visualization.datasource.datatable.TableCell;
-import com.google.visualization.datasource.datatable.TableRow;
-import com.google.visualization.datasource.datatable.value.DateTimeValue;
-import com.google.visualization.datasource.datatable.value.Value;
 import com.google.visualization.datasource.datatable.value.ValueType;
 import com.google.visualization.datasource.query.Query;
 import com.openhouseautomation.Convutils;
@@ -35,10 +31,10 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author dras
  */
-public class ReadingDataSourceServlet extends DataSourceServlet {
+public class ReadingDataSourceServletOld extends DataSourceServlet {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = Logger.getLogger(ReadingDataSourceServlet.class.getName());
+  private static final Logger log = Logger.getLogger(ReadingDataSourceServletOld.class.getName());
 
   // TODO: only in place for testing, not for production
   @Override
@@ -51,48 +47,71 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     // Create a data table,
     DataTable data = new DataTable();
     ArrayList cd = new ArrayList();
-    data.addColumn(new ColumnDescription("date", ValueType.DATETIME, "Date"));
-    String[] type = request.getParameterValues("type");
+    cd.add(new ColumnDescription("date", ValueType.DATETIME, "Date"));
+    String[] sensorids = request.getParameterValues("id");
+    Sensor[] sensors = new Sensor[sensorids.length];
 
-    List<Sensor> sensors;
+    // get the sensors
     try {
-      sensors = ofy().load().type(Sensor.class).filter("type", type[0]).list();
+      for (int i = 0; i < sensorids.length; i++) {
+        sensors[i] = ofy().load().type(Sensor.class).id(Long.parseLong(sensorids[i])).safe();
+        cd.add(new ColumnDescription(Long.toString(sensors[i].getId()), ValueType.NUMBER, sensors[i].getName()));
+      }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "could not retrieve sensor type: {0}", request.getParameterValues("type"));
+      // can't send a response
+      log.log(Level.SEVERE, "could not retrieve entity for {0}", request.getParameterValues("id"));
       return null;
     }
-
-    // add column descriptions
-    for (Sensor s : sensors) {
-      data.addColumn(new ColumnDescription(Long.toString(s.getId()), ValueType.NUMBER, s.getName()));
-    }
+    data.addColumns(cd);
 
     // use the sensors to get the readings
     int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
     DateTime cutoffdate = Convutils.getNewDateTime().minus(Period.days(shortchartdays));
-    int resolution = 15; // graph resolution in minutes
-    int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
-    log.log(Level.INFO, "filling {0} blocks", blocks);
-    double[][] readingsz = new double[sensors.size()][blocks + 10]; // fudge for ArrayIndexOutOfBoundsException
-
-    // fill in the readings
-    for (int i = 0; i < sensors.size(); i++) {
-      Sensor s = (Sensor) sensors.get(i);
-      List<Reading> readings = ofy().load().type(Reading.class).ancestor(s)
+    int resolution = 5; // graph resolution in minutes
+    int blocks = resolution * 60 * 1000; // blocks of time in graph (300k)
+    int positions = shortchartdays * 24 * 60 * 60 * 1000 / blocks;
+    double[][] readingsz = new double[sensors.length][positions + 10]; // fudge for ArrayIndexOutOfBoundsException
+    for (int i = 0; i < sensors.length; i++) {
+      List<Reading> readings = ofy().load().type(Reading.class).ancestor(sensors[i])
               .filter("timestamp >", cutoffdate).chunkAll().list();
       for (Reading reading : readings) {
-        int blocknumber = (int) ((reading.getTimestamp().getMillis() - cutoffdate.getMillis()) / 1000 / 60 / resolution);
-        readingsz[i][blocknumber] = -999;
+        int blocknumber = (int) ((reading.getTimestamp().getMillis() - cutoffdate.getMillis()) / blocks);
+        readingsz[i][blocknumber] = 0;
         try {
           readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
-        } catch (java.lang.NumberFormatException e) {
+        } catch (java.lang.NumberFormatException e) {}
+      }
+    }
+
+    // backfill leading zeros
+    for (int j = 0; j < sensors.length; j++) {
+      int i = 0;
+      while (readingsz[j][i] == 0) {
+        i++;
+        if (i == positions - 1) {
+          break;
+        }
+      }
+      for (int k = 0; k < i; k++) {
+        readingsz[j][k] = readingsz[j][i];
+      }
+    }
+
+    // forward fill other zeros
+    for (int j = 0; j < sensors.length; j++) {
+      double lastgoodreading = readingsz[j][0];
+      for (int i = 0; i < positions; i++) {
+        if (readingsz[j][i] != 0) {
+          lastgoodreading = readingsz[j][i];
+        } else {
+          readingsz[j][i] = lastgoodreading;
         }
       }
     }
 
     // now fill the data table
     try {
-      for (int i = 0; i < blocks; i++) {
+      for (int i = 0; i < positions; i++) {
         String szonelocal = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
         DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
         DateTimeZone dtzonelocal = DateTimeZone.forID(szonelocal);
@@ -103,20 +122,30 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
         // can't create DateTimeValue from GregorianCalendar that is not GMT.
         // and if you want your graph in a TZ other than GMT? Nope.
         GregorianCalendar cal = new GregorianCalendar(dt.toGregorianCalendar());
-        
-        // brittle below this line, stupid visualization chart servlet
-        TableRow tr = new TableRow();
-        TableCell tc = new TableCell(new DateTimeValue(cal));
-        tr.addCell(tc);
-        for (int j = 0; j < sensors.size(); j++) {
-          if (readingsz[j][i] == -999 || readingsz[j][i] == 0) {
-            // put in a blank
-            tr.addCell(new TableCell(Value.getNullValueFromValueType(data.getColumnDescription(j).getType())));
-          } else {
-            tr.addCell(new TableCell(readingsz[j][i]));
-          }
+        switch (sensors.length) {
+          case 1:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]));
+            break;
+          case 2:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]));
+            break;
+          case 3:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]));
+            break;
+          case 4:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]),
+                    new Double(readingsz[3][i]));
+            break;
+          case 5:
+          default:
+            data.addRowFromValues(cal, new Double(readingsz[0][i]),
+                    new Double(readingsz[1][i]), new Double(readingsz[2][i]),
+                    new Double(readingsz[3][i]), new Double(readingsz[4][i]));
+            break;
         }
-        data.addRow(tr);
       }
     } catch (TypeMismatchException e) {
       log.log(Level.SEVERE, e.toString(), e);
