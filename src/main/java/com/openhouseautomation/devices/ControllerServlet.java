@@ -137,7 +137,7 @@ public class ControllerServlet extends HttpServlet {
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
 
     // check that everything looks good
-    if (controller == null || reqpath == null || "".equals(reqpath)) {
+    if (controller == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
@@ -149,10 +149,6 @@ public class ControllerServlet extends HttpServlet {
       return;
     }
 
-    // handle brand new controllers
-    if (controller.getDesiredState() == null || controller.getDesiredState().equals("")) {
-      controller.setDesiredState(controllervalue);
-    }
     // fix old controllers
     if (controller.getType().equals(Controller.Type.ALARM)) {
       ArrayList al = new ArrayList();
