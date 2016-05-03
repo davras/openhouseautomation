@@ -93,7 +93,6 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
           try {
             readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
           } catch (java.lang.NumberFormatException e) {
-            readingsz[i][blocknumber] = null;
             log.log(Level.WARNING, "could not parse: {0}", reading);
           }
         }
