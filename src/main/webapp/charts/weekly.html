@@ -144,6 +144,26 @@
       }
       google.setOnLoadCallback(drawVisualizationHumidity);
     </script>
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualizationVoltage() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div_VOLTAGE",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=VOLTAGE',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Battery %',
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "##.00"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualizationVoltage);
+    </script>
 
   </head>
   <body>
@@ -217,6 +237,9 @@
           <br>
           <h3>Outside Light Level</h3>
           <div id="visualization_div_LIGHT" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Battery</h3>
+          <div id="visualization_div_VOLTAGE" style="width: 90%; height: 200px;"></div>
         </div>
       </div>
     </div>
