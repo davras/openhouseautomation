@@ -186,12 +186,11 @@ public class ControllerServlet extends HttpServlet {
    */
   public void handleDevice(Controller controller, String controllervalue, HttpServletRequest request, HttpServletResponse response) {
     // TODO put this into an objectify transaction
-    //ofy().save().entity(controller).now();
     if (!controller.getActualState().equals(controllervalue)) {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
       controller.setActualState(controllervalue);
-      // if desiredstatelastchange is more than 60 secs old and
+      // if desiredstatelastchange is more than 3 mins old and
       // the desiredstate is not the actual state, this is a local override.
       if (controller.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
               && !controller.getDesiredState().equals(controller.getActualState())) {
@@ -214,16 +213,12 @@ public class ControllerServlet extends HttpServlet {
         }
       }
     }
-    if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.MANUAL
-            && controller.getValidStates().contains(controllervalue)) {
-      controller.setDesiredState(controllervalue);
-    }
     ofy().save().entity(controller).now();
     log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
   }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
-    log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c, value, authhash});
+    log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c.getName(), value, authhash});
     SipHashHelper shh = new SipHashHelper();
     return shh.validateHash(c.getId().toString(), value, authhash);
   }
