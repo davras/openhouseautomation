@@ -2,12 +2,16 @@ package com.openhouseautomation.iftt;
 
 import com.openhouseautomation.logic.HouseFan;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author dave
  */
 public class WholeHouseFan extends DeferredSensor {
+
+  public static final Logger log = Logger.getLogger(WholeHouseFan.class.getName());
 
   public WholeHouseFan() {
   }
@@ -24,8 +28,11 @@ public class WholeHouseFan extends DeferredSensor {
       return;
     }
 
-    if (sensor.getName().equals("Outside Temperature") 
+    if (sensor.getName().equals("Outside Temperature")
             || sensor.getName().equals("Inside Temperature")) {
+      HouseFan hf = new HouseFan();
+      hf.process();
+      log.log(Level.INFO, "Decision:" + hf.getWeightedDecision().toMessage());
       new HouseFan().process();
     }
   }

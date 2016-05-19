@@ -1,6 +1,7 @@
 <div ng-repeat="device in devices.data">
   <h4>{{device.name}}:</h4>
   <label ng-hide="device.desiredState == device.actualState">Setting to {{device.desiredState}}...</label>
+  <label ng-hide="device.desiredState != device.actualState">&nbsp;</label>
   <div class="btn-group">
     <label class="btn btn-primary"
            ng-model="device.desiredState"

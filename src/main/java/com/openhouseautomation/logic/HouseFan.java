@@ -185,7 +185,7 @@ public class HouseFan {
     if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn()) ||
     (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
       newfanspeed = olddesiredfanspeed;
-      wd.addElement("Motor Wear Inhibit", 8, newfanspeed);
+      wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
     }
     // if no changes are necessary
     log.log(Level.INFO, wd.toString());
