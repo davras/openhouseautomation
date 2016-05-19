@@ -5,8 +5,12 @@
  */
 package com.openhouseautomation.iftt;
 
+import static com.openhouseautomation.iftt.WholeHouseFan.log;
+import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
+import java.util.Objects;
+import java.util.logging.Level;
 
 /**
  *
@@ -16,7 +20,23 @@ public class Temperature extends DeferredSensor {
 
   @Override
   public void run() {
-    //logTestNotification();
+    Float fold = null, fnew = null;
+    try {
+      fold = Float.parseFloat(super.sensor.getPreviousReading());
+      fnew = Float.parseFloat(super.sensor.getLastReading());
+    } catch (NumberFormatException e) {
+    }
+    if (Objects.equals(fold, fnew)) {
+      return;
+    }
+
+    if (sensor.getName().equals("Outside Temperature")
+            || sensor.getName().equals("Inside Temperature")) {
+      HouseFan hf = new HouseFan();
+      hf.process();
+      log.log(Level.INFO, "Decision:" + hf.getWeightedDecision().toMessage());
+      new HouseFan().process();
+    }
   }
   
   public void logTestNotification() {
