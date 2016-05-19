@@ -8,7 +8,7 @@ package com.openhouseautomation.devices;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import org.joda.time.DateTime;
+import com.google.common.base.Objects;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,10 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Reading;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.OnSave;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.iftt.DeferredSensor;
@@ -121,6 +119,7 @@ public class SensorServlet extends HttpServlet {
     // set the value
     sensor.setLastReadingDate(Convutils.getNewDateTime());
     sensor.setLastReading(sensorval);
+    doPostProcessing(sensor);
     ofy().save().entity(sensor).now();
     log.log(Level.INFO, "saved sensor:{0}", sensor);
     Reading reading = new Reading();
@@ -132,6 +131,34 @@ public class SensorServlet extends HttpServlet {
     out.println("OK");
   }
 
+  public void doPostProcessing(Sensor sensor) {
+    if (!sensor.needsPostprocessing()) {
+      return;
+    }
+    if (Objects.equal(sensor.getPreviousReading(), sensor.getLastReading())) {
+      return;
+    }
+    // Add the task to the default queue.
+    Queue queue = QueueFactory.getDefaultQueue();
+    DeferredSensor dfc = null;
+    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(sensor.getType().name());
+    log.log(Level.INFO, "creating class: {0}", classtoget);
+    try {
+      dfc = (DeferredSensor) Class.forName(classtoget).newInstance();
+      // i.e.: com.openhouseautomation.iftt.Alarm class
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      // obviously, don't enqueue the task
+      log.log(Level.WARNING, "I could not create the class needed: {0}"
+              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
+              new Object[]{classtoget, sensor.getId()}
+      );
+    }
+    if (dfc != null) {
+      // grab the sensor and add the task
+      dfc.setSensor(sensor);
+      queue.add(TaskOptions.Builder.withPayload(dfc));
+    }
+  }
   /**
    * Returns a short description of the servlet.
    *

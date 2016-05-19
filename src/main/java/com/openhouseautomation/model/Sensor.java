@@ -124,36 +124,6 @@ public class Sensor implements Serializable {
     }
   }
 
-  @OnSave
-  public void doPostProcessing() {
-    if (!needsPostprocessing()) {
-      return;
-    }
-    if (Objects.equal(getPreviousReading(), getLastReading())) {
-      return;
-    }
-    // Add the task to the default queue.
-    Queue queue = QueueFactory.getDefaultQueue();
-    DeferredSensor dfc = null;
-    String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(getType().name());
-    log.log(Level.INFO, "creating class: {0}", classtoget);
-    try {
-      dfc = (DeferredSensor) Class.forName(classtoget).newInstance();
-      // i.e.: com.openhouseautomation.iftt.Alarm class
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-      // obviously, don't enqueue the task
-      log.log(Level.WARNING, "I could not create the class needed: {0}"
-              + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
-              new Object[]{classtoget, getId()}
-      );
-    }
-    if (dfc != null) {
-      // grab the sensor and add the task
-      dfc.setSensor(this);
-      queue.add(TaskOptions.Builder.withPayload(dfc));
-    }
-  }
-
   public boolean isExpired() {
     return expired;
   }
