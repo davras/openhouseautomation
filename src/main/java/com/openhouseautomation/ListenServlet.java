@@ -210,6 +210,7 @@ public class ListenServlet extends HttpServlet {
         if (!curstate.equals("x")) {
           log.log(Level.INFO, "updating actual and desired state, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
           c.setActualState(curstate);
+          c.setLastActualStateChange(Convutils.getNewDateTime());
           c.setDesiredState(curstate);
         }
         dirty = true;

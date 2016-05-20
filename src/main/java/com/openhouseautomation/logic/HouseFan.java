@@ -221,6 +221,6 @@ public class HouseFan {
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
-    nhnotif.send();
+    nhnotif.alwaysSend();
   }
 }

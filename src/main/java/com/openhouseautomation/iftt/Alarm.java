@@ -2,13 +2,16 @@ package com.openhouseautomation.iftt;
 
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
+import java.util.logging.Logger;
 
 /**
  *
  * @author dave
  */
 public class Alarm extends DeferredController {
-
+  
+  public static final Logger log = Logger.getLogger(Alarm.class.getName());
+  
   public Alarm() {
   }
 
@@ -24,13 +27,13 @@ public class Alarm extends DeferredController {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Alarm Not Ready");
       nhnotif.setBody("Door/Window left open");
-      nhnotif.sendWithoutNotificationLogging();
+      nhnotif.alwaysSend();
       return;
     }
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Alarm State Change");
     nhnotif.setBody("Alarm: " + super.controller.getActualState());
-    nhnotif.sendWithoutNotificationLogging();
+    nhnotif.alwaysSend();
   }
 }

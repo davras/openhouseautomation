@@ -37,7 +37,7 @@ public class Lights extends DeferredController {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Charger status");
       nhnotif.setBody("Charger status change: " + super.controller.getPreviousState()+ " -> " + super.controller.getActualState());
-      nhnotif.sendWithoutNotificationLogging();
+      nhnotif.alwaysSend();
     }
   }
 }

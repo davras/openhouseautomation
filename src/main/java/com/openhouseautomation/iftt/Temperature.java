@@ -5,12 +5,12 @@
  */
 package com.openhouseautomation.iftt;
 
-import static com.openhouseautomation.iftt.WholeHouseFan.log;
 import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.Objects;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,6 +18,7 @@ import java.util.logging.Level;
  */
 public class Temperature extends DeferredSensor {
 
+  public static final Logger log = Logger.getLogger(Temperature.class.getName());
   @Override
   public void run() {
     Float fold = null, fnew = null;
@@ -45,7 +46,7 @@ public class Temperature extends DeferredSensor {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Outside Temperature");
       nhnotif.setBody("Outside Temperature: " + super.sensor.getLastReading());
-      nhnotif.sendWithoutNotificationLogging();
+      nhnotif.alwaysSend();
     }
   }
 }

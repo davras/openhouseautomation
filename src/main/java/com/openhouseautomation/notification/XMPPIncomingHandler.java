@@ -82,7 +82,7 @@ public class XMPPIncomingHandler extends HttpServlet {
     nhnotif.setRecipient(fromJID.getId());
     nhnotif.setSubject("Response for query");
     nhnotif.setBody(status);
-    nhnotif.sendWithoutNotificationLogging();
+    nhnotif.alwaysSend();
   }
 
   /**

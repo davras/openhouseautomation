@@ -64,26 +64,15 @@ public class NotificationHandler {
     }
     log.log(Level.INFO, "no previous notification found, creating one");
     nl = new NotificationLog();
-    nl.setLastnotification(Convutils.getNewDateTime().minusMonths(1));
+    nl.setLastnotification(Convutils.getNewDateTime());
     nl.setRecipient(recipient);
     nl.setSubject(subject);
     nl.setBody(body);
     ofy().save().entity(nl).now();
-    // send xmpp first
-    // if that fails, send e-mail
-    XMPPNotification xmppnotif = new XMPPNotification();
-    if (!xmppnotif.send(this)) {
-      log.log(Level.WARNING, "XMPP send failed, using e-mail");
-      // then e-mail instead
-      MailNotification mnotif = new MailNotification();
-      mnotif.send(this);
-    }
-    // update the last notification time
-    nl.setLastnotification(Convutils.getNewDateTime());
-    ofy().save().entity(nl).now();
+    alwaysSend();
   }
 
-  public void sendWithoutNotificationLogging() {
+  public void alwaysSend() {
     // send xmpp first
     // if that fails, send e-mail
     XMPPNotification xmppnotif = new XMPPNotification();

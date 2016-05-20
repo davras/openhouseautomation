@@ -190,12 +190,14 @@ public class ControllerServlet extends HttpServlet {
       log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
               new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
       controller.setActualState(controllervalue);
+      controller.setLastActualStateChange(Convutils.getNewDateTime());
       // if desiredstatelastchange is more than 3 mins old and
       // the desiredstate is not the actual state, this is a local override.
       if (controller.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
-              && !controller.getDesiredState().equals(controller.getActualState())) {
-        log.log(Level.WARNING, "POST /device, lastdes is > 180 secs old, going into manual");
-        log.log(Level.WARNING, "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
+              && !controller.getDesiredState().equals(controller.getActualState())
+              && !Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
+        log.log(Level.WARNING, "POST /device, lastdes is > 180 secs old, going into manual\n"
+                + "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
                 new Object[]{controller.getLastDesiredStateChange(),
                   controller.getDesiredState(),
                   controller.getActualState()
@@ -248,6 +250,7 @@ public class ControllerServlet extends HttpServlet {
       return;
     }
     // check if unexpired
+    // TODO this model doesn't work well...
     Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
     if (cexpir == null) {
       log.log(Level.WARNING, "Making a new light expiration controller");
@@ -276,6 +279,9 @@ public class ControllerServlet extends HttpServlet {
       nh.setBody("Controller online: " + cexpir.getName());
       nh.send();
     }
+    // end crappy model
+    
+    
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
@@ -294,6 +300,7 @@ public class ControllerServlet extends HttpServlet {
         // a new update for the actual state of a light
         log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
         c.setActualState(curstate);
+        c.setLastActualStateChange(Convutils.getNewDateTime());
       }
       // only set the values from network request that make sense
       if (c.getDesiredState().equals("1")) {

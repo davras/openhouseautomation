@@ -14,7 +14,7 @@ import com.openhouseautomation.model.DatastoreConfig;
  */
 public class Convutils {
 
-  static String timezone = "UTC";
+  static String timezone = "America/Los_Angeles";
 
   /**
    * Converts seconds to a human-eyeball friendly format
