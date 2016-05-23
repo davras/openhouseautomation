@@ -31,7 +31,14 @@
     <min-pending-latency>12000ms</min-pending-latency>
   </automatic-scaling>
   <static-error-handlers>
-  <handler file="error_page.html" />
-  <!--<handler file="over_quota.html" error-code="over_quota" />-->
-</static-error-handlers>
+    <handler file="error_page.html" />
+    <!--<handler file="over_quota.html" error-code="over_quota" />-->
+  </static-error-handlers>
+  <static-files>
+    <include path="/**.html" expiration="1d"/>
+    <exclude path="/navbar.html" />
+  </static-files>
+  <system-properties>
+    <property name="appengine.api.urlfetch.defaultDeadline" value="30"/>
+  </system-properties>
 </appengine-web-app>
