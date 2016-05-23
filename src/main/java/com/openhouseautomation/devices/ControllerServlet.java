@@ -209,10 +209,12 @@ public class ControllerServlet extends HttpServlet {
         etl.setType("Controller transition to manual");
         etl.setUser(request.getRemoteUser());
         ofy().save().entity(etl);
-        if (controller.getValidStates().contains(controllervalue)) {
-          controller.setDesiredState(controllervalue);
-          controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        }
+        controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+      }
+      if (controller.getValidStates().contains(controllervalue)) {
+        controller.setDesiredState(controllervalue);
+        log.log(Level.INFO, "POST /device, desired state:{0} @{1}",
+              new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange()});
       }
     }
     ofy().save().entity(controller).now();
@@ -280,8 +282,7 @@ public class ControllerServlet extends HttpServlet {
       nh.send();
     }
     // end crappy model
-    
-    
+
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
