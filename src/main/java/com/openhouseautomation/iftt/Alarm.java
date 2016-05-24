@@ -1,7 +1,9 @@
 package com.openhouseautomation.iftt;
 
+import com.google.apphosting.api.ApiProxy;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -28,6 +30,7 @@ public class Alarm extends DeferredController {
       nhnotif.setSubject("Alarm Not Ready");
       nhnotif.setBody("Door/Window left open");
       nhnotif.alwaysSend();
+      log.log(Level.FINE, "Remaining: " +  ApiProxy.getCurrentEnvironment().getRemainingMillis() + "ms");
       return;
     }
   }

@@ -9,6 +9,7 @@
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties" />
+    <property name="appengine.api.urlfetch.defaultDeadline" value="30"/>
   </system-properties>
 
   <!-- HTTP Sessions are disabled by default. To enable HTTP sessions specify: 
@@ -38,7 +39,4 @@
     <include path="/**.html" expiration="1d"/>
     <exclude path="/navbar.html" />
   </static-files>
-  <system-properties>
-    <property name="appengine.api.urlfetch.defaultDeadline" value="30"/>
-  </system-properties>
 </appengine-web-app>
