@@ -30,10 +30,5 @@ public class Alarm extends DeferredController {
       nhnotif.alwaysSend();
       return;
     }
-    NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
-    nhnotif.setSubject("Alarm State Change");
-    nhnotif.setBody("Alarm: " + super.controller.getActualState());
-    nhnotif.alwaysSend();
   }
 }
