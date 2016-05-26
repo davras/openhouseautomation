@@ -6,6 +6,8 @@ Goals:
  - Lights (X-10) and LED strip accent lighting
  - Home entertainment (IR LED)
  - Alarm monitoring
+ - Whole House Fan
+ - Serial control (remote turn on/off, input select, etc.)
 - Cheap...each device needs to be < $100 (including the CPU, sensors, displays, comms, etc.)
 - Easy to use. Set the keys, load the firmware, done.
 - Use the cloud, not an expensive "central controller".
