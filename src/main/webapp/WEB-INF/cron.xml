@@ -18,4 +18,28 @@
     <schedule>every 1 hours</schedule>
     <timezone>America/Los_Angeles</timezone>
   </cron>
+  <cron>
+    <url>/cron/getforecast?zipcode=94105</url>
+    <description>Gets the forecast for the supplied zip code</description>
+    <schedule>every 1 hours</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+  <cron>
+    <url>/cron/getforecast?zipcode=94043</url>
+    <description>Gets the forecast for the supplied zip code</description>
+    <schedule>every 1 hours</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+  <cron>
+    <url>/ExpirationCheck</url>
+    <description>Check for expired Sensors and Controllers</description>
+    <schedule>every 15 minutes</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
+  <cron>
+    <url>/HouseTimers</url>
+    <description>Runs timers for automated controls</description>
+    <schedule>every 1 minutes</schedule>
+    <timezone>America/Los_Angeles</timezone>
+  </cron>
 </cronentries>

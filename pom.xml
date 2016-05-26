@@ -6,11 +6,11 @@
   <version>1.0</version>
 
   <groupId>com.openhouseautomation</groupId>
-  <artifactId>gautoard</artifactId>
+  <artifactId>openhouseautomation</artifactId>
 
   <properties>
     <appengine.app.version>1</appengine.app.version>
-    <appengine.target.version>1.9.8</appengine.target.version>
+    <appengine.target.version>1.9.30</appengine.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -18,13 +18,37 @@
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client-appengine</artifactId>
-      <version>1.17.0-rc</version>
+      <version>1.19.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>guava-jdk5</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.3.2</version>
+    </dependency>
+    
+    <!-- necessary for appstats to work -->
+    <dependency> 
+      <groupId>com.google.appengine</groupId> 
+      <artifactId>appengine-api-labs</artifactId> 
+      <version>${appengine.target.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.5</version>
     </dependency>
 
     <dependency>
@@ -39,7 +63,17 @@
       <version>1.1.2</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>angularjs</artifactId>
+      <version>1.2.26</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.3.3</version>
+    </dependency>
+    
     <!-- Compile/runtime dependencies -->
     <dependency>
       <groupId>com.google.appengine</groupId>
@@ -60,7 +94,7 @@
     <dependency>
       <groupId>com.googlecode.objectify</groupId>
       <artifactId>objectify</artifactId>
-      <version>5.0.2</version>
+      <version>5.0.5</version>
     </dependency>
     <dependency>
       <groupId>javax.measure</groupId>
@@ -70,7 +104,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>16.0.1</version>
+      <version>18.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.visualization</groupId>
@@ -83,7 +117,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -107,9 +141,8 @@
     <dependency>
       <groupId>com.google.appengine.tools</groupId>
       <artifactId>appengine-mapreduce</artifactId>
-      <version>0.7.2</version>
+      <version>0.8.4</version>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -149,7 +182,7 @@
         <configuration>
           <enableJarClasses>true</enableJarClasses>
         </configuration>
-        <executions>
+        <!-- <executions>
           <execution>
             <phase>compile</phase>
             <goals>
@@ -157,6 +190,7 @@
             </goals>
           </execution>
         </executions>
+        -->
       </plugin>
     </plugins>
   </build>

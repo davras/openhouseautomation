@@ -60,13 +60,21 @@ public class ReadingServletMR extends HttpServlet {
     // Output<O,R>, Output<ReadingHistory>, so O=ReadingHistory, R=Void
     Output output = new DatastoreOutput();
 
-    MapReduceSpecification<Entity, String, String, ReadingHistory, Object> mrspecs =
-        new MapReduceSpecification.Builder<>(input, mapper, reducer, output)
-            .setKeyMarshaller(Marshallers.getStringMarshaller())
-            .setValueMarshaller(Marshallers.getStringMarshaller()).setNumReducers(reduceShardCount)
-            .setJobName("history").build();
+//    MapReduceSpecification<Entity, String, String, ReadingHistory, Object> mrspecs =
+//        new MapReduceSpecification.Builder<>(input, mapper, reducer, output)
+//            .setKeyMarshaller(Marshallers.getStringMarshaller())
+//            .setValueMarshaller(Marshallers.getStringMarshaller()).setNumReducers(reduceShardCount)
+//            .setJobName("history").build();
 
-    MapReduceSettings mrsettings = new MapReduceSettings.Builder().build();
+    MapReduceSpecification<Entity, String, String, ReadingHistory, Object>
+        mrspecs = new MapReduceSpecification.Builder<>(input, mapper, reducer, output)
+            .setKeyMarshaller(Marshallers.getStringMarshaller())
+            .setValueMarshaller(Marshallers.getStringMarshaller())
+            .setNumReducers(5)
+            .build();
+    
+    
+    MapReduceSettings mrsettings = new MapReduceSettings.Builder().setMillisPerSlice(55000).build();
     return MapReduceJob.start(mrspecs, mrsettings);
   }
 

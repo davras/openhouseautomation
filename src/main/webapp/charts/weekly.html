@@ -26,54 +26,56 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization112578578() {
+      function drawVisualizationTemperature() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_112578578",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=112578578',
+          "containerId": "visualization_div_TEMPERATURE",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=TEMPERATURE',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Outside Wind Speed 2 min avg',
-            "colors": ['blue'],
+            "title": 'Temperatures',
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
             "displayExactValues": true,
-            "scaleFormat": "###.0"
+            "scaleFormat": "###.0",
+            "legendPosition": "newRow"
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization112578578);
+      google.setOnLoadCallback(drawVisualizationTemperature);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization1596290393() {
+      function drawVisualizationWindSpeed() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_1596290393",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=1596290393',
+          "containerId": "visualization_div_WINDSPEED",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=WINDSPEED',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Outside Wind Direction 2 min avg',
-            "colors": ['blue'],
+            "title": 'Wind Speed',
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
             "displayExactValues": true,
-            "scaleFormat": "##.00"
+            "scaleFormat": "###.0",
+            "max": 20
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization1596290393);
+      google.setOnLoadCallback(drawVisualizationWindSpeed);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization1714117207() {
+      function drawVisualizationRain() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_1714117207",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=1714117207',
+          "containerId": "visualization_div_RAIN",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=RAIN',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Rain Current',
-            "colors": ['blue'],
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -82,38 +84,18 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization1714117207);
+      google.setOnLoadCallback(drawVisualizationRain);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3130021022() {
+      function drawVisualizationPressure() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_3130021022",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3130021022',
-          "chartType": "AnnotationChart",
-          "options": {
-            "title": 'Outside Temperature',
-            "colors": ['blue'],
-            "scaleType": 'maximized',
-            "thickness": 2,
-            "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "##.00"
-          }
-        });
-      }
-      google.setOnLoadCallback(drawVisualization3130021022);
-    </script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3409600514() {
-        google.visualization.drawChart({
-          "containerId": "visualization_div_3409600514",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3409600514',
+          "containerId": "visualization_div_PRESSURE",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=PRESSURE',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Barometer',
-            "colors": ['blue'],
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -122,18 +104,18 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization3409600514);
+      google.setOnLoadCallback(drawVisualizationPressure);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3885021817() {
+      function drawVisualizationLight() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_3885021817",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3885021817',
+          "containerId": "visualization_div_LIGHT",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=LIGHT',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Light Level',
-            "colors": ['blue'],
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -142,18 +124,18 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization3885021817);
+      google.setOnLoadCallback(drawVisualizationLight);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization4251563943() {
+      function drawVisualizationHumidity() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_4251563943",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=4251563943',
+          "containerId": "visualization_div_HUMIDITY",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=HUMIDITY',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Outside Humidity',
-            "colors": ['blue'],
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -162,18 +144,18 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization4251563943);
+      google.setOnLoadCallback(drawVisualizationHumidity);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3829498030() {
+      function drawVisualizationVoltage() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_3829498030",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3829498030',
+          "containerId": "visualization_div_VOLTAGE",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=VOLTAGE',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Office Temperature',
-            "colors": ['blue'],
+            "title": 'Battery %',
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
@@ -182,28 +164,9 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualization3829498030);
+      google.setOnLoadCallback(drawVisualizationVoltage);
     </script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualization3959642986() {
-        google.visualization.drawChart({
-          "containerId": "visualization_div_3959642986",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?id=3959642986',
-          "chartType": "AnnotationChart",
-          "options": {
-            "title": 'Office Barometer',
-            "colors": ['blue'],
-            "scaleType": 'maximized',
-            "thickness": 2,
-            "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "##.00"
-          }
-        });
-      }
-      google.setOnLoadCallback(drawVisualization3959642986);
-    </script>
+
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -219,6 +182,7 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
+            <li ng-include src="'/login.html'"></li>
             <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
           </ul>
         </div>
@@ -231,14 +195,26 @@
           <ul class="nav nav-sidebar">
             <li>Overview</li>
             <li class="divider"></li>
-            <li class="nav-header">Sensors</li>
-            <li class="divider"></li>
-            <li class="nav-header">Controllers</li>
-            <li class="divider"></li>
-            <li class="nav-header">Readings</li>
             <li><a href="/status.jsp">Current</a></li>
             <li class="active"><a href="/charts/weekly.html">Weekly</a></li>
             <li><a href="/charts/archived.html">Archived</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Control</li>
+            <li><a href="/controller/lights">Lights</a></li>
+            <li><a href="/controller/fan">Fan</a></li>
+            <li><a href="/controller/thermostat">Thermostat</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Scenes</li>
+            <li><a href="/scenes/wakeup">Wake Up</a></li>
+            <li><a href="/scenes/leave">Leave</a></li>
+            <li><a href="/scenes/gethome">Get Home</a></li>
+            <li><a href="/scenes/watchamovie">Watch a Movie</a></li>
+            <li><a href="/scenes/gotobed">Go to Bed</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Manage</li>
+            <li><a href="/addcontroller">Add Controller</a></li>
+            <li><a href="/addsensor">Add Sensor</a></li>
+            <li><a href="/addlcddisplay.jsp">Add LCD Display</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -246,32 +222,26 @@
 
           <script src="/js/jquery-ui.js"></script>
 
-          <h3>Outside Wind Speed 2 min avg</h3>
-          <div id="visualization_div_112578578" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Wind Direction 2 min avg</h3>
-          <div id="visualization_div_1596290393" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Rain Current</h3>
-          <div id="visualization_div_1714117207" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Temperature</h3>
-          <div id="visualization_div_3130021022" style="width: 90%; height: 200px;"></div>
+          <h3>Temperatures</h3>
+          <div id="visualization_div_TEMPERATURE" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Barometer</h3>
-          <div id="visualization_div_3409600514" style="width: 90%; height: 200px;"></div>
-          <br>
-          <h3>Outside Light Level</h3>
-          <div id="visualization_div_3885021817" style="width: 90%; height: 200px;"></div>
+          <div id="visualization_div_PRESSURE" style="width: 90%; height: 200px;"></div>
           <br>
           <h3>Outside Humidity</h3>
-          <div id="visualization_div_4251563943" style="width: 90%; height: 200px;"></div>
+          <div id="visualization_div_HUMIDITY" style="width: 90%; height: 200px;"></div>
           <br>
-          <h3>Office Temperature</h3>
-          <div id="visualization_div_3829498030" style="width: 90%; height: 200px;"></div>
+          <h3>Outside Wind Speed</h3>
+          <div id="visualization_div_WINDSPEED" style="width: 90%; height: 200px;"></div>
           <br>
-          <h3>Office Barometer</h3>
-          <div id="visualization_div_3959642986" style="width: 90%; height: 200px;"></div>
+          <h3>Outside Rain Current</h3>
+          <div id="visualization_div_RAIN" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Outside Light Level</h3>
+          <div id="visualization_div_LIGHT" style="width: 90%; height: 200px;"></div>
+          <br>
+          <h3>Battery</h3>
+          <div id="visualization_div_VOLTAGE" style="width: 90%; height: 200px;"></div>
         </div>
       </div>
     </div>

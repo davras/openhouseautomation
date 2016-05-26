@@ -6,6 +6,7 @@
 
 package com.openhouseautomation.model;
 
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
@@ -14,6 +15,7 @@ import com.googlecode.objectify.annotation.Id;
  * @author dras
  */
 @Entity
+@Cache
 public class Location {
     @Id String name;
     String zipcode;

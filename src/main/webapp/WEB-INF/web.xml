@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <!-- Re-enable the auth filter...maybe...later, when auth is mapped out -->
+    <filter>
+        <description>Make sure only authorized users can change house settings</description>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.openhouseautomation.filters.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <!-- controllers are authed by ip address -->
+        <url-pattern>/controller/*</url-pattern>
+        <!-- web requests are authed by user -->
+        <url-pattern>/status/controller/update*</url-pattern>
+        <url-pattern>/status/display/*</url-pattern>
+    </filter-mapping>
     <filter>
         <filter-name>ObjectifyFilter</filter-name>
         <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
@@ -8,46 +22,90 @@
         <filter-name>ObjectifyFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <filter>
-        <filter-name>appstats</filter-name>
-        <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
-        <init-param>
-            <param-name>logMessage</param-name>
-            <param-value>Appstats available: /appstats/details?time={ID}</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>appstats</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <!--
+Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
+  
+  <filter>
+    <filter-name>appstats</filter-name>
+    <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
+    <init-param>
+      <param-name>logMessage</param-name>
+      <param-value>Appstats available: /appstats/details?time={ID}</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>appstats</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  -->
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.SensorServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ForecastServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ForecastServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ForecastServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ArchivedReadingDataSourceServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ArchivedReadingDataSourceServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.ArchivedReadingDataSourceServlet</servlet-class>
     </servlet>
     <servlet>
         <description>Gets the weather forecast for the provided zipcode (either in initialization params or by URL)</description>
         <servlet-name>WeatherForecast</servlet-name>
         <servlet-class>com.openhouseautomation.cron.WeatherForecast</servlet-class>
-        <init-param>
-            <param-name>zipcode</param-name>
-            <param-value>95376</param-value>
-        </init-param>
     </servlet>
     <servlet>
         <servlet-name>LCDDisplayServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LCDDisplayServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.display.LCDDisplayServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ControllerServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.devices.ControllerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TestServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.TestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>NotificationTest</servlet-name>
+        <servlet-class>com.openhouseautomation.notification.NotificationTestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.notification.IncomingMailHandlerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ListenServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.ListenServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>NavbarServlet</servlet-name>
+        <servlet-class>com.openhouseautomation.NavbarServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExpirationCheck</servlet-name>
+        <servlet-class>com.openhouseautomation.cron.ExpirationCheck</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>XMPPIncomingHandler</servlet-name>
+        <servlet-class>com.openhouseautomation.notification.XMPPIncomingHandler</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HouseTimers</servlet-name>
+        <servlet-class>com.openhouseautomation.cron.HouseTimers</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -75,28 +133,36 @@
     <servlet>
         <description>Gives the lat,long coordinates of the IP that called this URL.</description>
         <servlet-name>LocationServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.LocationServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.LocationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LocationServlet</servlet-name>
         <url-pattern>/location</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>DatastoreExport</servlet-name>
-        <servlet-class>com.openhouseautomation.DatastoreExport</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>DatastoreExport</servlet-name>
-        <url-pattern>/datastoreexport</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <description>Returns the time since epoch (Jan 1, 1970) in seconds (not milliseconds!), useful for setting Arduino time.</description>
         <servlet-name>TimeServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.TimeServlet</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.TimeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>TimeServlet</servlet-name>
         <url-pattern>/gettime</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AddSensor</servlet-name>
+        <servlet-class>com.openhouseautomation.manage.AddSensorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddSensor</servlet-name>
+        <url-pattern>/addsensor</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AddController</servlet-name>
+        <servlet-class>com.openhouseautomation.manage.AddControllerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddController</servlet-name>
+        <url-pattern>/addcontroller</url-pattern>
     </servlet-mapping>
     <!-- APPSTATS -->
     <servlet>
@@ -111,17 +177,40 @@
         <servlet-name>appstats</servlet-name>
         <url-pattern>/appstats/*</url-pattern>
     </servlet-mapping>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Admin Only</web-resource-name>
-            <url-pattern>/tasks/*</url-pattern>
-            <url-pattern>/cron/*</url-pattern>
-            <url-pattern>/mapreduce/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>admin</role-name>
-        </auth-constraint>
-    </security-constraint>
+    <servlet-mapping>
+        <servlet-name>ControllerServlet</servlet-name>
+        <url-pattern>/controller/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TestServlet</servlet-name>
+        <url-pattern>/testservlet/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <url-pattern>/status/*</url-pattern>
+        <!-- <url-pattern>/status/display</url-pattern> doesn't work -->
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplaySourceServlet</servlet-name>
+        <url-pattern>/status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NotificationTest</servlet-name>
+        <url-pattern>/notificationtest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IncomingMailHandlerServlet</servlet-name>
+        <url-pattern>/_ah/mail/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListenServlet</servlet-name>
+        <url-pattern>/listen</url-pattern>
+        <url-pattern>/listen/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
+        <url-pattern>/CombinedReadingDataSourceServlet</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SensorServlet</servlet-name>
         <url-pattern>/sensor</url-pattern>
@@ -146,9 +235,6 @@
         <servlet-name>LCDDisplayServlet</servlet-name>
         <url-pattern>/lcd</url-pattern>
     </servlet-mapping>
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
     <servlet>
         <servlet-name>mapreduce</servlet-name>
         <servlet-class>com.google.appengine.tools.mapreduce.MapReduceServlet</servlet-class>
@@ -165,4 +251,36 @@
         <servlet-name>pipeline</servlet-name>
         <url-pattern>/_ah/pipeline/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExpirationCheck</servlet-name>
+        <url-pattern>/ExpirationCheck</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>XMPPIncomingHandler</servlet-name>
+        <url-pattern>/_ah/xmpp/message/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NavbarServlet</servlet-name>
+        <url-pattern>/navbar.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HouseTimers</servlet-name>
+        <url-pattern>/HouseTimers</url-pattern>
+    </servlet-mapping>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin Only</web-resource-name>
+            <url-pattern>/cron/*</url-pattern>
+            <url-pattern>/mapreduce/*</url-pattern>
+            <url-pattern>/appstats/*</url-pattern>
+            <!--<url-pattern>/*.html</url-pattern>-->
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>mail</web-resource-name>
+            <url-pattern>/_ah/mail/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 </web-app>

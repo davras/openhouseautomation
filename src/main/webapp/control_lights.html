@@ -1,0 +1,45 @@
+<form>
+
+  <div ng-repeat="device in devices.data">
+    <h4>
+      <button 
+        type="button"
+        class="btn btn-lg btn-default light-off"
+        ng-show="device.actualState == 0"
+        ng-disabled="device.desiredState != device.actualState"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 1)"   
+        >
+        {{device.name}}
+      </button>
+      <button
+        type="button"
+        class="btn btn-lg light-on"
+        ng-show="device.actualState == 1"
+        ng-disabled="device.desiredState != device.actualState"
+        ng-model="device.desiredState"
+        ng-click="processForm(device.id, 0)"
+        >
+        {{device.name}}
+      </button>
+      <label ng-hide="device.desiredState == device.actualState">
+        Setting to {{device.desiredState}}...
+      </label>
+    </h4>
+  </div>
+  <hr>
+  <div class="btn-group">
+    <h4>
+      <button
+        ng-click="processForm(100, 1)"
+        class="btn btn-lg light-on"      
+        >All On
+      </button>
+      <button
+        ng-click="processForm(100, 0)"
+        class="btn btn-lg btn-default"
+        >All Off
+      </button>
+    </h4>
+  </div>
+</form>

@@ -1,7 +1,7 @@
 Goals:
 ======
 
-- Use devices to automate a house.
+- Use devices to automate a house:
  - Thermostat
  - Lights (X-10) and LED strip accent lighting
  - Home entertainment (IR LED)
@@ -21,9 +21,9 @@ Features:
 - Open hardware, open software, open firmware
 - Make GAE 'learn' the scenes, like "arrived home", "going to bed", etc.
 - Triggers allow if-then. If the front door opens, turn on the porch light. If the garage door opens, turn on the garage lights. If the back door opens, turn on the back porch light for 5 mins.
-- Simple, flexible protocol, 7 fields to save Arduino memory.
- - domain.user.location.device.parameter.action=value[;timestamp]
- - GET /service?com.rasdesign.dras.home.thermostat.temperature.set=78F HTTP/1.0
+- Simple, secure protocol
+ - Each device has a numeric ID
+ - Each request will have a "time+shared secret"-based hash
 
 Code for:
 =========
@@ -37,13 +37,16 @@ Current status:
 
 - Arduino code finished for wired ethernet Arduino
 - Arduino code finished for wireless Arduino (CC3000 and WiFi shields)
-- Arduino code 90% complete for Makershed arLCD + WiFi shield.
+- Arduino code finished for Makershed arLCD + WiFi shield.
+- Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
+- Spark code done for BMP180 and DS18B20 sensors
+- Shell script for controlling the Whole House Fan
+- Particle Core for remote projector
+- Arduino code for X10 (lights)
 
 To do:
 ======
-- Better UI for arLCD+WiFi.
-- Arduino+X10 controls.
-- RPi + CM11A + Heyu for lights (is it possible?)
+
 
 Maybe:
 ======
@@ -53,7 +56,7 @@ Maybe:
 
 Setup Instructions:
 ===================
-Requires [Apache Maven](http://maven.apache.org) 3.0 or greater, and JDK 7+ in order to run.
+Requires [Apache Maven](http://maven.apache.org) 3.1.0 or greater, and JDK 7+ in order to run.
 
 First time setup, run
 
@@ -67,10 +70,18 @@ Building will run the tests, but to explicitly run tests you can use the test ta
 
     mvn test
 
-To start the app, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included.  Just run the command.
+To start the app locally, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included.  Just run the command.
 
     mvn appengine:devserver
+
+To deploy the app, run:
+    
+    mvn appengine:update
 
 To see all the available goals for the App Engine plugin, run
 
     mvn help:describe -Dplugin=appengine
+
+Errata:
+===================
+My house is my dogfood.  Please be nice.

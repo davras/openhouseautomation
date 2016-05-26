@@ -6,10 +6,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.ReadingHistory;
 import com.openhouseautomation.model.Sensor;
 import com.googlecode.objectify.Key;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import com.openhouseautomation.Convutils;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +22,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
 
   @Override
   public void reduce(String key, ReducerInput<String> values) {
-    LOG.log(Level.WARNING, "reducing: {0}", key);
+    LOG.log(Level.INFO, "reducing: {0}", key);
     if (key.startsWith("TEMPERATURE") || key.startsWith("HUMIDITY")) {
       reduceHighLow(key, values);
     } else if (key.startsWith("LIGHT")) {
@@ -33,6 +30,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     } else if (key.startsWith("WINDSPEED")) {
       reduceHigh(key, values);
     }
+    // TODO reduce rain volume
   }
 
   public void reduceHighLow(String key, ReducerInput<String> values) {
@@ -57,9 +55,9 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setHigh(high);
     rhist.setLow(low);
-    rhist.setTimestamp(convertStringDate(readingdate));
-    deduplicateStore(rhist);
-    // emit(rhist); // needs to emit an entity
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
+    rhist.setId(sensorid + "." + readingdate);
+    ofy().save().entity(rhist).now();
   }
 
   public void reduceAvgNonZero(String key, ReducerInput<String> values) {
@@ -81,9 +79,9 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setAverage(Float.toString(totalval / readings));
-    rhist.setTimestamp(convertStringDate(readingdate));
-    deduplicateStore(rhist);
-    // emit(rhist);
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
+    rhist.setId(sensorid + "." + readingdate);
+    ofy().save().entity(rhist).now();
   }
 
   public void reduceTotal(String key, ReducerInput<String> values) {
@@ -99,19 +97,17 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     String readingdate = st1.nextToken();
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
-    rhist.setAverage(Float.toString(totalval));
-    rhist.setTimestamp(convertStringDate(readingdate));
-    deduplicateStore(rhist);
-    // emit(rhist);
+    rhist.setTotal(Float.toString(totalval));
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
+    rhist.setId(sensorid + "." + readingdate);
+    ofy().save().entity(rhist).now();
   }
 
   public void reduceHigh(String key, ReducerInput<String> values) {
     String high = "-9999";
-    Float val = 0f;
     while (values.hasNext()) {
       String value = values.next();
-      val = Float.parseFloat(value);
-      if (val > Float.parseFloat(high)) {
+      if (Float.parseFloat(value) > Float.parseFloat(high)) {
         high = value;
       }
     }
@@ -122,31 +118,9 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     ReadingHistory rhist = new ReadingHistory();
     rhist.setSensor(Key.create(Sensor.class, Long.parseLong(sensorid)));
     rhist.setHigh(high);
-    rhist.setTimestamp(convertStringDate(readingdate));
-    deduplicateStore(rhist);
-    // emit(rhist);
+    rhist.setTimestamp(Convutils.convertStringDate(readingdate));
+    rhist.setId(sensorid + "." + readingdate);
+    ofy().save().entity(rhist).now();
   }
 
-  public Date convertStringDate(String s) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    Date d;
-    try {
-      d = dateFormat.parse(s);
-    } catch (ParseException pe) {
-      return new Date(0L);
-    }
-    return d;
-  }
-
-  public void deduplicateStore(ReadingHistory rh) {
-    List<ReadingHistory> stored = ofy().load().type(ReadingHistory.class).ancestor(rh.getSensor()).filter("timestamp = ", rh.getTimestamp().getTime()).list();
-    // delete the old entry/entries for this sensor/date combo
-    for (ReadingHistory rhlist : stored) {
-      LOG.log(Level.WARNING, "deleting: {0}", rhlist);
-      ofy().delete().entity(rhlist);
-    }
-    // and save the new entity
-    LOG.log(Level.WARNING, "adding: {0}", rh);
-    ofy().save().entity(rh).now();
-  }
 }

@@ -1,0 +1,29 @@
+<div ng-repeat="device in devices.data">
+  <div ng-hide="device.desiredState == device.actualState">
+    <div ng-hide="device.desiredState == '1'">
+      <h2>Turning projector off </h2>
+    </div>
+    <div ng-hide="device.desiredState == '0'">
+      <h2> Turning projector on </h2>
+    </div>
+    <!-- <h2>Changing from {{device.actualState}} to {{device.desiredState}}...please wait</h2> -->
+  </div>
+  <h4>
+    <button type="button" class="btn btn-lg btn-default light-off"
+            ng-show="device.actualState == '0'"
+            ng-disabled="device.desiredState != device.actualState"
+            ng-model="device.desiredState"
+            ng-click="processForm(device.id, 1)"   
+            >
+      {{device.name}}
+    </button>
+    <button type="button" class="btn btn-lg light-on"
+            ng-show="device.actualState == '1'"
+            ng-disabled="device.desiredState != device.actualState"
+            ng-model="device.desiredState"
+            ng-click="processForm(device.id, 0)"
+            >
+      {{device.name}}
+    </button>
+  </h4>
+</div>

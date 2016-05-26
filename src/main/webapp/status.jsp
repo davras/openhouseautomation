@@ -5,6 +5,7 @@
 <%--<%@page import="static com.googlecode.objectify.ObjectifyService.ofy"%>DO NOT USE!--%>
 <%@page import="static com.openhouseautomation.OfyService.ofy"%>
 <%@page import="com.openhouseautomation.model.Sensor"%>
+<%@page import="com.openhouseautomation.model.Forecast"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -19,7 +20,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>gAutoArd</title>
+    <title>Open House Automation</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -29,6 +30,7 @@
 
     <link rel="stylesheet" href="/css/jquery-ui.css">
 
+    <link rel="stylesheet" href="/css/tables.css">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -52,6 +54,7 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
+            <li ng-include src="'/login.html'"></li>
             <li><a href="https://code.google.com/p/gautoard/wiki/DesignConcepts">Help</a></li>
           </ul>
         </div>
@@ -64,14 +67,26 @@
           <ul class="nav nav-sidebar">
             <li>Overview</li>
             <li class="divider"></li>
-            <li class="nav-header">Sensors</li>
-            <li class="divider"></li>
-            <li class="nav-header">Controllers</li>
-            <li class="divider"></li>
-            <li class="nav-header">Readings</li>
             <li class="active"><a href="/status.jsp">Current</a></li>
             <li><a href="/charts/weekly.html">Weekly</a></li>
             <li><a href="/charts/archived.html">Archived</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Control</li>
+            <li><a href="/controller/lights">Lights</a></li>
+            <li><a href="/controller/fan">Fan</a></li>
+            <li><a href="/controller/thermostat">Thermostat</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Scenes</li>
+            <li><a href="/scenes/wakeup">Wake Up</a></li>
+            <li><a href="/scenes/leave">Leave</a></li>
+            <li><a href="/scenes/gethome">Get Home</a></li>
+            <li><a href="/scenes/watchamovie">Watch a Movie</a></li>
+            <li><a href="/scenes/gotobed">Go to Bed</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Manage</li>
+            <li><a href="/addcontroller">Add Controller</a></li>
+            <li><a href="/addsensor">Add Sensor</a></li>
+            <li><a href="/addlcddisplay.jsp">Add LCD Display</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -81,16 +96,38 @@
               while (iterator.hasNext()) {
                 Sensor sens = (Sensor) iterator.next();
             %>
-            <tr><td>
+            <tr<% if (sens.isExpired()) {%> style="background-color:red"<% }%>><td align="right">
                 <%= sens.getName()%>:
               </td><td>
                 <%= sens.getLastReading()%>&nbsp;<%= sens.getUnit()%>
-              </td><td>
-                <%= Convutils.timeAgoToString(sens.getLastReadingDate().getTime() / 1000, 4 * 60 * 60)%>
+              </td><td align="center">
+                <%= sens.getHumanAge()%>
               </td>
               </td>
             </tr>
             <% }%>
+          </table>
+          <br>
+          <h1>Forecast</h1>
+          <table>
+            <tr>
+              <th>Zip Code</th><th>Forecast High</th><th>Forecast Low</th><th>Prob of Precip</th>
+            </tr>
+            <%
+              Query<Forecast> queryfc = ofy().load().type(Forecast.class);
+              QueryResultIterator<Forecast> iteratorfc = queryfc.iterator();
+              while (iteratorfc.hasNext()) {
+                Forecast fcdo = (Forecast) iteratorfc.next();
+            %>
+            <tr>
+              <td> <%= fcdo.getZipCode()%></td>
+              <td> <%= fcdo.getForecastHigh()%></td>
+              <td> <%= fcdo.getForecastLow()%></td>
+              <td> <%= fcdo.getForecastPop()%>%</td>
+            </tr>
+            <%
+              }
+            %>
           </table>
         </div>
       </div>

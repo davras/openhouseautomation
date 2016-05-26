@@ -5,5 +5,6 @@
     <property name="timestamp" direction="asc"/>
   </datastore-index>
   <datastore-index kind="ReadingHistory" ancestor="true" source="manual">
+    <property name="timestamp" direction="asc"/>
   </datastore-index>
 </datastore-indexes>

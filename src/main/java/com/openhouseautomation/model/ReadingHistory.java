@@ -1,13 +1,13 @@
 package com.openhouseautomation.model;
 
+import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
-
-import java.util.Date;
 
 /**
  * A class representing a reading from a sensor device.
@@ -16,16 +16,16 @@ import java.util.Date;
  */
 @Entity
 @Index
+@Cache
 public class ReadingHistory {
 
-    @Parent
-    Key<Sensor> sensor;
-    @Id
-    Long id;
+    @Parent Key<Sensor> sensor;
+    @Id String id;
     String high;
     String low;
     String average;
-    Date timestamp;
+    String total;
+    DateTime timestamp;
 
     /**
      * Empty constructor for objectify.
@@ -52,7 +52,7 @@ public class ReadingHistory {
     /**
      * Returns the {@code id} of the {@link ReadingHistory}.
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -61,7 +61,7 @@ public class ReadingHistory {
      *
      * @param id the id to set
      */
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -105,10 +105,16 @@ public class ReadingHistory {
         this.average = value;
     }
 
+    public void setTotal(String total) {
+      this.total = total;
+    }
+    public String getTotal() {
+      return total;
+    }
     /**
      * Returns the {@code timestamp} of the {@link ReadingHistory}.
      */
-    public Date getTimestamp() {
+    public DateTime getTimestamp() {
         return timestamp;
     }
 
@@ -117,7 +123,7 @@ public class ReadingHistory {
      *
      * @param id the id to set
      */
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(DateTime timestamp) {
         this.timestamp = timestamp;
     }
 
