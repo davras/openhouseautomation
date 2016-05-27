@@ -36,7 +36,6 @@ public class Temperature extends DeferredSensor {
       HouseFan hf = new HouseFan();
       hf.process();
       log.log(Level.INFO, "Decision:" + hf.getWeightedDecision().toMessage());
-      //new HouseFan().process();
     }
   }
   

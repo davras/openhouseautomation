@@ -40,9 +40,7 @@ public class HouseFan {
     if (!considerControlMode()) {
       return;
     }
-    if (!considerTemperatures()) {
-      return;
-    }
+    considerTemperatures(); // always needs to run in case it is hotter outside than inside to stop fan
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
@@ -150,7 +148,7 @@ public class HouseFan {
   public boolean shouldTurnOff() {
     // only turn the fan off if insidetemperature is more than 2 deg below setpoint
     if ((insidetemp + 1) < setpoint) {
-      wd.addElement("Door Wear Prevention", newfanspeed, log);
+      wd.addElement("Door Wear Prevention Override", 1000, newfanspeed);
       return true;
     }
     return false;
@@ -158,6 +156,7 @@ public class HouseFan {
 
   public boolean shouldTurnOn() {
     if ((insidetemp - 1) > setpoint) {
+      wd.addElement("Door Wear Prevention Override", 1000, newfanspeed);
       return true;
     }
     return false;
@@ -198,7 +197,7 @@ public class HouseFan {
     etl.setIp("127.0.0.1");
     etl.setNewState(Integer.toString(newfanspeed));
     etl.setPreviousState(Integer.toString(olddesiredfanspeed));
-    etl.setType("Auto change fan speed");
+    etl.setType("Auto change fan speed because: " + getWeightedDecision().toMessage());
     etl.setUser(this.getClass().getName());
     ofy().save().entity(etl);
 
