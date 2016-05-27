@@ -120,13 +120,13 @@ public class SensorServlet extends HttpServlet {
     sensor.setLastReadingDate(Convutils.getNewDateTime());
     sensor.setLastReading(sensorval);
     doPostProcessing(sensor);
-    ofy().save().entity(sensor).now();
+    ofy().save().entity(sensor); // async
     log.log(Level.INFO, "saved sensor:{0}", sensor);
     Reading reading = new Reading();
     reading.setSensor(sk);
     reading.setTimestamp(Convutils.getNewDateTime());
     reading.setValue(sensorval);
-    ofy().save().entity(reading).now();
+    ofy().save().entity(reading); // async
     log.log(Level.INFO, "logged reading:{0}", reading);
     out.println("OK");
   }
@@ -156,7 +156,7 @@ public class SensorServlet extends HttpServlet {
     if (dfc != null) {
       // grab the sensor and add the task
       dfc.setSensor(sensor);
-      queue.add(TaskOptions.Builder.withPayload(dfc));
+      queue.addAsync(TaskOptions.Builder.withPayload(dfc)); // async
     }
   }
   /**
