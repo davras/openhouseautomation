@@ -118,7 +118,7 @@ public class HouseFan {
         wd.addElement("Outside Temperature Slope", 10, 0);
       } else {
         if (Integer.parseInt(controller.getActualState()) > 0) {
-          wd.addElement("Colder outside, no fan speed change", 20, controller.getActualState());
+          wd.addElement("Colder outside, no fan speed change", 20, Integer.parseInt(controller.getActualState()));
         }
       }
     }
@@ -169,8 +169,16 @@ public class HouseFan {
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = (Integer) wd.getTopValue();
-    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
+    int newdesiredfanspeed = 0;
+    if (wd.getTopValue() instanceof String) {
+      // just in case a string is tossed into the values
+      newdesiredfanspeed = Integer.parseInt((String) wd.getTopValue());
+    } else if (wd.getTopValue() instanceof Integer) {
+      newdesiredfanspeed = (Integer) wd.getTopValue();
+    } else {
+      log.log(Level.SEVERE, "some strange data in weighted decision top value: {0}", wd.getTopValue());
+    }
+    log.log(Level.INFO, "trying for fan speed: {0} because of: {1}", new Object[]{newdesiredfanspeed, wd.getTopName()});
 
     if (olddesiredfanspeed < newdesiredfanspeed) {
       newfanspeed++;
@@ -181,8 +189,8 @@ public class HouseFan {
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
     // create hysteresis to prevent damper door motor wear
-    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn()) ||
-    (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
+    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn())
+            || (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
       newfanspeed = olddesiredfanspeed;
       wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
     }
@@ -206,7 +214,7 @@ public class HouseFan {
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     //if (olddesiredfanspeed == 0 || newfanspeed == 0) {
-      sendNotification();
+    sendNotification();
     //}
   }
 
