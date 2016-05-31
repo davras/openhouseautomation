@@ -1,12 +1,17 @@
 package com.openhouseautomation.logic;
 
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.EventLog;
+import com.openhouseautomation.model.Reading;
+import com.openhouseautomation.model.Sensor;
 import com.openhouseautomation.notification.NotificationHandler;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -31,6 +36,7 @@ public class HouseFan {
   }
 
   public void process() {
+    // functions return true if successful/need further processing
     if (!setup()) {
       return;
     }
@@ -40,7 +46,15 @@ public class HouseFan {
     if (!considerControlMode()) {
       return;
     }
-    considerTemperatures(); // always needs to run in case it is hotter outside than inside to stop fan
+    if (!loadReadings()) {
+      return;
+    }
+    if (!considerFreshness()) {
+      return;
+    }
+
+    // always needs to run in case it is hotter outside than inside to stop fan
+    considerTemperatureOutvsIn();
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
@@ -87,7 +101,7 @@ public class HouseFan {
     return true;
   }
 
-  public boolean considerTemperatures() {
+  public boolean loadReadings() {
     // get the inside and outside temperatures
     outsidetemp = Utilities.getDoubleReading("Outside Temperature");
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
@@ -97,13 +111,24 @@ public class HouseFan {
       log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
       return false;
     }
+    return true;
+  }
+
+  public boolean considerFreshness() {
+    Sensor outside_temperature = ofy().load().type(Sensor.class).filter("name", "Outside Temperature").first().now();
+    Sensor inside_temperature = ofy().load().type(Sensor.class).filter("name", "Inside Temperature").first().now();
+    if (!outside_temperature.isExpired() && !inside_temperature.isExpired()) {
+      return true;
+    }
+    return false;
+  }
+
+  public void considerTemperatureOutvsIn() {
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
-      wd.addElement("It is hotter outside than inside", 5, 0);
+      wd.addElement("Outside hotter than Inside", 5, 0);
       log.log(Level.INFO, wd.toString());
-      return false;
     }
-    return true;
   }
 
   public void considerSlope() {
@@ -207,15 +232,15 @@ public class HouseFan {
     etl.setPreviousState(Integer.toString(olddesiredfanspeed));
     etl.setType("Auto change fan speed because: " + getWeightedDecision().toMessage());
     etl.setUser(this.getClass().getName());
-    ofy().save().entity(etl);
+    ofy().save().entity(etl).now();
 
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
-    ofy().save().entity(controller);
+    ofy().save().entity(controller).now();
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
-    //if (olddesiredfanspeed == 0 || newfanspeed == 0) {
-    sendNotification();
-    //}
+    if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+      sendNotification();
+    }
   }
 
   public int ensureRange(int value, int min, int max) {

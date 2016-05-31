@@ -27,19 +27,6 @@ public class Sensor implements Serializable {
   private static final long serialVersionUID = 101010L;
   private static final Logger log = Logger.getLogger(Sensor.class.getName());
 
-  /**
-   * @return the previousreading
-   */
-  public String getPreviousReading() {
-    return previousreading;
-  }
-
-  /**
-   * @param previousreading the previousreading to set
-   */
-  public void setPreviousReading(String previousreading) {
-    this.previousreading = previousreading;
-  }
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
   /**
@@ -95,56 +82,6 @@ public class Sensor implements Serializable {
   public String previousreading; // the reading when the entity was loaded
   @JsonIgnore
   private boolean postprocessing = false;
-  
-  @OnLoad
-  void updateAge() {
-    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
-  }
-
-  @OnLoad
-  void backupLastReading() {
-    previousreading = lastReading;
-  }
-
-  @OnLoad
-  void updateExpired() {
-    if (lastReadingDate == null) {
-      DateTime now = Convutils.getNewDateTime();
-      lastReadingDate = now.minusMinutes(15);
-      // gives a new sensor 15 mins to report
-    }
-    if (expirationtime == null) {
-      this.expired = false;
-      expirationtime = 60 * 60; // 1 hour default
-    }
-    if (expirationtime == 0) {
-      this.expired = false;
-    } else {
-      this.expired = lastReadingDate.plusSeconds(getExpirationTime()).isBeforeNow();
-    }
-  }
-
-  public boolean isExpired() {
-    return expired;
-  }
-
-  /**
-   * @return the postprocessing
-   */
-  public boolean needsPostprocessing() {
-    return postprocessing;
-  }
-
-  /**
-   * @param postprocessing the postprocessing to set
-   */
-  public void setPostprocessing(boolean postprocessing) {
-    this.postprocessing = postprocessing;
-  }
-
-  public String getHumanAge() {
-    return humanage;
-  }
 
   /**
    * Empty constructor for objectify.
@@ -368,7 +305,7 @@ public class Sensor implements Serializable {
   public String getSecret() {
     return secret;
   }
-  
+
   /**
    * Sets the {@code expirationtime} for this {@link Sensor}.
    *
@@ -386,6 +323,70 @@ public class Sensor implements Serializable {
    */
   public Integer getExpirationTime() {
     return expirationtime;
+  }
+
+  @OnLoad
+  public void updateAge() {
+    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
+  }
+
+  @OnLoad
+  public void backupLastReading() {
+    previousreading = lastReading;
+  }
+
+  @OnLoad
+  public void updateExpired() {
+    if (lastReadingDate == null) {
+      DateTime now = Convutils.getNewDateTime();
+      lastReadingDate = now.minusMinutes(15);
+      // gives a new sensor 15 mins to report
+    }
+    if (expirationtime == null) {
+      this.expired = false;
+      expirationtime = 60 * 60; // 1 hour default
+    }
+    if (expirationtime == 0) {
+      this.expired = false;
+    } else {
+      this.expired = lastReadingDate.plusSeconds(getExpirationTime()).isBeforeNow();
+    }
+  }
+
+  public boolean isExpired() {
+    return expired;
+  }
+
+  /**
+   * @return the previousreading
+   */
+  public String getPreviousReading() {
+    return previousreading;
+  }
+
+  /**
+   * @param previousreading the previousreading to set
+   */
+  public void setPreviousReading(String previousreading) {
+    this.previousreading = previousreading;
+  }
+
+  /**
+   * @return the postprocessing
+   */
+  public boolean needsPostprocessing() {
+    return postprocessing;
+  }
+
+  /**
+   * @param postprocessing the postprocessing to set
+   */
+  public void setPostprocessing(boolean postprocessing) {
+    this.postprocessing = postprocessing;
+  }
+
+  public String getHumanAge() {
+    return humanage;
   }
 
   @Override
@@ -431,6 +432,8 @@ public class Sensor implements Serializable {
             .add("unit", unit)
             .add("lastReading", lastReading)
             .add("lastReadingDate", lastReadingDate)
+            .add("getExpirationTime", expirationtime)
+            .add("isExpired", expired)
             .toString();
   }
 
