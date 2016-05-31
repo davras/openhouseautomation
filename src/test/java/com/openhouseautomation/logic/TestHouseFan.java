@@ -8,7 +8,6 @@ package com.openhouseautomation.logic;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.googlecode.objectify.ObjectifyService;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
@@ -18,6 +17,9 @@ import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
+import com.googlecode.objectify.util.Closeable;
 
 /**
  *
@@ -31,15 +33,19 @@ public class TestHouseFan {
   Sensor insidesensor;
 
   public TestHouseFan() {
+    JodaTimeTranslators.add(ObjectifyService.factory());
     ObjectifyService.register(Controller.class);
+    ObjectifyService.register(Sensor.class);
   }
   private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
           new LocalDatastoreServiceTestConfig(),
           new LocalMemcacheServiceTestConfig());
+  private Closeable closeable;
 
   @Before
   public void setUp() {
     helper.setUp();
+    closeable = ObjectifyService.begin();
     hftester = new HouseFan();
     controller = new Controller();
     controller.setName("Whole House Fan");
@@ -51,6 +57,7 @@ public class TestHouseFan {
 
   @After
   public void tearDown() {
+    closeable.close();
     helper.tearDown();
   }
 
@@ -105,55 +112,63 @@ public class TestHouseFan {
     assertFalse(hftester.considerControlMode());
   }
 
+  // TODO rewrite hf test for extra methods
   @Test
-  public void testConsiderTemperatures() {
-    // should return false for ridiculous readings
-    //test outside sensor
-    hftester.setup();
-    outsidesensor.setLastReading("-200");
+  public void testConsiderFreshnessTrue() {
+    outsidesensor.setLastReading("42");
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("75");
+    insidesensor.setLastReading("72");
     ofy().save().entity(insidesensor).now();
-    assertFalse(hftester.considerTemperatures());
 
-    hftester.setup();
-    outsidesensor.setLastReading("65");
+    // both are fresh readings, should return true
+    System.err.println("considerFreshness=" + hftester.considerFreshness());
+    assertTrue(hftester.considerFreshness());
+  }
+
+  @Test
+  public void testConsiderFreshnessFalseInside() {
+    outsidesensor.setLastReading("42");
+    outsidesensor.setLastReadingDate(new DateTime().minusMinutes(30));
+    outsidesensor.setExpirationTime(3600);
+    outsidesensor.updateExpired();
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("75");
+    insidesensor.setLastReading("72");
+    insidesensor.setLastReadingDate(new DateTime().minusMinutes(30));
+    insidesensor.setExpirationTime(1);
+    insidesensor.updateExpired();
+    System.err.println("insidesensor:" + insidesensor);
     ofy().save().entity(insidesensor).now();
-    assertTrue(hftester.considerTemperatures());
 
-    // test inside sensor
-    hftester.setup();
-    outsidesensor.setLastReading("65");
+    // should return false for inside stale reading
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+    }
+    System.err.println("considerFreshness=" + hftester.considerFreshness());
+    assertFalse(hftester.considerFreshness());
+  }
+
+  @Test
+  public void testConsiderFreshnessFalseOutside() {
+    outsidesensor.setLastReading("42");
+    // new sensors are given 15 minutes before expiring
+    outsidesensor.setLastReadingDate(new DateTime().minusMinutes(30));
+    outsidesensor.setExpirationTime(1);
+    outsidesensor.updateExpired();
+    System.err.println("outsidesensor:" + outsidesensor);
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("-200");
+    insidesensor.setLastReading("72");
+    insidesensor.setLastReadingDate(new DateTime().minusMinutes(30));
+    insidesensor.setExpirationTime(3600);
+    outsidesensor.updateExpired();
     ofy().save().entity(insidesensor).now();
-    assertFalse(hftester.considerTemperatures());
 
-    hftester.setup();
-    outsidesensor.setLastReading("65");
-    ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("85");
-    ofy().save().entity(insidesensor).now();
-    assertTrue(hftester.considerTemperatures());
-
-    // test outside > inside
-    hftester.setup();
-    insidesensor.setLastReading("75");
-    ofy().save().entity(insidesensor).now();
-    outsidesensor.setLastReading("85");
-    ofy().save().entity(outsidesensor).now();
-    assertFalse(hftester.considerTemperatures());
-
-    // test outside < inside
-    hftester.setup();
-    insidesensor.setLastReading("85");
-    ofy().save().entity(insidesensor).now();
-    outsidesensor.setLastReading("75");
-    ofy().save().entity(outsidesensor).now();
-    assertTrue(hftester.considerTemperatures());
-
+    // should return false for outsidesensor stale reading
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+    }
+    assertFalse(hftester.considerFreshness());
   }
 
   //@Test
