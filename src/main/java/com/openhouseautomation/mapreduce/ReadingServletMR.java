@@ -70,7 +70,7 @@ public class ReadingServletMR extends HttpServlet {
         mrspecs = new MapReduceSpecification.Builder<>(input, mapper, reducer, output)
             .setKeyMarshaller(Marshallers.getStringMarshaller())
             .setValueMarshaller(Marshallers.getStringMarshaller())
-            .setNumReducers(5)
+            .setNumReducers(3)
             .build();
     
     

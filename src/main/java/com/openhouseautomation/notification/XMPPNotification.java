@@ -13,6 +13,8 @@ import com.google.appengine.api.xmpp.XMPPService;
 import com.google.appengine.api.xmpp.XMPPServiceFactory;
 import com.google.apphosting.api.ApiProxy;
 import com.openhouseautomation.model.DatastoreConfig;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,13 +22,16 @@ import com.openhouseautomation.model.DatastoreConfig;
  */
 public class XMPPNotification {
 
+  public static final Logger log = Logger.getLogger(XMPPNotification.class.getName());
+
   public boolean send(NotificationHandler nh) {
     String sender = DatastoreConfig.getValueForKey("xmpp sender", "chat@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotchat.com");
     String recipient = nh.getRecipient();
-    
-    if ("".equals(sender)) {
+
+    if ("".equals(sender) || null == nh.getBody() || "".equals(nh.getBody())) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
+      log.log(Level.WARNING, "Empty sender or body for XMPP message");
       return false;
     }
     JID jidsender = new JID(sender);

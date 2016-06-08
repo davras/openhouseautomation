@@ -51,7 +51,7 @@ public class NotificationHandler {
   }
 
   public void send() {
-    log.log(Level.INFO, "starting send()");
+    log.log(Level.INFO, "starting send({1})", subject);
     // get the notification entry for this subject
     NotificationLog nl = ofy().load().type(NotificationLog.class)
             .filter("subject", subject).first().now();

@@ -8,12 +8,16 @@ package com.openhouseautomation.iftt;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author dave
  */
 public class Rain extends DeferredSensor {
+
+  public static final Logger log = Logger.getLogger(Rain.class.getName());
 
   public Rain() {
   }
@@ -26,7 +30,9 @@ public class Rain extends DeferredSensor {
       fnew = Float.parseFloat(super.sensor.getLastReading());
     } catch (NumberFormatException e) {
     }
-    if (Objects.equals(fold, fnew)) return;
+    if (Objects.equals(fold, fnew)) {
+      return;
+    }
 
     // now that we are done sanity checking
     NotificationHandler nhnotif = new NotificationHandler();
@@ -42,6 +48,11 @@ public class Rain extends DeferredSensor {
     if (fold > 0.021 && fnew < 0.02) {
       nhnotif.setBody("Rain stopped");
     }
-    nhnotif.send();
+    if (nhnotif.getBody() != null && !"".equals(nhnotif.getBody())) {
+      nhnotif.send();
+    } else {
+      log.log(Level.WARNING, "Rain tried to send an empty body");
+    }
+
   }
 }

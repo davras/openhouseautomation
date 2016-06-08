@@ -197,10 +197,11 @@ public class ControllerServlet extends HttpServlet {
               && !controller.getDesiredState().equals(controller.getActualState())
               && !Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
         log.log(Level.WARNING, "POST /device, lastdes is > 180 secs old, going into manual\n"
-                + "controller.lastdesiredstatechange:{0}\ndesired: {1}, actual: {2}",
+                + "controller.lastdesiredstatechange:{0}\ncurrent time:{3}\ndesired: {1}, actual: {2}",
                 new Object[]{controller.getLastDesiredStateChange(),
                   controller.getDesiredState(),
-                  controller.getActualState()
+                  controller.getActualState(),
+                  Convutils.getNewDateTime()
                 });
         EventLog etl = new EventLog();
         etl.setIp(request.getRemoteAddr());
@@ -214,7 +215,7 @@ public class ControllerServlet extends HttpServlet {
       if (controller.getValidStates().contains(controllervalue)) {
         controller.setDesiredState(controllervalue);
         log.log(Level.INFO, "POST /device, desired state:{0} @{1}",
-              new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange()});
+                new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange()});
       }
     }
     ofy().save().entity(controller).now();
