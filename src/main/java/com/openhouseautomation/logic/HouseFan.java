@@ -43,6 +43,11 @@ public class HouseFan {
     if (!considerTemperatures()) {
       return;
     }
+    if (hotterOutside()) {
+      processFanChange();
+      // forces the fan to turn off when it is hotter outside than inside
+      return;
+    }
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
@@ -99,13 +104,17 @@ public class HouseFan {
       log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
       return false;
     }
+    return true;
+  }
+  
+  public boolean hotterOutside() {
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
       wd.addElement("It is hotter outside than inside", 5, 0);
       log.log(Level.INFO, wd.toString());
-      return false;
+      return true; // return true so that fan speed processing will happen
     }
-    return true;
+    return false;
   }
 
   public void considerSlope() {

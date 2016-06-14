@@ -144,7 +144,8 @@ public class TestHouseFan {
     ofy().save().entity(insidesensor).now();
     outsidesensor.setLastReading("85");
     ofy().save().entity(outsidesensor).now();
-    assertFalse(hftester.considerTemperatures());
+    assertTrue(hftester.considerTemperatures());
+    assertTrue(hftester.hotterOutside());
 
     // test outside < inside
     hftester.setup();
