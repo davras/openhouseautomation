@@ -221,8 +221,8 @@ public class ListenServlet extends HttpServlet {
       if (c.getDesiredState().equals("0")) {
         toret[lightnum] = '0';
       }
-      if (c.getLastContactDate().plusMinutes(20).isBeforeNow()) {
-        // update only 3x per hour to save DS writes
+      if (c.getLastContactDate().plusSeconds(c.getExpirationtime()-240).isBeforeNow()) {
+        // update only when needed to save DS writes
         // expiration alert after 1 hour
         log.log(Level.INFO, "updating last contact date");
         c.setLastContactDate(Convutils.getNewDateTime());

@@ -182,7 +182,7 @@ public class DisplaySourceServlet extends HttpServlet {
       StringWriter swout = new StringWriter();
       om.writeValue(swout, controllers);
       initscene.setConfig(swout.toString());
-      ofy().save().entity(initscene).now();
+      ofy().save().entity(initscene); // async
     }
 
     Query<Scene> query = ofy().cache(false).load().type(Scene.class);
@@ -257,7 +257,7 @@ public class DisplaySourceServlet extends HttpServlet {
     etl.setPreviousState("");
     etl.setType("User change scene");
     etl.setUser(request.getRemoteUser());
-    ofy().save().entity(etl);
+    ofy().save().entity(etl); // async
 
     // parse and set the controller settings
     String config = scene.getConfig();
@@ -274,7 +274,7 @@ public class DisplaySourceServlet extends HttpServlet {
       }
       controller.setDesiredState(state);
       controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-      ofy().save().entity(controller);
+      ofy().save().entity(controller); // async
       log.log(Level.INFO, "updated controller: " + controller.toString());
     }
     response.sendError(HttpServletResponse.SC_OK);
@@ -295,7 +295,7 @@ public class DisplaySourceServlet extends HttpServlet {
         c.setLastDesiredStateChange(Convutils.getNewDateTime());
         c.setLastContactDate(Convutils.getNewDateTime());
       }
-      ofy().save().entities(lights);
+      ofy().save().entities(lights).now();
       log.log(Level.INFO, "updated all controllers");
     } else { // an individual light
       ofy().clear(); // clear the session cache, not the memcache
@@ -325,6 +325,7 @@ public class DisplaySourceServlet extends HttpServlet {
       etl.setType("User change controller");
       etl.setUser(request.getRemoteUser());
       ofy().save().entity(etl).now();
+      // response.setStatus(HttpServletResponse.SC_OK);
       response.sendError(HttpServletResponse.SC_OK);
     }
   }

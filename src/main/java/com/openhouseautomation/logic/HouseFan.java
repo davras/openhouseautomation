@@ -232,11 +232,11 @@ public class HouseFan {
     etl.setPreviousState(Integer.toString(olddesiredfanspeed));
     etl.setType("Auto change fan speed because: " + getWeightedDecision().toMessage());
     etl.setUser(this.getClass().getName());
-    ofy().save().entity(etl).now();
+    ofy().save().entity(etl); // async
 
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
-    ofy().save().entity(controller).now();
+    ofy().save().entity(controller); // async
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     if (olddesiredfanspeed == 0 || newfanspeed == 0) {
       sendNotification();

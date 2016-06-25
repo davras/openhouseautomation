@@ -46,7 +46,7 @@ public class DatastoreConfig {
       dc = new DatastoreConfig();
       dc.setKey(key);
       dc.setValue(defaultstr);
-      ofy().save().entity(dc).now();
+      ofy().save().entity(dc); // async
       return defaultstr;
     }
     return dc.getValue();

@@ -251,37 +251,6 @@ public class ControllerServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
       return;
     }
-    // check if unexpired
-    // TODO this model doesn't work well...
-    Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
-    if (cexpir == null) {
-      log.log(Level.WARNING, "Making a new light expiration controller");
-      cexpir = new Controller();
-      cexpir.setOwner("SYSTEM");
-      cexpir.setLocation("SYSTEM");
-      cexpir.setZone("SYSTEM");
-      cexpir.setType(Controller.Type.LIGHTS);
-      cexpir.setDesiredState("0");
-      cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-      cexpir.setActualState("0");
-      cexpir.setLastDesiredStateChange(Convutils.getNewDateTime());
-      cexpir.setLastActualStateChange(Convutils.getNewDateTime());
-      cexpir.setId(1234567890L);
-      cexpir.setName("Lights");
-      cexpir.setLastContactDate(Convutils.getNewDateTime());
-      ofy().save().entity(cexpir).now();
-    } else {
-      cexpir.setLastContactDate(Convutils.getNewDateTime());
-      ofy().save().entity(cexpir).now();
-    }
-    if (cexpir.getLastContactDate().isBefore(Convutils.getNewDateTime().minusMinutes(10))) {
-      // notify someone
-      NotificationHandler nh = new NotificationHandler();
-      nh.setSubject("Light Controller online");
-      nh.setBody("Controller online: " + cexpir.getName());
-      nh.send();
-    }
-    // end crappy model
 
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,

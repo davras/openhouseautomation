@@ -57,7 +57,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setLow(low);
     rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
-    ofy().save().entity(rhist).now();
+    ofy().save().entity(rhist); // async
   }
 
   public void reduceAvgNonZero(String key, ReducerInput<String> values) {
@@ -81,7 +81,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setAverage(Float.toString(totalval / readings));
     rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
-    ofy().save().entity(rhist).now();
+    ofy().save().entity(rhist); // async
   }
 
   public void reduceTotal(String key, ReducerInput<String> values) {
@@ -100,7 +100,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setTotal(Float.toString(totalval));
     rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
-    ofy().save().entity(rhist).now();
+    ofy().save().entity(rhist); // async
   }
 
   public void reduceHigh(String key, ReducerInput<String> values) {
@@ -120,7 +120,7 @@ public class ReadingReducer extends Reducer<String, String, ReadingHistory> {
     rhist.setHigh(high);
     rhist.setTimestamp(Convutils.convertStringDate(readingdate));
     rhist.setId(sensorid + "." + readingdate);
-    ofy().save().entity(rhist).now();
+    ofy().save().entity(rhist); // async
   }
 
 }
