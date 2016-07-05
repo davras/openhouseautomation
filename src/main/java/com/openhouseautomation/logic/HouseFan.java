@@ -52,7 +52,9 @@ public class HouseFan {
     if (!considerFreshness()) {
       return;
     }
-
+    if (!considerDamperMotorWear()) {
+      return;
+    }
     // always needs to run in case it is hotter outside than inside to stop fan
     considerTemperatureOutvsIn();
     considerSlope();
@@ -121,6 +123,16 @@ public class HouseFan {
       return true;
     }
     return false;
+  }
+
+  public boolean considerDamperMotorWear() {
+    // to close the doors, the last desired state change has to be > 30 mins ago
+    if ("1".equals(controller.getActualState())
+            && controller.getLastActualStateChange().plusMinutes(30).isBeforeNow()) {
+      wd.addElement("Damper Door Motor Wear Inhibitor", 8, 1);
+      return false;
+    }
+    return true;
   }
 
   public void considerTemperatureOutvsIn() {
@@ -213,12 +225,6 @@ public class HouseFan {
     }
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-    // create hysteresis to prevent damper door motor wear
-    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn())
-            || (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
-      newfanspeed = olddesiredfanspeed;
-      wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
-    }
     // if no changes are necessary
     log.log(Level.INFO, wd.toString());
     if (olddesiredfanspeed == newfanspeed) {
