@@ -20,7 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -192,7 +191,9 @@ public class ControllerServlet extends HttpServlet {
       controller.setActualState(controllervalue);
       controller.setLastActualStateChange(Convutils.getNewDateTime());
       // if desiredstatelastchange is more than 3 mins old and
-      // the desiredstate is not the actual state, this is a local override.
+      // the desiredstate is not the actual state,
+      // and the last desired state change is before the last actual change
+      // then someone has locally overridden, must go to Manual
       if (controller.getLastDesiredStateChange().minusMinutes(3).isBeforeNow()
               && !controller.getDesiredState().equals(controller.getActualState())
               && !Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
