@@ -129,7 +129,9 @@ public class HouseFan {
     // to close the doors, the last desired state change has to be > 30 mins ago
     if ("1".equals(controller.getActualState())
             && controller.getLastActualStateChange().plusMinutes(30).isBeforeNow()) {
-      wd.addElement("Damper Door Motor Wear Inhibitor", 8, 1);
+      wd.addElement("Damper Door Motor Wear Inhibitor\n"
+              + "lastActualStateChange=" + controller.getLastActualStateChange() + "\n"
+              + "lastDesiredStateChange=" + controller.getLastDesiredStateChange(), 8, 1);
       return false;
     }
     return true;
