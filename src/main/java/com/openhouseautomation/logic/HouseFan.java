@@ -52,10 +52,10 @@ public class HouseFan {
     if (!considerFreshness()) {
       return;
     }
-    if (!considerDamperMotorWear()) {
-      return;
-    }
+    // always needs to run to stop motor wear
+    considerDamperMotorWear();
     // always needs to run in case it is hotter outside than inside to stop fan
+    // can override motor wear inhibitor
     considerTemperatureOutvsIn();
     considerSlope();
     considerForecast();
@@ -125,16 +125,14 @@ public class HouseFan {
     return false;
   }
 
-  public boolean considerDamperMotorWear() {
+  public void considerDamperMotorWear() {
     // to close the doors, the last desired state change has to be > 30 mins ago
     if ("1".equals(controller.getActualState())
             && controller.getLastActualStateChange().plusMinutes(30).isBeforeNow()) {
       wd.addElement("Damper Door Motor Wear Inhibitor\n"
               + "lastActualStateChange=" + controller.getLastActualStateChange() + "\n"
               + "lastDesiredStateChange=" + controller.getLastDesiredStateChange(), 8, 1);
-      return false;
     }
-    return true;
   }
 
   public void considerTemperatureOutvsIn() {
