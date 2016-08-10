@@ -2,6 +2,7 @@ package com.openhouseautomation.iftt;
 
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -17,6 +18,10 @@ public class Alarm extends DeferredController {
 
   @Override
   public void run() {
+    log.log(Level.WARNING, "Alarm trigger: actual={0}, previous={1}, lastactualstatechange={2}",
+            new Object[]{super.controller.getActualState(),
+              super.controller.getPreviousState(),
+              super.controller.getLastActualStateChange()});
     if (super.controller.getActualState().equals(super.controller.getPreviousState())) {
       return;
     }

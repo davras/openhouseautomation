@@ -215,9 +215,9 @@ public class HouseFan {
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
-    //if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+    if (olddesiredfanspeed == 0 || newfanspeed == 0) {
       sendNotification();
-    //}
+    }
   }
 
   public int ensureRange(int value, int min, int max) {
@@ -226,7 +226,6 @@ public class HouseFan {
 
   public void sendNotification() {
     NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setBody(wd.toMessage());
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);

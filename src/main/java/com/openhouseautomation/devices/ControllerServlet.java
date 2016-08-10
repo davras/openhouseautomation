@@ -8,6 +8,7 @@ package com.openhouseautomation.devices;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
@@ -204,6 +205,13 @@ public class ControllerServlet extends HttpServlet {
                   controller.getActualState(),
                   Convutils.getNewDateTime()
                 });
+        log.log(Level.WARNING, "POST /device, cont.lastdesiredstatechange:{0}\n" +
+                "current time:{1}\n"+
+                "difference:{2}",
+                new Object[]{controller.getLastDesiredStateChange().getMillis(),
+                  Convutils.getNewDateTime().getMillis(),
+                  (Convutils.getNewDateTime().getMillis()-controller.getLastDesiredStateChange().getMillis())
+                });
         EventLog etl = new EventLog();
         etl.setIp(request.getRemoteAddr());
         etl.setNewState("MANUAL," + controllervalue);
@@ -212,6 +220,12 @@ public class ControllerServlet extends HttpServlet {
         etl.setUser(request.getRemoteUser());
         ofy().save().entity(etl);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        // send notification of manual transition
+        NotificationHandler nhnotif = new NotificationHandler();
+        nhnotif.setBody(controller.getName() + " in MANUAL");
+        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+        nhnotif.setSubject("Controller AUTO->MANUAL");
+        nhnotif.alwaysSend();
       }
       if (controller.getValidStates().contains(controllervalue)) {
         controller.setDesiredState(controllervalue);
