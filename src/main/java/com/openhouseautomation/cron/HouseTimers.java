@@ -45,6 +45,7 @@ public class HouseTimers extends HttpServlet {
     log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
     doChargers();
     doBoatPump();
+    turnOffHouseFan();
     response.sendError(HttpServletResponse.SC_OK);
   }
 
@@ -89,6 +90,14 @@ public class HouseTimers extends HttpServlet {
     }
   }
 
+  public void turnOffHouseFan() {
+    if (curhour == 8 && (curmin == 0 || curmin == 1)) {
+      // House Fan off at 8am
+      log.log(Level.INFO, "Turning off house fan");
+      setController(4280019022L, "0");
+    }
+  }
+  
   public void setController(Long controllerid, String state) {
     ofy().clear();
     Controller controller = ofy().load().type(Controller.class).id(controllerid).now();

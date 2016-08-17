@@ -18,7 +18,7 @@ public class Alarm extends DeferredController {
 
   @Override
   public void run() {
-    log.log(Level.WARNING, "Alarm trigger: actual={0}, previous={1}, lastactualstatechange={2}",
+    log.log(Level.INFO, "Alarm trigger: actual={0}, previous={1}, lastactualstatechange={2}",
             new Object[]{super.controller.getActualState(),
               super.controller.getPreviousState(),
               super.controller.getLastActualStateChange()});
