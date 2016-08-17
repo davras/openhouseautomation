@@ -101,8 +101,10 @@ public class HouseTimers extends HttpServlet {
   public void setController(Long controllerid, String state) {
     ofy().clear();
     Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
-    controller.setDesiredState(state);
-    ofy().save().entity(controller).now();
+    if (controller != null && !controller.getDesiredState().equals(state)) {
+      controller.setDesiredState(state);
+      ofy().save().entity(controller).now();
+    }
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
