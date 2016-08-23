@@ -94,7 +94,20 @@ public class HouseTimers extends HttpServlet {
     if (curhour == 8 && (curmin == 0 || curmin == 1)) {
       // House Fan off at 8am
       log.log(Level.INFO, "Turning off house fan");
-      setController(4280019022L, "0");
+      ofy().clear();
+      Controller controller = ofy().load().type(Controller.class).id(4280019022L).now();
+      boolean dirty=false;
+      if (!"0".equals(controller.getDesiredState())) {
+        controller.setDesiredState("0");
+        dirty=true;
+      }
+      if (!Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
+        controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+        dirty=true;
+      }
+      if (dirty) {
+        ofy().save().entity(controller).now();
+      }
     }
   }
   
