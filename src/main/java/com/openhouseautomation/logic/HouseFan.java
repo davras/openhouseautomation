@@ -179,7 +179,7 @@ public class HouseFan {
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = (Integer) wd.getTopValue();
+    int newdesiredfanspeed = Integer.parseInt(wd.getTopValue());
     log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
 
     if (olddesiredfanspeed < newdesiredfanspeed) {
