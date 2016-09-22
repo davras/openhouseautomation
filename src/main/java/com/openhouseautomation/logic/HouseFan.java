@@ -106,7 +106,7 @@ public class HouseFan {
     }
     return true;
   }
-  
+
   public boolean hotterOutside() {
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
@@ -179,7 +179,7 @@ public class HouseFan {
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = Integer.parseInt(wd.getTopValue());
+    int newdesiredfanspeed = Integer.parseInt((String) wd.getTopValue());
     log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
 
     if (olddesiredfanspeed < newdesiredfanspeed) {
@@ -191,8 +191,8 @@ public class HouseFan {
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
     // create hysteresis to prevent damper door motor wear
-    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn()) ||
-    (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
+    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn())
+            || (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
       newfanspeed = olddesiredfanspeed;
       wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
     }
@@ -202,20 +202,20 @@ public class HouseFan {
       log.log(Level.INFO, "No changes needed");
       return;
     }
-    // log the event
-    EventLog etl = new EventLog();
-    etl.setIp("127.0.0.1");
-    etl.setNewState(Integer.toString(newfanspeed));
-    etl.setPreviousState(Integer.toString(olddesiredfanspeed));
-    etl.setType("Auto change fan speed");
-    etl.setUser(this.getClass().getName());
-    ofy().save().entity(etl);
 
     // save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+      // log the event
+      EventLog etl = new EventLog();
+      etl.setIp("127.0.0.1");
+      etl.setNewState(Integer.toString(newfanspeed));
+      etl.setPreviousState(Integer.toString(olddesiredfanspeed));
+      etl.setType("Auto change fan speed");
+      etl.setUser(this.getClass().getName());
+      ofy().save().entity(etl);
       sendNotification();
     }
   }

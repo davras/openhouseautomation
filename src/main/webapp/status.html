@@ -54,7 +54,7 @@
           <!-- Sensor current readings go here -->
           <ul class="list-group">
             <li class="list-group-item" ng-repeat="sensor in sensors.data">{{ sensor.name}}:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
-              <i ng-class='{red : sensor.expired, black : !sensor.expired}'>{{sensor.humanAge}}</i>
+              <i ng-class='{red : sensor.expired, black : !sensor.expired}'>&nbsp;&nbsp;{{sensor.humanAge}}</i>
             </li>
           </ul>
           <hr/>

@@ -7,7 +7,10 @@ package com.openhouseautomation.cron;
 
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
+import com.openhouseautomation.model.DatastoreConfig;
+import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +49,7 @@ public class HouseTimers extends HttpServlet {
     doChargers();
     doBoatPump();
     turnOffHouseFan();
+    doDenLights();
     response.sendError(HttpServletResponse.SC_OK);
   }
 
@@ -65,8 +69,8 @@ public class HouseTimers extends HttpServlet {
       setController(3960328784L, "0");
     }
 
-    
   }
+
   public void doChargers() {
     if (curhour == 23 && (curmin == 0 || curmin == 1)) {
       // Charger on at 11pm
@@ -96,21 +100,22 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Turning off house fan");
       ofy().clear();
       Controller controller = ofy().load().type(Controller.class).id(4280019022L).now();
-      boolean dirty=false;
+      boolean dirty = false;
       if (!"0".equals(controller.getDesiredState())) {
         controller.setDesiredState("0");
-        dirty=true;
+        sendNotification();
+        dirty = true;
       }
       if (!Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-        dirty=true;
+        dirty = true;
       }
       if (dirty) {
         ofy().save().entity(controller).now();
       }
     }
   }
-  
+
   public void setController(Long controllerid, String state) {
     ofy().clear();
     Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
@@ -120,6 +125,34 @@ public class HouseTimers extends HttpServlet {
     }
   }
 
+  public void doDenLights() {
+    double outsidelight = Utilities.getDoubleReading("Outside Light Level");
+    // if it is dark outside, turn on the den light
+    // ranges from 0V to 3.14V
+    boolean lights=false;
+    if (outsidelight < 1) {
+      lights=true;
+    }
+    // turn off between midnight and 6am
+    if (curhour < 6) {
+      lights=false;
+    }
+    if (lights) {
+      setController(3640433672L, "1");
+      log.log(Level.INFO, "Turning den light on");
+    } else {
+      setController(3640433672L, "0");
+      log.log(Level.INFO, "Turning den light off");
+    }
+  }
+
+  public void sendNotification() {
+    NotificationHandler nhnotif = new NotificationHandler();
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+    nhnotif.setSubject("Fan Speed");
+    nhnotif.setBody("Turned off House Fan");
+    nhnotif.alwaysSend();
+  }
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.
