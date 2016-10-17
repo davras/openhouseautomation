@@ -64,7 +64,7 @@ public class HouseTimers extends HttpServlet {
       // Pump on at 6pm
       log.log(Level.INFO, "Turning boat pump on");
       setController(3960328784L, "1");
-    } else {
+    } else if (curmin == 0 || curmin == 1) {
       log.log(Level.INFO, "Turning boat pump off");
       setController(3960328784L, "0");
     }
@@ -129,6 +129,7 @@ public class HouseTimers extends HttpServlet {
     double outsidelight = Utilities.getDoubleReading("Outside Light Level");
     // if it is dark outside, turn on the den light
     // ranges from 0V to 3.14V
+    if (curmin > 1) return; // only change at the beginning of the hour
     boolean lights=false;
     if (outsidelight < 1) {
       lights=true;
