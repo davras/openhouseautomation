@@ -14,6 +14,7 @@
         {{state}}
       </label>
       <label ng-hide="device.desiredState == device.actualState">In Progress...</label>
+      <label ng-show="device.expired">Controller offline</label>
     </div>
   </div>
 </form>
