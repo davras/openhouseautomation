@@ -33,12 +33,12 @@ public class Rain extends DeferredSensor {
     if (Objects.equals(fold, fnew)) {
       return;
     }
-
+    log.log(Level.FINE, "Rain old: {0}, new: {1}", new Object[]{fold, fnew});
     // now that we are done sanity checking
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Rain Sensor Change");
-    if (fold < 0.011 && fnew > 0.023) {
+    if (fold < 0.023 && fnew > 0.023) {
       // takes 2 bucket tips to alert (0.022 inches of rain)
       nhnotif.setBody("Started Raining: " + fnew + " inches/hr");
     }
