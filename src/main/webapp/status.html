@@ -54,7 +54,8 @@
           <!-- Sensor current readings go here -->
           <ul class="list-group">
             <li class="list-group-item" ng-repeat="sensor in sensors.data">
-              {{ sensor.name}}:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
+              <a href="http://gautoard.appspot.com/charts/{{sensor.type | lowercase}}.html">
+              {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
               <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
                 &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>
             </li>

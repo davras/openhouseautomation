@@ -32,13 +32,13 @@
 
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualizationTemperature() {
+      function drawVisualization() {
         google.visualization.drawChart({
-          "containerId": "visualization_div_TEMPERATURE",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=TEMPERATURE',
+          "containerId": "visualization_div",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=WINDSPEED',
           "chartType": "AnnotationChart",
           "options": {
-            "title": 'Temperatures',
+            "title": 'Wind Speed',
             "colors": ['blue', 'red', 'orange', 'green', 'black'],
             "scaleType": 'maximized',
             "thickness": 2,
@@ -83,7 +83,7 @@
       </div>
       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1>Temperatures</h1>
-        <div id="visualization_div_TEMPERATURE" style="width: 90%; height: 400px;"></div>
+        <div id="visualization_div" style="width: 90%; height: 400px;"></div>
       </div>
     </div>
   </div>

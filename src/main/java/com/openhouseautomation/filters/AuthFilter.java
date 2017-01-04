@@ -7,6 +7,7 @@ package com.openhouseautomation.filters;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.openhouseautomation.model.DatastoreConfig;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +39,9 @@ public class AuthFilter implements Filter {
     HttpServletResponse res = (HttpServletResponse) response;
     UserService userService = UserServiceFactory.getUserService();
     String thisURL = req.getRequestURI();
+    /**
+     * debug below is commented out
+     * 
     // if the user is logged in, populate username
     log.log(Level.INFO, "Auth: " + userService.getCurrentUser());
     if (userService.isUserLoggedIn()) {
@@ -48,22 +52,25 @@ public class AuthFilter implements Filter {
     log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
     log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
     log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
-    
+    */
+            
     boolean approved = false;
     if (req.getUserPrincipal() != null) {
-      //if ("/status/display/devices".equals(req.getPathInfo())) {
       // needs a user logged in
-      log.log(Level.INFO, "approved by user principle");
-      approved = userService.isUserAdmin();
       // you have to be an admin to control the house
+      approved = userService.isUserAdmin();
+      //String adminnotadmin = approved ? "" : " not ";
+      log.log(Level.INFO, userService.getCurrentUser() + " is " + 
+              (approved ? "" : "not ") + "an admin");
     }
-    if (!approved && "50.194.29.173".equals(req.getRemoteAddr())) {
+    String trustedips = DatastoreConfig.getValueForKey("trustedips", "192.168.1.1");
+    if (!approved && null != trustedips && trustedips.contains(req.getRemoteAddr())) {
       // or be in the house (source ip is home)
-      log.log(Level.INFO, "approved by source ip");
+      log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by trusted ip: " + trustedips);
       approved = true;
     }
     if (req.getRemoteAddr().startsWith("0.")) {
-      log.log(Level.INFO, "approved by internal ip");
+      log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by internal ip");
       approved = true;
     }
 
