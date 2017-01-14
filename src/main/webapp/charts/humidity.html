@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="gAutoArd" >
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,28 +7,19 @@
 
     <title>gAutoArd</title>
 
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angularbootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>    
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- gAutoArd core CSS -->
     <link href="/css/main.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="/css/jquery-ui.css">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+  
     <style>
       #slider { margin: 10px; }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
-    <script src="/js/jquery-ui.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/bootstrap.min.js"></script>
 
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});
@@ -43,12 +34,16 @@
             "scaleType": 'maximized',
             "thickness": 2,
             "displayRangeSelector": false,
-            "displayExactValues": true,
-            "scaleFormat": "###.0"
+            "displayExactValues": false,
+            "numberFormat": "#",
+            "scaleFormat": "#",
+            "legendPosition": "newRow",
+            "max": 125,
+            "min": 0,
           }
         });
       }
-      google.setOnLoadCallback(drawVisualizationTemperature);
+      google.setOnLoadCallback(drawVisualization);
     </script>
   </head>
   <body>
@@ -57,33 +52,24 @@
     <div class="row">
       <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
-          <li>Overview</li>
+          <li class="nav-header"><a href="/index.html">Overview</a></li>
           <li class="divider"></li>
-          <li><a href="/status.jsp">Current</a></li>
-          <li class="active"><a href="/charts/weekly.html">Weekly</a></li>
-          <li><a href="/charts/archived.html">Archived</a></li>
+          <li class="nav-header"><a href="/status.html">Status</a></li>
           <li class="divider"></li>
-          <li class="nav-header">Control</li>
-          <li><a href="/controller/lights">Lights</a></li>
-          <li><a href="/controller/fan">Fan</a></li>
-          <li><a href="/controller/thermostat">Thermostat</a></li>
+          <li class="nav-header"><a href="/control.html">Control</a></li>
           <li class="divider"></li>
-          <li class="nav-header">Scenes</li>
-          <li><a href="/scenes/wakeup">Wake Up</a></li>
-          <li><a href="/scenes/leave">Leave</a></li>
-          <li><a href="/scenes/gethome">Get Home</a></li>
-          <li><a href="/scenes/watchamovie">Watch a Movie</a></li>
-          <li><a href="/scenes/gotobed">Go to Bed</a></li>
+          <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
           <li class="divider"></li>
-          <li class="nav-header">Manage</li>
-          <li><a href="/addcontroller">Add Controller</a></li>
-          <li><a href="/addsensor">Add Sensor</a></li>
-          <li><a href="/addlcddisplay.jsp">Add LCD Display</a></li>
+          <li class="nav-header active"><a href="/charts.html">Charts</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/manage.html">Manage</a></li>
         </ul>
       </div>
       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <h1>Temperatures</h1>
-        <div id="visualization_div" style="width: 90%; height: 400px;"></div>
+        <div class="jumbotron" style="text-align:center">
+          <h2>Humidity</h2>
+        </div>
+        <div id="visualization_div" style="width: 100%; height: 400px;"></div>
       </div>
     </div>
   </div>

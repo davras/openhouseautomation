@@ -26,7 +26,7 @@
     <service>xmpp_error</service>
   </inbound-services>
   <automatic-scaling>
-    <min-pending-latency>12000ms</min-pending-latency>
+    <min-pending-latency>5000ms</min-pending-latency>
   </automatic-scaling>
   <static-error-handlers>
     <handler file="error_page.html" />

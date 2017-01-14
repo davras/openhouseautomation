@@ -13,6 +13,8 @@
         <!-- web requests are authed by user -->
         <url-pattern>/status/controller/update*</url-pattern>
         <url-pattern>/status/display/*</url-pattern>
+        <!-- re-enable after verifying sensor hashes working -->
+        <!-- <url-pattern>/sensor</url-pattern> -->
     </filter-mapping>
     <filter>
         <filter-name>ObjectifyFilter</filter-name>
