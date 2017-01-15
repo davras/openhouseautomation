@@ -37,13 +37,15 @@ public class Controller implements Serializable {
    */
   public enum Type {
 
+      // if you add a new type, add it's default valid states in the AddControllerServlet
     ALARM("Alarm"),
     GARAGEDOOR("Garage Door"),
     LIGHTS("Lights"),
     PROJECTOR("Projector"),
     SPRINKLER("Sprinkler"),
     THERMOSTAT("Thermostat"),
-    WHOLEHOUSEFAN("Whole House Fan");
+    WHOLEHOUSEFAN("Whole House Fan"),
+    DOORLOCK("Door Lock");
 
     private final String text;
 

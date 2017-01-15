@@ -88,7 +88,7 @@ public class AddControllerServlet extends HttpServlet {
         vs.add("DISARM");
         vs.add("HOME");
         vs.add("AWAY");
-      } else if (cont.type == Controller.Type.PROJECTOR) {
+      } else if (cont.type == Controller.Type.PROJECTOR || cont.type == Controller.Type.DOORLOCK) {
         vs.add("0");
         vs.add("1");
       }
