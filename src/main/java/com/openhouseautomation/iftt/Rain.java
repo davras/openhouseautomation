@@ -50,8 +50,6 @@ public class Rain extends DeferredSensor {
     }
     if (nhnotif.getBody() != null && !"".equals(nhnotif.getBody())) {
       nhnotif.alwaysSend();
-    } else {
-      log.log(Level.WARNING, "Rain tried to send an empty body");
     }
 
   }
