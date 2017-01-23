@@ -38,6 +38,10 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ReadingDataSourceServlet.class.getName());
 
+  int resolution = 10; // graph resolution in minutes
+  int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
+  int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
+  
   // TODO: only in place for testing, not for production
   @Override
   protected boolean isRestrictedAccessMode() {
@@ -65,17 +69,20 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     }
 
     // use the sensors to get the readings
-    int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
+    shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
     DateTime cutoffdate = Convutils.getNewDateTime().minus(Period.days(shortchartdays));
-    int resolution = 15; // graph resolution in minutes
-    int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
     log.log(Level.INFO, "filling {0} blocks", blocks);
     Double[][] readingsz = new Double[sensors.size()][blocks + 10]; // fudge for ArrayIndexOutOfBoundsException
-
     starttime = System.currentTimeMillis();
     // fill in the readings
     for (int i = 0; i < sensors.size(); i++) {
       Sensor s = (Sensor) sensors.get(i);
+      // zero if needed
+      if (s.getType() == Sensor.Type.RAIN) {
+        for (int clrz=0; clrz < blocks; clrz++) {
+          readingsz[i][clrz] = 0.0;
+        }
+      }
       long starttime2 = System.currentTimeMillis();
       Iterable<Reading> readings = ofy().load().type(Reading.class).ancestor(s).chunkAll().iterable();
       log.log(Level.INFO, "retrieve reading iterator took {0}ms", (System.currentTimeMillis() - starttime2));

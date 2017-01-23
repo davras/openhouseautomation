@@ -65,19 +65,22 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "id={0},name={1}", new Object[]{controller.getId(), controller.getName()});
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
-      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + controller.getLastDesiredStateChange().getMillis() / 1000);
-      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId(), controller.getDesiredState(), controller.getLastDesiredStateChange().getMillis() / 1000});
+      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + 
+              controller.getLastDesiredStateChange().getMillis() / 1000);
+      log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId().toString(),
+        controller.getDesiredState(), Long.toString(controller.getLastDesiredStateChange().getMillis() / 1000)});
     } else if (reqpath.startsWith("/display")) {
       // show the actual state
       out.println(controller.toString());
       log.log(Level.INFO, "sent display:{0}", controller.toString());
     } else if (reqpath.startsWith("/initialize")) {
-      initializeController(controller);
+      initalizeValidStates(controller);
+      ofy().save().entity(controller);
       out.println(controller);
     }
   }
 
-  public void initializeController(Controller controller) {
+  public void initalizeValidStates(Controller controller) {
     List vs = new ArrayList();
     // this should be some sort of ENUM, but it is controller-type specific
     // i.e. fan could have "on/off", or "off/low/high", or "0,1,2,3,4,5"
@@ -98,8 +101,6 @@ public class ControllerServlet extends HttpServlet {
       vs.add("0");
     }
     controller.setValidStates(vs);
-    ofy().save().entity(controller);
-
   }
 
   /**
@@ -147,15 +148,6 @@ public class ControllerServlet extends HttpServlet {
       log.log(Level.WARNING, "hash validation failed");
       response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, hash failed");
       return;
-    }
-
-    // fix old controllers
-    if (controller.getType().equals(Controller.Type.ALARM)) {
-      ArrayList al = new ArrayList();
-      al.add("Disarm");
-      al.add("Home");
-      al.add("Away");
-      controller.setValidStates(al);
     }
 
     // notify if the controller is un-expiring
