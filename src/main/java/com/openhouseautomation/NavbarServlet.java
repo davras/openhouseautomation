@@ -48,7 +48,8 @@ public class NavbarServlet extends HttpServlet {
               + "      </button>\n"
       );
       if (request.getUserPrincipal() != null) {
-        out.println("<a class=\"navbar-brand\" href=\"/\">" + request.getUserPrincipal().getName() + "</a>");
+        //out.println("<a class=\"navbar-brand\" href=\"/\">" + request.getUserPrincipal().getName() + "</a>");
+        out.println("<a href=\"/\"><img src=\"/images/ic_home_white_24dp.png\" width=\"48\" height=\"48\"/></a>");
       } else {
         out.print("<a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("navbar.html", "")) + "\">Login</a>");
       }
@@ -59,10 +60,10 @@ public class NavbarServlet extends HttpServlet {
               + "      <ul class=\"nav navbar-nav\">\n"
       );
       if (request.getUserPrincipal() != null) {
-        out.println("<li class=\"active\"><a class=\"navbar-brand\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a></li>");
+        out.println("<nav class=\"navbar\"><a class=\"navbar-brand\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a>");
       }
       out.println(
-              "      </ul>\n"
+              "      </nav>\n"
               + "    </div><!-- /.navbar-collapse -->\n"
               + "  </div><!-- /.container-fluid -->\n"
               + "</nav>");

@@ -1,13 +1,4 @@
 <div ng-repeat="device in devices.data">
-  <div ng-hide="device.desiredState == device.actualState">
-    <div ng-hide="device.desiredState == '1'">
-      <h2> Unlocking door </h2>
-    </div>
-    <div ng-hide="device.desiredState == '0'">
-      <h2> Locking door </h2>
-    </div>
-    <!-- <h2>Changing from {{device.actualState}} to {{device.desiredState}}...please wait</h2> -->
-  </div>
   <h4>
     <button type="button" class="btn btn-lg btn-default light-off"
             ng-show="device.actualState == '0'"
@@ -25,6 +16,9 @@
             >
       {{device.name}}
     </button>
+    <img ng-show="device.desiredState != device.actualState" 
+         src="/images/ic_wb_cloudy_grey600_36dp.png"/>
+    <alert type="none" class="alert-danger" ng-show="device.expired">Controller offline</alert>
   </h4>
-  <h3 ng-show="device.expired">Controller offline</h3>
 </div>
+

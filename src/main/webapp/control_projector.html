@@ -25,6 +25,8 @@
             >
       {{device.name}}
     </button>
+    <img ng-show="device.desiredState != device.actualState" 
+         src="/images/ic_wb_cloudy_grey600_36dp.png"/>
   </h4>
-  <h3 ng-show="device.expired">Controller offline</h3>
+  <alert type="none" class="alert-danger" ng-show="device.expired">Controller offline</alert>
 </div>

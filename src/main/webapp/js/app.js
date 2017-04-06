@@ -34,37 +34,20 @@
    */
   LOGIN_STATUS_URL = "/status/login";
 
-  /**app.controller('LoginController', ['$scope', '$http', function($scope, $http) {
-      var userdetails = this;
-      userdetails.username = null;
-      userdetails.redirecturl = null;
-      $http.get(LOGIN_STATUS_URL).success(function(data) {
-        userdetails = data;
-        console.log("loading user login: ");
-        console.log(userdetails);
-      });
-      this.getLogin = function() {
-        if (userdetails.username != null)
-          return userdetails.username;
-        if (userdetails.redirecturl != null)
-          return userdetails.redirecturl;
-        return "<h2>Checking</h2>";
-      };
-    }]);
-    */
-
   app.controller('SensorController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
       var sensors = this;
       sensors.data = [];
-      $http.get(SENSOR_DATA_URL).success(function(data) {
-        console.log("loading sensor data");
-        sensors.data = data;
-      });
+      $http.get(SENSOR_DATA_URL)
+              .then(function successCallback(response) {
+                console.log("loading sensor data");
+                sensors.data = response.data;
+              });
       var sensorPromise = $interval(function() {
         console.log("refreshing sensors data");
-        $http.get(SENSOR_DATA_URL).success(function(data) {
-          sensors.data = data;
-        });
+        $http.get(SENSOR_DATA_URL)
+                .then(function successCallback(response) {
+                  sensors.data = response.data;
+                });
       }, 60000);
       $scope.$on('$destroy', function() {
         $interval.cancel(sensorPromise);
@@ -74,9 +57,10 @@
   app.controller('ForecastController', ['$http', function($http) {
       var forecasts = this;
       forecasts.data = [];
-      $http.get(FORECAST_DATA_URL).success(function(data) {
-        forecasts.data = data;
-      });
+      $http.get(FORECAST_DATA_URL)
+              .then(function successCallback(response) {
+                forecasts.data = response.data;
+              });
     }]);
 
   app.controller('DeviceController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
@@ -90,8 +74,8 @@
       console.log("loading devices data");
 
       // load the tab types first
-      $http.get(DEVICE_TYPE_LIST_URL).success(function(data) {
-        devices.list = data;
+      $http.get(DEVICE_TYPE_LIST_URL).then(function successCallback(response) {
+        devices.list = response.data;
         console.log("get device types");
       });
       this.setTab = function(newval) {
@@ -99,12 +83,11 @@
         devices.currenttab = newval; // save the new tab
         console.log("tab set to " + newval);
         // immediately load the controller data for this device
-        $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).success(function(data) {
-          devices.data = data;  // now filled with new tab's data
+        $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).then(function successCallback(response) {
+          devices.data = response.data;  // now filled with new tab's data
         });
       };
       this.isSet = function(tabname) {
-        //console.log("comparing " + devices.currenttab + "==" + tabname);
         return devices.currenttab == tabname;
       };
       this.getLink = function() {
@@ -113,17 +96,20 @@
       var devicePromise = $interval(function() {
         //console.log(new Date().getTime() + ">" + (devices.lastcomm + 15000));
         if (devices.fastpull || (new Date().getTime() > (devices.lastcomm + 15000))) {
-          $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).success(function(data) {
-            devices.data = data;
-            devices.lastcomm = new Date().getTime();
-            var len = devices.data.length;
-            devices.fastpull = false;
-            for (var p = 0; p < len; p++) {
-              if (devices.data[p].desiredState !== devices.data[p].actualState) {
-                devices.fastpull = true;
-              }
-            }
-          });
+          devices.lastcomm = new Date().getTime();
+          $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab)
+                  .then(function successCallback(response) {
+                    devices.data = response.data;
+                    var len = devices.data.length;
+                    devices.fastpull = false;
+                    for (var p = 0; p < len; p++) {
+                      if (devices.data[p].desiredState !== devices.data[p].actualState) {
+                        devices.fastpull = true;
+                      }
+                    }
+                  }, function errorCallback(response) {
+                    devices.fastpull = false;
+                  });
         }
       }, 2000);
       $scope.$on('$destroy', function() {
@@ -191,10 +177,8 @@
       scenes.list = [];
       scenes.active = 0;
 
-      $http.get(SCENE_LIST_URL).success(function(data) {
-        scenes.list = data;
-        console.log("get scenes");
-        console.log(scenes.list);
+      $http.get(SCENE_LIST_URL).then(function successCallback(response) {
+        scenes.list = response.data;
       });
 
       $scope.processForm = function(id) {
@@ -211,7 +195,7 @@
               str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
             return str.join("&");
           },
-          data: { id: $scope.id }
+          data: {id: $scope.id}
         }).success(function() {
           // should check for a 200 return
         });

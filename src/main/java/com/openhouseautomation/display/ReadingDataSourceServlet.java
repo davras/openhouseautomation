@@ -38,7 +38,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(ReadingDataSourceServlet.class.getName());
 
-  int resolution = 10; // graph resolution in minutes
+  int resolution = 5; // graph resolution in minutes
   int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
   int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
   

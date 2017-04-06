@@ -1,5 +1,6 @@
 package com.openhouseautomation;
 
+import com.google.appengine.api.LifecycleManager;
 import com.google.apphosting.api.ApiProxy;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
@@ -74,7 +75,10 @@ public class ListenServlet extends HttpServlet {
       timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
       pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
       Controller changedcontroller = null;
-      while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
+      while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout
+              && !out.checkError()
+              && !foundachange
+              && !LifecycleManager.getInstance().isShuttingDown()) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
         ofy().clear(); // clear the session cache, not the memcache

@@ -1,8 +1,3 @@
-<div ng-hide="device.desiredState == device.actualState">
-  <label ng-hide="device.desiredState == device.actualState">Setting to {{device.desiredState}}...</label>
-  <label ng-hide="device.desiredState != device.actualState">&nbsp;</label>
-  <label ng-show="device.expired">Controller offline</label>
-</div>
 <form>
   <div ng-repeat="device in devices.data">
     <h4>{{device.name}}:&nbsp;{{device.actualState}}
@@ -20,3 +15,4 @@
     </div>
   </div>
 </form>
+<alert type="none" class="alert-danger" ng-show="device.expired">Controller offline</alert>

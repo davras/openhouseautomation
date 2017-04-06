@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>gautoard</application>
-  <version>44d</version>
+  <version>48d</version>
   <!-- Allows App Engine to send multiple requests to one instance in parallel: -->
   <threadsafe>true</threadsafe>
   <system-properties>
@@ -33,10 +33,10 @@
     <!--<handler file="over_quota.html" error-code="over_quota" />-->
   </static-error-handlers>
   <static-files>
-<!--    <include path="/**.html" expiration="1d"/>
+ <!--   <include path="/**.html" expiration="1d"/>
     <include path="/**.css" expiration="1d"/>
-    <include path="/**.js" expiration="1d"/>
-    -->
+    <include path="/**.js" expiration="1d"/> -->
+    
     <exclude path="/navbar.html" />
   </static-files>
 </appengine-web-app>
