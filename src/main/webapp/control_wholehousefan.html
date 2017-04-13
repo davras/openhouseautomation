@@ -30,5 +30,7 @@
       MANUAL
     </label>
   </div>
-  <alert type="none" class="alert-danger" ng-show="device.expired">Controller offline</alert>
+    <img ng-show="device.expired" src="/images/ic_cloud_off_black_24dp.png" />
+    <img ng-show="device.desiredState != device.actualState" 
+         src="/images/ic_cloud_upload_grey600_24dp.png"/>
 </div>

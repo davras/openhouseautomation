@@ -49,7 +49,7 @@ public class NavbarServlet extends HttpServlet {
       );
       if (request.getUserPrincipal() != null) {
         //out.println("<a class=\"navbar-brand\" href=\"/\">" + request.getUserPrincipal().getName() + "</a>");
-        out.println("<a href=\"/\"><img src=\"/images/ic_home_white_24dp.png\" width=\"48\" height=\"48\"/></a>");
+        out.println("<a href=\"/\"><img src=\"/images/ic_home_white_24dp.png\" width=\"36\" height=\"36\"/></a>");
       } else {
         out.print("<a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("navbar.html", "")) + "\">Login</a>");
       }

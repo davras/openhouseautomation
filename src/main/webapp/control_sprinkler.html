@@ -13,7 +13,9 @@
              ng-click="processForm(device.id, state)">
         {{state}}
       </label>
-      <label ng-hide="device.desiredState == device.actualState">Working...</label>
+    <img ng-show="device.expired" src="/images/ic_cloud_off_black_24dp.png" />
+    <img ng-show="device.desiredState != device.actualState" 
+         src="/images/ic_cloud_upload_grey600_24dp.png"/>
     </div>
   </div>
 </form>

@@ -33,10 +33,9 @@
     <!--<handler file="over_quota.html" error-code="over_quota" />-->
   </static-error-handlers>
   <static-files>
- <!--   <include path="/**.html" expiration="1d"/>
+    <include path="/**.html" expiration="1d"/>
     <include path="/**.css" expiration="1d"/>
-    <include path="/**.js" expiration="1d"/> -->
-    
+    <include path="/**.js" expiration="1d"/>
     <exclude path="/navbar.html" />
   </static-files>
 </appengine-web-app>
