@@ -30,6 +30,7 @@ public class HouseFan {
     return wd;
   }
 
+  // the more expensive checks are later on, so bail out early if possible.
   public void process() {
     if (!setup()) {
       return;
@@ -52,6 +53,29 @@ public class HouseFan {
     considerForecast();
     computeDesiredSpeed();
     processFanChange();
+  }
+
+  public String notifyInManual() {
+    // if the fan is in manual, but the house needs to be cooled down, notify admin
+    if (!setup()) {
+      return "";
+    }
+    if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.MANUAL) {
+      return "";
+    }
+    considerTemperatures();
+    if (hotterOutside()) {
+      return "";
+    }
+    considerSlope();
+    considerForecast();
+    computeDesiredSpeed();
+    int newdesiredfanspeed = Integer.parseInt((String) wd.getTopValue());
+    if (newdesiredfanspeed > 0) {
+      return "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh +
+              "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
+    }
+    return "";
   }
 
   public boolean setup() {

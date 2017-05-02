@@ -7,6 +7,7 @@ package com.openhouseautomation.cron;
 
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
@@ -50,6 +51,7 @@ public class HouseTimers extends HttpServlet {
     doBoatPump();
     turnOffHouseFan();
     doDenLights();
+    notifyTurnOnHouseFan();
     response.sendError(HttpServletResponse.SC_OK);
   }
 
@@ -60,15 +62,15 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void doBoatPump() {
-    if (curhour == 18 && (curmin == 0 || curmin == 1)) {
+    if (curhour == 18 && curmin == 0) {
       // Pump on at 6pm
       log.log(Level.INFO, "Turning boat pump on");
       setController(3960328784L, "1");
-    } else if (curmin == 0 || curmin == 1) {
+    } else if (curmin == 1) {
+      // turn off 1 mon after every hour
       log.log(Level.INFO, "Turning boat pump off");
       setController(3960328784L, "0");
     }
-
   }
 
   public void doChargers() {
@@ -103,7 +105,11 @@ public class HouseTimers extends HttpServlet {
       boolean dirty = false;
       if (!"0".equals(controller.getDesiredState())) {
         controller.setDesiredState("0");
-        sendNotification();
+        NotificationHandler nhnotif = new NotificationHandler();
+        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+        nhnotif.setSubject("Fan Speed");
+        nhnotif.setBody("Turned off House Fan");
+        nhnotif.alwaysSend();
         dirty = true;
       }
       if (!Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
@@ -113,6 +119,20 @@ public class HouseTimers extends HttpServlet {
       if (dirty) {
         ofy().save().entity(controller).now();
       }
+    }
+  }
+
+  public void notifyTurnOnHouseFan() {
+    if (curhour < 17) {
+      return; // only after 5pm
+    }
+    String hfnotify = new HouseFan().notifyInManual();
+    if (null != hfnotify && !"".equals(hfnotify)) {
+      NotificationHandler nhnotif = new NotificationHandler();
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+      nhnotif.setSubject("House Fan");
+      nhnotif.setBody(hfnotify);
+      nhnotif.send();
     }
   }
 
@@ -129,14 +149,16 @@ public class HouseTimers extends HttpServlet {
     double outsidelight = Utilities.getDoubleReading("Outside Light Level");
     // if it is dark outside, turn on the den light
     // ranges from 0V to 3.14V
-    if (curmin > 1) return; // only change at the beginning of the hour
-    boolean lights=false;
+    if (curmin > 1) {
+      return; // only change at the beginning of the hour
+    }
+    boolean lights = false;
     if (outsidelight < 1) {
-      lights=true;
+      lights = true;
     }
     // turn off between midnight and 6am
     if (curhour < 6) {
-      lights=false;
+      lights = false;
     }
     if (lights) {
       setController(3640433672L, "1");
@@ -148,12 +170,9 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void sendNotification() {
-    NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
-    nhnotif.setSubject("Fan Speed");
-    nhnotif.setBody("Turned off House Fan");
-    nhnotif.alwaysSend();
+
   }
+
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.
