@@ -79,16 +79,6 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Turning chargers on");
       setController(91125605L, "1");
     }
-    if (curhour == 02 && (curmin == 0 || curmin == 1)) {
-      // Charger off at 2am
-      log.log(Level.INFO, "Turning chargers off");
-      setController(91125605L, "0");
-    }
-    if (curhour == 6 && (curmin == 0 || curmin == 1)) {
-      // Charger on at 6am
-      log.log(Level.INFO, "Turning chargers on");
-      setController(91125605L, "1");
-    }
     if (curhour == 8 && (curmin == 0 || curmin == 1)) {
       // Charger off at 8am
       log.log(Level.INFO, "Turning chargers off");
