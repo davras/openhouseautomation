@@ -40,8 +40,10 @@ public class Sensor implements Serializable {
   public void setPreviousReading(String previousreading) {
     this.previousreading = previousreading;
   }
+
   //TODO Fields for the type of reduction for history
   // like: Highs, Lows, Average, NonZeroAverage, NoReduction
+
   /**
    * Enum for the type of sensor. Self-explanatory
    */
@@ -95,10 +97,14 @@ public class Sensor implements Serializable {
   public String previousreading; // the reading when the entity was loaded
   @JsonIgnore
   private boolean postprocessing = false;
-  
+
   @OnLoad
   void updateAge() {
-    this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
+    if (getLastReadingDate() != null) {
+      this.humanage = Convutils.timeAgoToString(getLastReadingDate().getMillis() / 1000);
+    } else {
+      this.humanage = "never";
+    }
   }
 
   @OnLoad
@@ -368,7 +374,7 @@ public class Sensor implements Serializable {
   public String getSecret() {
     return secret;
   }
-  
+
   /**
    * Sets the {@code expirationtime} for this {@link Sensor}.
    *

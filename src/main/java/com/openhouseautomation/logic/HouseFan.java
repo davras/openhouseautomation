@@ -32,6 +32,7 @@ public class HouseFan {
 
   // the more expensive checks are later on, so bail out early if possible.
   public void process() {
+    // load controller
     if (!setup()) {
       return;
     }
@@ -41,15 +42,18 @@ public class HouseFan {
     if (!considerControlMode()) {
       return;
     }
+    // load 2 temperature readings
     if (!considerTemperatures()) {
       return;
     }
     if (hotterOutside()) {
-      processFanChange();
       // forces the fan to turn off when it is hotter outside than inside
+      processFanChange();
       return;
     }
+    // load many temperature readings
     considerSlope();
+    // load forecast readings
     considerForecast();
     computeDesiredSpeed();
     processFanChange();
@@ -70,21 +74,21 @@ public class HouseFan {
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
-    int newdesiredfanspeed=safeParseInt(wd.getTopValue());
+    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
     if (newdesiredfanspeed > 0) {
-      return "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh +
-              "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
+      return "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh
+              + "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
     }
     return "";
   }
 
   public int safeParseInt(Object o) {
     if (o instanceof java.lang.String) {
-      return Integer.parseInt((String)o);
+      return Integer.parseInt((String) o);
     }
-    return (Integer)o;
+    return (Integer) o;
   }
-  
+
   public boolean setup() {
     ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
@@ -127,14 +131,15 @@ public class HouseFan {
 
   public boolean considerTemperatures() {
     // get the inside and outside temperatures
-    if (outsidetemp == 0.0 || insidetemp == 0.0) {
-      outsidetemp = Utilities.getDoubleReading("Outside Temperature");
-      insidetemp = Utilities.getDoubleReading("Inside Temperature");
-    }
+    outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+    insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    log.log(Level.WARNING, "Outside: " + outsidetemp + " Inside: " + insidetemp);
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
     wd.addElement("Reading Inside Temperature", 1000, insidetemp);
-    if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
-      log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
+    if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100
+            || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
+      log.log(Level.WARNING, "bad temperature read, outside={0}, inside={1}",
+              new Object[]{outsidetemp, insidetemp});
       return false;
     }
     return true;
@@ -158,7 +163,7 @@ public class HouseFan {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
       // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
       // but don't slow fan if outside is much colder than inside
-      if ((Utilities.getDoubleReading("Outside Temperature") + 5) > Utilities.getDoubleReading("Inside Temperature")) {
+      if ((outsidetemp + 5) > insidetemp) {
         wd.addElement("Outside Temperature Slope", 10, 0);
       } else {
         if (safeParseInt(controller.getActualState()) > 0) {

@@ -1,11 +1,14 @@
 package com.openhouseautomation.logic;
 
+import com.googlecode.objectify.Key;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.Sensor;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -62,7 +65,7 @@ public class Utilities {
    * @return the slope of the readings from (now-seconds) to now
    */
   public static double getSlope(String name, int seconds) {
-    Sensor sens = ofy().load().type(Sensor.class).filter("name", name).first().now();
+    Sensor sens = getSensor(name);
     return getSlope(sens.getId(), seconds);
   }
 
@@ -77,14 +80,28 @@ public class Utilities {
     return getSlope(new Long(id), seconds);
   }
 
-  /**
-   *
-   * @param name
-   * @return
-   */
+  private static final HashMap<String, Key<Sensor>> sensorkeys = new HashMap();
+ 
   public static double getDoubleReading(String name) {
-    Sensor sens = ofy().load().type(Sensor.class).filter("name", name).first().now();
-    return Double.parseDouble(sens.getLastReading());
+    return Double.parseDouble(getSensor(name).getLastReading());  
+  }
+  
+  public static void fillCache(String name) {
+      log.log(Level.INFO, "filling sensor cache");
+      // get the keys
+      Iterable<Key<Sensor>> allsensors = ofy().load().type(Sensor.class).keys();
+      for (Key<Sensor> s: allsensors) {
+        Sensor stemp = ofy().load().key(s).now();
+        sensorkeys.put(stemp.getName(), s);
+      }
+  }
+  public static Sensor getSensor(String name) {
+    if (!sensorkeys.containsKey(name)) {
+      fillCache(name);
+    }
+    Key<Sensor> ksensor = sensorkeys.get(name);
+    Sensor sensor = ofy().load().key(ksensor).now();
+    return sensor;
   }
 
   public static double getForecastHigh(String zipcode) {
