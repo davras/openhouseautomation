@@ -133,7 +133,7 @@ public class HouseFan {
     // get the inside and outside temperatures
     outsidetemp = Utilities.getDoubleReading("Outside Temperature");
     insidetemp = Utilities.getDoubleReading("Inside Temperature");
-    log.log(Level.WARNING, "Outside: " + outsidetemp + " Inside: " + insidetemp);
+    //log.log(Level.WARNING, "Outside: " + outsidetemp + " Inside: " + insidetemp);
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
     wd.addElement("Reading Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100
