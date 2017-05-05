@@ -45,8 +45,8 @@ public class HouseFan {
       return;
     }
     if (hotterOutside()) {
-      processFanChange();
       // forces the fan to turn off when it is hotter outside than inside
+      processFanChange();
       return;
     }
     considerSlope();
@@ -129,12 +129,14 @@ public class HouseFan {
     // get the inside and outside temperatures
     if (outsidetemp == 0.0 || insidetemp == 0.0) {
       outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+      log.log(Level.WARNING, "OUTTEMP:" + outsidetemp);
       insidetemp = Utilities.getDoubleReading("Inside Temperature");
+      log.log(Level.WARNING, "INTEMP:" + insidetemp);
     }
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
     wd.addElement("Reading Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
-      log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
+      log.log(Level.WARNING, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
       return false;
     }
     return true;
@@ -158,7 +160,7 @@ public class HouseFan {
       // this will make the fan slow down if temperature outside is increasing, i.e. warming up
       // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
       // but don't slow fan if outside is much colder than inside
-      if ((Utilities.getDoubleReading("Outside Temperature") + 5) > Utilities.getDoubleReading("Inside Temperature")) {
+      if ((outsidetemp + 5) > insidetemp) {
         wd.addElement("Outside Temperature Slope", 10, 0);
       } else {
         if (safeParseInt(controller.getActualState()) > 0) {

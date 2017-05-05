@@ -106,38 +106,51 @@ public class TestHouseFan {
   }
 
   @Test
-  public void testConsiderTemperatures() {
+  public void testConsiderTemperaturesBadReadings() {
     // should return false for ridiculous readings
     //test outside sensor
     hftester.setup();
-    outsidesensor.setLastReading("-200");
+    outsidesensor.setLastReading("-201");
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("75");
+    insidesensor.setLastReading("71");
     ofy().save().entity(insidesensor).now();
     assertFalse(hftester.considerTemperatures());
+  }
+
+  @Test
+  public void testConsiderTemperatureGood() {
 
     hftester.setup();
-    outsidesensor.setLastReading("65");
+    outsidesensor.setLastReading("62");
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("75");
+    insidesensor.setLastReading("72");
     ofy().save().entity(insidesensor).now();
     assertTrue(hftester.considerTemperatures());
+  }
 
+  @Test
+  public void testBadInsideTemperature() {
     // test inside sensor
     hftester.setup();
-    outsidesensor.setLastReading("65");
+    outsidesensor.setLastReading("63");
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("-200");
+    insidesensor.setLastReading("-193");
     ofy().save().entity(insidesensor).now();
     assertFalse(hftester.considerTemperatures());
+  }
 
+  @Test
+  public void testInsideGreaterThanOutside() {
     hftester.setup();
-    outsidesensor.setLastReading("65");
+    outsidesensor.setLastReading("64");
     ofy().save().entity(outsidesensor).now();
-    insidesensor.setLastReading("85");
+    insidesensor.setLastReading("84");
     ofy().save().entity(insidesensor).now();
     assertTrue(hftester.considerTemperatures());
+  }
 
+  //@Test
+  public void testHotterOutside() {
     // test outside > inside
     hftester.setup();
     insidesensor.setLastReading("75");
@@ -146,7 +159,10 @@ public class TestHouseFan {
     ofy().save().entity(outsidesensor).now();
     assertTrue(hftester.considerTemperatures());
     assertTrue(hftester.hotterOutside());
+  }
 
+  @Test
+  public void testOutsideLessThanInside() {
     // test outside < inside
     hftester.setup();
     insidesensor.setLastReading("85");
@@ -154,7 +170,6 @@ public class TestHouseFan {
     outsidesensor.setLastReading("75");
     ofy().save().entity(outsidesensor).now();
     assertTrue(hftester.considerTemperatures());
-
   }
 
   //@Test
