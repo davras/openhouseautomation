@@ -16,6 +16,7 @@ import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
 import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.model.Forecast;
+import com.openhouseautomation.model.NotificationLog;
 import com.openhouseautomation.model.Scene;
 import com.openhouseautomation.model.SceneController;
 import com.openhouseautomation.model.Sensor;
@@ -30,7 +31,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -68,6 +71,14 @@ public class DisplaySourceServlet extends HttpServlet {
       doDisplayControllers(request, response);
       return;
     }
+    if (request.getPathInfo().startsWith("/display/alerts")) {
+      doDisplayAlerts(request, response);
+      return;
+    }
+    if (request.getPathInfo().startsWith("/display/notifications")) {
+      doDisplayNotifications(request, response);
+      return;
+    }
     if (request.getPathInfo().startsWith("/devicetypelist")) {
       doListDeviceTypes(request, response);
       return;
@@ -84,6 +95,7 @@ public class DisplaySourceServlet extends HttpServlet {
     response.getWriter().println("path not supported");
   }
 
+  // TODO I dont' think this is needed anymore, but won't delete on this branch
   private void doLoginRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // if the user is logged in, populate username
     if (request.getUserPrincipal() != null) {
@@ -210,6 +222,50 @@ public class DisplaySourceServlet extends HttpServlet {
     om.writeValue(out, ofy().load().type(Controller.class).filter("type", type).list());
   }
 
+  private void doDisplayAlerts(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    try {
+      String json = "";
+      JSONArray jsareturn = new JSONArray();
+      // TODO convert to query for expired controllers
+      List<Controller> controllers = ofy().load().type(Controller.class).list();
+      for (Controller c : controllers) {
+        if (c.isExpired()) {
+          JSONObject jso = new JSONObject();
+          jso.put("type", "danger")
+                  .put("msg", "Controller offline: " + c.getName());
+          jsareturn.put(jso);
+        }
+      }
+      // TODO convert to query for expired sensors
+      List<Sensor> sensors = ofy().load().type(Sensor.class).list();
+      for (Sensor s : sensors) {
+        if (s.isExpired()) {
+          JSONObject jso = new JSONObject();
+          jso.put("type", "danger")
+                  .put("msg", "Sensor offline: " + s.getName());
+          jsareturn.put(jso);
+        }
+      }
+      jsareturn.write(out);
+    } catch (JSONException e) {
+      response.getWriter().print("[{ type: 'danger', msg: 'unable to retrieve alerts' }]");
+    }
+  }
+
+  
+  private void doDisplayNotifications(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    // dev on localhost
+    if (request.getRemoteAddr().equals("127.0.0.1")) {
+      response.getWriter().print(testNotificationString);
+      return;
+    }
+    // production
+    ofy().clear();
+    ObjectMapper om = new ObjectMapper();
+    om.writeValue(out, ofy().load().type(NotificationLog.class).list());
+  }
   /**
    * Handles the HTTP <code>POST</code> method.
    *
@@ -332,4 +388,5 @@ public class DisplaySourceServlet extends HttpServlet {
   String testSensorString = "[{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
   String testControllerString = "[{\"id\":4280019022,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"atticwhf\",\"type\":\"WHOLEHOUSEFAN\",\"name\":\"Whole House Fan\",\"desiredStatePriority\":\"MANUAL\",\"validStates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"lastDesiredStateChange\":1414987381855,\"lastActualStateChange\":1414987381855,\"desiredState\":\"0\",\"actualState\":\"0\"}]";
   String testSceneString = "";
+  String testNotificationString="";
 }

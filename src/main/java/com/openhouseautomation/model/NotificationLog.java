@@ -9,6 +9,7 @@ import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 
 /**
@@ -63,6 +64,12 @@ public class NotificationLog {
     this.lastnotification = lastnotification;
   }
 
+  public String getHumantime() {
+    return Convutils.timeAgoToString(this.lastnotification.getMillis() / 1000);
+  }
+  public long getNotificationtime() {
+    return lastnotification.getMillis();
+  }
   /**
    * @return the subject
    */
@@ -90,7 +97,5 @@ public class NotificationLog {
   public void setId(Long id) {
     this.id = id;
   }
-  
-  
 
 }

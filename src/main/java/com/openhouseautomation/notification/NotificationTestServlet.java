@@ -5,7 +5,6 @@
  */
 package com.openhouseautomation.notification;
 
-import com.google.apphosting.api.ApiProxy;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,14 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 /**
  *

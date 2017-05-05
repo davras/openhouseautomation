@@ -70,7 +70,7 @@ public class HouseFan {
     considerSlope();
     considerForecast();
     computeDesiredSpeed();
-    int newdesiredfanspeed = Integer.parseInt((String) wd.getTopValue());
+    int newdesiredfanspeed=safeParseInt(wd.getTopValue());
     if (newdesiredfanspeed > 0) {
       return "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh +
               "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
@@ -78,6 +78,13 @@ public class HouseFan {
     return "";
   }
 
+  public int safeParseInt(Object o) {
+    if (o instanceof java.lang.String) {
+      return Integer.parseInt((String)o);
+    }
+    return (Integer)o;
+  }
+  
   public boolean setup() {
     ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
@@ -120,9 +127,11 @@ public class HouseFan {
 
   public boolean considerTemperatures() {
     // get the inside and outside temperatures
-    outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+    if (outsidetemp == 0.0 || insidetemp == 0.0) {
+      outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+      insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    }
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
-    insidetemp = Utilities.getDoubleReading("Inside Temperature");
     wd.addElement("Reading Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100 || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
       log.log(Level.INFO, "bad temperature read, outside={0}, inside={1}", new Object[]{outsidetemp, insidetemp});
@@ -152,7 +161,7 @@ public class HouseFan {
       if ((Utilities.getDoubleReading("Outside Temperature") + 5) > Utilities.getDoubleReading("Inside Temperature")) {
         wd.addElement("Outside Temperature Slope", 10, 0);
       } else {
-        if (Integer.parseInt(controller.getActualState()) > 0) {
+        if (safeParseInt(controller.getActualState()) > 0) {
           wd.addElement("Colder outside, no fan speed change", 20, controller.getActualState());
         }
       }
@@ -198,12 +207,12 @@ public class HouseFan {
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    olddesiredfanspeed = Integer.parseInt(controller.getDesiredState());
+    olddesiredfanspeed = safeParseInt(controller.getDesiredState());
     wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
 
     // now, what does the weighted decision say?
     newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = Integer.parseInt((String) wd.getTopValue());
+    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
     log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
 
     if (olddesiredfanspeed < newdesiredfanspeed) {
@@ -253,6 +262,6 @@ public class HouseFan {
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
-    nhnotif.alwaysSend();
+    nhnotif.send();
   }
 }

@@ -35,7 +35,7 @@ public class NavbarServlet extends HttpServlet {
     try (PrintWriter out = response.getWriter()) {
       UserService userService = UserServiceFactory.getUserService();
       out.println(
-              "<nav class=\"navbar navbar-default navbar-static-top navbar-inverse\">\n"
+              "<nav class=\"navbar navbar-default navbar-fixed-top navbar-inverse\">\n"
               + "  <div class=\"container-fluid\">\n"
               + "<!--ver 30d-->"
               + "    <!-- Brand and toggle get grouped for better mobile display -->\n"

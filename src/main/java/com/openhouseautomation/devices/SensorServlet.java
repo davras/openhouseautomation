@@ -148,7 +148,7 @@ public class SensorServlet extends HttpServlet {
       // i.e.: com.openhouseautomation.iftt.Alarm class
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       // obviously, don't enqueue the task
-      log.log(Level.WARNING, "I could not create the class needed: {0}"
+      log.log(Level.SEVERE, "I could not create the class needed: {0}"
               + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
               new Object[]{classtoget, sensor.getId()}
       );

@@ -53,6 +53,35 @@
             <a href="/manage/" class="btn btn-primary btn-lg">Manage</a>
           </p>
         </div>
+        <hr/>
+        <!--
+        <div ng-controller="AlertsReader as alertsz">
+          <div uib-alert ng-repeat="alertz in alertsz.data" ng-class="alert-danger">
+            {{alertz.msg}}
+          </div>
+        </div>
+        -->
+        <div ng-controller="AlertsReader as alertsz">
+          <script type="text/ng-template" id="alert.html">
+            <div ng-transclude></div>
+          </script>
+          <div ng-repeat="alert in alertsz.data" class="alert alert-danger" >{{alert.msg}}</div>
+        </div>
+        <hr/>
+        <div class="table-condensed" ng-controller="NotificationLog as notifications">
+          <table class="table">
+            <thead>
+              <tr><th>Time</th><th>Recipient</th><th>Subject</th><th>Body</th>
+            </thead>
+            <tr ng-repeat="notification in notifications.data">
+              <td>{{notification.notificationtime | date:'short' }}<br>
+                {{notification.humantime}}</td>
+              <td>{{notification.recipient}}</td>
+              <td>{{notification.subject}}</td>
+              <td>{{notification.body}}</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>

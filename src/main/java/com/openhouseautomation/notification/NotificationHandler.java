@@ -11,7 +11,6 @@ import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.NotificationLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -52,35 +51,20 @@ public class NotificationHandler {
 
   public void send() {
     log.log(Level.INFO, "starting send({1})", subject);
-    // get the notification entry for this subject
-    NotificationLog nl = ofy().load().type(NotificationLog.class)
-            .filter("subject", subject).first().now();
-    if (nl != null) {
-      log.log(Level.INFO, "Not notifying, last notification was {0}", Convutils.timeAgoToString(nl.getLastnotification().getMillis() / 1000L));
-      return;
-    }
     if (recipient == null || "".equals(recipient)) {
       recipient = DatastoreConfig.getValueForKey("admin");
     }
-    log.log(Level.INFO, "no previous notification found, creating one");
-    nl = new NotificationLog();
+
+    // get the notification entry for this subject
+    NotificationLog nl = ofy().load().type(NotificationLog.class)
+            .filter("subject", subject).first().now();
+    if (nl == null) {
+      nl = new NotificationLog();
+      nl.setRecipient(recipient);
+      nl.setSubject(subject);
+    }
     nl.setLastnotification(Convutils.getNewDateTime());
-    nl.setRecipient(recipient);
-    nl.setSubject(subject);
     nl.setBody(body);
     ofy().save().entity(nl).now();
-    alwaysSend();
-  }
-
-  public void alwaysSend() {
-    // send xmpp first
-    // if that fails, send e-mail
-    XMPPNotification xmppnotif = new XMPPNotification();
-    if (!xmppnotif.send(this)) {
-      log.log(Level.WARNING, "XMPP send failed, using e-mail");
-      // then e-mail instead
-      MailNotification mnotif = new MailNotification();
-      mnotif.send(this);
-    }
   }
 }

@@ -32,12 +32,13 @@ public class Lights extends DeferredController {
       // no change, ignore
       return;
     }
-    if (super.controller.getId() == 91125605L) {
+    //if (super.controller.getId() == 91125605L) {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Charger status");
-      nhnotif.setBody("Charger status change: " + super.controller.getPreviousState()+ " -> " + super.controller.getActualState());
-      nhnotif.alwaysSend();
-    }
+      nhnotif.setBody("Charger status change: " + super.controller.getPreviousState()
+              + " -> " + super.controller.getActualState());
+      nhnotif.send();
+    //}
   }
 }

@@ -8,6 +8,14 @@
   /**
    * @const
    */
+  ALERTS_DATA_URL = "/status/display/alerts";
+  /**
+   * @const
+   */
+  NOTIFICATIONS_DATA_URL = "/status/display/notifications";
+  /**
+   * @const
+   */
   FORECAST_DATA_URL = "/status/display/forecast";
   /**
    * @const
@@ -61,6 +69,46 @@
               .then(function successCallback(response) {
                 forecasts.data = response.data;
               });
+    }]);
+
+  app.controller('AlertsReader', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+      var alertsz = this;
+      alertsz.data = [];
+      $http.get(ALERTS_DATA_URL)
+              .then(function successCallback(response) {
+                console.log("loading alerts data");
+                alertsz.data = response.data;
+              });
+      var alertsPromise = $interval(function() {
+        console.log("refreshing alerts data");
+        $http.get(ALERTS_DATA_URL)
+                .then(function successCallback(response) {
+                  alertsz.data = response.data;
+                });
+      }, 60000);
+      $scope.$on('$destroy', function() {
+        $interval.cancel(alertsPromise);
+      });
+    }]);
+
+  app.controller('NotificationLog', ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+      var notifications = this;
+      notifications.data = [];
+      $http.get(NOTIFICATIONS_DATA_URL)
+              .then(function successCallback(response) {
+                console.log("loading notifications data");
+                notifications.data = response.data;
+              });
+      var notificationsPromise = $interval(function() {
+        console.log("refreshing notifications data");
+        $http.get(NOTIFICATIONS_DATA_URL)
+                .then(function successCallback(response) {
+                  notifications.data = response.data;
+                });
+      }, 60000);
+      $scope.$on('$destroy', function() {
+        $interval.cancel(notificationsPromise);
+      });
     }]);
 
   app.controller('DeviceController', ['$scope', '$http', '$interval', function($scope, $http, $interval) {

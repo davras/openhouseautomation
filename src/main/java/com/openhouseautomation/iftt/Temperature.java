@@ -46,7 +46,7 @@ public class Temperature extends DeferredSensor {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Outside Temperature");
       nhnotif.setBody("Outside Temperature: " + super.sensor.getLastReading());
-      nhnotif.alwaysSend();
+      nhnotif.send();
     }
   }
 }

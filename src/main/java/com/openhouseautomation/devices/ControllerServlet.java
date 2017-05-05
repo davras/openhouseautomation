@@ -217,7 +217,7 @@ public class ControllerServlet extends HttpServlet {
         nhnotif.setBody(controller.getName() + " in MANUAL");
         nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
         nhnotif.setSubject("Controller AUTO->MANUAL");
-        nhnotif.alwaysSend();
+        nhnotif.send();
       }
       if (controller.getValidStates().contains(controllervalue)) {
         controller.setDesiredState(controllervalue);

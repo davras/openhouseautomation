@@ -32,8 +32,7 @@ public class Alarm extends DeferredController {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("Alarm Not Ready");
       nhnotif.setBody("Door/Window left open");
-      nhnotif.alwaysSend();
-      return;
+      nhnotif.send();
     }
   }
 }
