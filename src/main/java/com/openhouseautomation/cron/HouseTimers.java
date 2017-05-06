@@ -50,7 +50,6 @@ public class HouseTimers extends HttpServlet {
     doChargers();
     doBoatPump();
     turnOffHouseFan();
-    doDenLights();
     notifyTurnOnHouseFan();
     response.sendError(HttpServletResponse.SC_OK);
   }
@@ -133,34 +132,6 @@ public class HouseTimers extends HttpServlet {
       controller.setDesiredState(state);
       ofy().save().entity(controller).now();
     }
-  }
-
-  public void doDenLights() {
-    double outsidelight = Utilities.getDoubleReading("Outside Light Level");
-    // if it is dark outside, turn on the den light
-    // ranges from 0V to 3.14V
-    if (curmin > 1) {
-      return; // only change at the beginning of the hour
-    }
-    boolean lights = false;
-    if (outsidelight < 1) {
-      lights = true;
-    }
-    // turn off between midnight and 6am
-    if (curhour < 6) {
-      lights = false;
-    }
-    if (lights) {
-      setController(3640433672L, "1");
-      log.log(Level.INFO, "Turning den light on");
-    } else {
-      setController(3640433672L, "0");
-      log.log(Level.INFO, "Turning den light off");
-    }
-  }
-
-  public void sendNotification() {
-
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
