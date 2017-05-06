@@ -36,6 +36,9 @@ public class NotificationLog {
     this.body = body;
   }
   
+  public String getBody() {
+    return body;
+  }
   /**
    * @return the recipient of the notification
    */
