@@ -65,8 +65,8 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "id={0},name={1}", new Object[]{controller.getId(), controller.getName()});
     if (reqpath.startsWith("/device")) {
       // get the devices's desired state
-      out.println(controller.getId() + "=" + controller.getDesiredState() + ";" + 
-              controller.getLastDesiredStateChange().getMillis() / 1000);
+      out.println(controller.getId() + "=" + controller.getDesiredState() + ";"
+              + controller.getLastDesiredStateChange().getMillis() / 1000);
       log.log(Level.INFO, "sent device desired:{0}={1};{2}", new Object[]{controller.getId().toString(),
         controller.getDesiredState(), Long.toString(controller.getLastDesiredStateChange().getMillis() / 1000)});
     } else if (reqpath.startsWith("/display")) {
@@ -197,12 +197,12 @@ public class ControllerServlet extends HttpServlet {
                   controller.getActualState(),
                   Convutils.getNewDateTime()
                 });
-        log.log(Level.WARNING, "POST /device, cont.lastdesiredstatechange:{0}\n" +
-                "current time:{1}\n"+
-                "difference:{2}",
+        log.log(Level.WARNING, "POST /device, cont.lastdesiredstatechange:{0}\n"
+                + "current time:{1}\n"
+                + "difference:{2}",
                 new Object[]{controller.getLastDesiredStateChange().getMillis(),
                   Convutils.getNewDateTime().getMillis(),
-                  (Convutils.getNewDateTime().getMillis()-controller.getLastDesiredStateChange().getMillis())
+                  (Convutils.getNewDateTime().getMillis() - controller.getLastDesiredStateChange().getMillis())
                 });
         EventLog etl = new EventLog();
         etl.setIp(request.getRemoteAddr());
@@ -235,6 +235,24 @@ public class ControllerServlet extends HttpServlet {
     return shh.validateHash(c.getId().toString(), value, authhash);
   }
 
+  private Controller makeNewLightExpirationController() {
+    log.log(Level.WARNING, "Making a new light expiration controller");
+    Controller cexpir = new Controller();
+    cexpir.setOwner("SYSTEM");
+    cexpir.setLocation("SYSTEM");
+    cexpir.setZone("SYSTEM");
+    cexpir.setType(Controller.Type.LIGHTS);
+    cexpir.setDesiredState("0");
+    cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+    cexpir.setActualState("0");
+    cexpir.setLastDesiredStateChange(Convutils.getNewDateTime());
+    cexpir.setLastActualStateChange(Convutils.getNewDateTime());
+    cexpir.setId(1234567890L);
+    cexpir.setName("Lights");
+    cexpir.setLastContactDate(Convutils.getNewDateTime());
+    return cexpir;
+  }
+
   /**
    * Returns a short description of the servlet.
    *
@@ -245,6 +263,21 @@ public class ControllerServlet extends HttpServlet {
     return "Handles sensor reads and updates";
   }
 
+  private void checkLightControllerUnexpired() {
+    Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
+    if (cexpir == null) {
+      cexpir = makeNewLightExpirationController();
+    }
+    if (cexpir.getLastContactDate().isBefore(Convutils.getNewDateTime().minusMinutes(10))) {
+      // notify someone
+      NotificationHandler nh = new NotificationHandler();
+      nh.setSubject("Light Controller online");
+      nh.setBody("Controller online: " + cexpir.getName());
+      nh.send();
+    }
+    cexpir.setLastContactDate(Convutils.getNewDateTime());
+    ofy().save().entity(cexpir).now();
+  }
   /**
    * Handles an X10 light controller, 16 lights at a time
    *
@@ -260,36 +293,7 @@ public class ControllerServlet extends HttpServlet {
       return;
     }
     // check if unexpired
-    // TODO this model doesn't work well...
-    Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
-    if (cexpir == null) {
-      log.log(Level.WARNING, "Making a new light expiration controller");
-      cexpir = new Controller();
-      cexpir.setOwner("SYSTEM");
-      cexpir.setLocation("SYSTEM");
-      cexpir.setZone("SYSTEM");
-      cexpir.setType(Controller.Type.LIGHTS);
-      cexpir.setDesiredState("0");
-      cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-      cexpir.setActualState("0");
-      cexpir.setLastDesiredStateChange(Convutils.getNewDateTime());
-      cexpir.setLastActualStateChange(Convutils.getNewDateTime());
-      cexpir.setId(1234567890L);
-      cexpir.setName("Lights");
-      cexpir.setLastContactDate(Convutils.getNewDateTime());
-      ofy().save().entity(cexpir).now();
-    } else {
-      cexpir.setLastContactDate(Convutils.getNewDateTime());
-      ofy().save().entity(cexpir).now();
-    }
-    if (cexpir.getLastContactDate().isBefore(Convutils.getNewDateTime().minusMinutes(10))) {
-      // notify someone
-      NotificationHandler nh = new NotificationHandler();
-      nh.setSubject("Light Controller online");
-      nh.setBody("Controller online: " + cexpir.getName());
-      nh.send();
-    }
-    // end crappy model
+    checkLightControllerUnexpired();
 
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,

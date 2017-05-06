@@ -108,10 +108,6 @@ public class ListenServlet extends HttpServlet {
           out.close();
           return;
         }
-        if (out.checkError()) {
-          return;
-        }
-        // TODO(dras): how to detect if client disconnected?
         try {
           log.log(Level.INFO, "zzz...");
           Thread.sleep(pollinterval);

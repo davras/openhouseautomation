@@ -29,7 +29,6 @@ public class LocationServlet extends HttpServlet {
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
     try {
-      /* TODO(dras): output your page here. You may use following sample code. */
       out.println(location);
     } finally {
       out.close();

@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,26 +79,12 @@ public class DisplaySourceServlet extends HttpServlet {
       doListDeviceTypes(request, response);
       return;
     }
-    if (request.getPathInfo().startsWith("/login")) {
-      doLoginRequest(request, response);
-      return;
-    }
     if (request.getPathInfo().startsWith("/display/scenes")) {
       doDisplayScenes(request, response);
       return;
     }
     log.log(Level.WARNING, "unsupported path: " + request.getPathInfo());
-    response.getWriter().println("path not supported");
-  }
-
-  // TODO I dont' think this is needed anymore, but won't delete on this branch
-  private void doLoginRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // if the user is logged in, populate username
-    if (request.getUserPrincipal() != null) {
-      response.getWriter().print("[{\"username\":\"" + request.getUserPrincipal().getName() + "\"}]");
-    } else {
-      response.getWriter().print("[{\"redirecturl\":\"" + UserServiceFactory.getUserService().createLoginURL("/control.html") + "\"}]");
-    }
+    response.sendError(HttpStatus.SC_NOT_FOUND, "path not supported");
   }
 
   private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
