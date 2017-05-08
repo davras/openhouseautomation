@@ -246,7 +246,7 @@ public class DisplaySourceServlet extends HttpServlet {
     // production
     ofy().clear();
     ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, ofy().load().type(NotificationLog.class).list());
+    om.writeValue(out, ofy().load().type(NotificationLog.class).order("+lastnotification").list());
   }
   /**
    * Handles the HTTP <code>POST</code> method.
