@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.http.HttpStatus;
 import org.joda.time.DateTime;
 
 /**
@@ -176,11 +177,33 @@ public class ListenServlet extends HttpServlet {
     log.log(Level.INFO, "request path:" + reqpath);
 
     if (reqpath.startsWith("/lights")) {
-      doLightsListen(request, response);
-      return;
-    }
+      doLightsListen(request, response);    }
   }
 
+  private boolean validateInputData(List<Controller> lights, String actualstate) {
+    // validate the device presents a sane state
+    // i.e. xxxxxxxxxxxxxxxxx would be expected (boot-up), as well as
+    //      0x00x1xxxxxxxxxxx if there were 4 lights configured
+    // but  1101001xx1x0x0x10 means controllercount != devicecount
+    // so mark it dirty
+    int controllercount=lights.size();
+    int devicecount=getDeviceCount(actualstate);
+    if (controllercount == devicecount) {
+      return true;
+    }
+    return false;
+  }
+  
+  private int getDeviceCount(String actualstate) {
+    int devicecount=0;
+    for (int i=0; i < actualstate.length();i++) {
+      if (actualstate.charAt(i)!='x') {
+        devicecount++;
+      }
+    }
+    return devicecount;
+  }
+  
   private void doLightsListen(HttpServletRequest request, HttpServletResponse response) throws IOException {
     timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
     pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
@@ -197,6 +220,7 @@ public class ListenServlet extends HttpServlet {
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
     ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
+    boolean validinputdata = validateInputData(lights,actualstate);
     boolean dirty = false;
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
@@ -207,7 +231,9 @@ public class ListenServlet extends HttpServlet {
       }
       if (!curstate.equals(c.getActualState())) {
         // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
-        if (!curstate.equals("x")) {
+        // check for valid input data, as a crashing device can send garbage
+        // in that case, send back known good data and ignore the device data
+        if (!curstate.equals("x") && validinputdata) {
           log.log(Level.INFO, "updating actual and desired state, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
           c.setActualState(curstate);
           c.setLastActualStateChange(Convutils.getNewDateTime());
