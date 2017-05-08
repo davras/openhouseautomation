@@ -17,7 +17,7 @@ public class NotificationLog {
 
   @Id private Long id; //id for the log event, automatic
   private String recipient; // Who got the notification
-  private DateTime lastnotification; // The Date the last time the notification was sent
+  @Index private DateTime lastnotification; // The Date the last time the notification was sent
   @Index private String subject;
   private String body;
 
