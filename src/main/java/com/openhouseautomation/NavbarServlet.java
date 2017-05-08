@@ -61,7 +61,7 @@ public class NavbarServlet extends HttpServlet {
       );
       if (request.getUserPrincipal() != null) {
         out.println("<nav class=\"navbar\" style=\"margin-bottom: 0px; \">" +
-                "<a class=\"navbar-brand\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a>");
+                "<a class=\"navbar-brand text-center\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a>");
       }
       out.println(
               "      </nav>\n"
