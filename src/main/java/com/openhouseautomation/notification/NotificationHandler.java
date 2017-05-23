@@ -67,4 +67,8 @@ public class NotificationHandler {
     nl.setBody(body);
     ofy().save().entity(nl).now();
   }
+  public void page() {
+    recipient = DatastoreConfig.getValueForKey("pager", "nobody@example.com");
+    send();
+  }
 }

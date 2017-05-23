@@ -116,7 +116,7 @@ public class HouseTimers extends HttpServlet {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("House Fan");
       nhnotif.setBody(hfnotify);
-      nhnotif.send();
+      nhnotif.page();
     }
   }
 

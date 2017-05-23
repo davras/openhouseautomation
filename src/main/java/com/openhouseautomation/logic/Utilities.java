@@ -106,6 +106,9 @@ public class Utilities {
 
   public static double getForecastHigh(String zipcode) {
     Forecast forecast = ofy().load().type(Forecast.class).id(zipcode).now();
+    if (null == forecast.getForecastHigh() || "".equals(forecast.getForecastHigh())) {
+      return 0.0;
+    }
     return Double.parseDouble(forecast.getForecastHigh());
   }
 }
