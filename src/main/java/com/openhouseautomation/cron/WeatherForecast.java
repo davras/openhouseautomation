@@ -1,7 +1,7 @@
 package com.openhouseautomation.cron;
 
+import com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
-import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class WeatherForecast extends HttpServlet {
     try (PrintWriter out = response.getWriter()) {
       // first, get the zip code
       String zipcode = request.getParameter("zipcode");
-      if (zipcode == null || "".equals(zipcode)) {
+      if (Strings.isNullOrEmpty(zipcode)) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing zipcode");
         return;
       }
@@ -70,7 +70,6 @@ public class WeatherForecast extends HttpServlet {
         forecast = new Forecast();
         forecast.setZipCode(zipcode);
       }
-      forecast.setForecastLow(minimum);
 
       XPathExpression exprmax
               = xpath.compile("/dwml/data/parameters/temperature[@type='maximum']/value[1]");
@@ -84,6 +83,10 @@ public class WeatherForecast extends HttpServlet {
       forecast.setLastUpdate(Convutils.getNewDateTime());
 
       log.log(Level.INFO, "forecast cron took {0}ms", (System.currentTimeMillis() - curtime));
+      
+      if (Strings.isNullOrEmpty(minimum) || Strings.isNullOrEmpty(maximum)) {
+        return;
+      }
       ofy().save().entity(forecast).now();
       out.println(forecast);
     } catch (Exception e) {

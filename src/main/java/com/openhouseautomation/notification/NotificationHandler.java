@@ -69,6 +69,7 @@ public class NotificationHandler {
   }
   public void page() {
     recipient = DatastoreConfig.getValueForKey("pager", "nobody@example.com");
-    send();
+    MailNotification mn = new MailNotification();
+    mn.send(this);
   }
 }

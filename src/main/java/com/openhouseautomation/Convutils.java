@@ -1,5 +1,6 @@
 package com.openhouseautomation;
 
+import com.google.appengine.repackaged.com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -79,9 +80,7 @@ public class Convutils {
   }
 
   public static String toTitleCase(String givenString) {
-    if (null == givenString || "".equals(givenString)) {
-      return null;
-    }
+    givenString = Strings.nullToEmpty(givenString);
     String[] arr = givenString.toLowerCase().split(" ");
     StringBuilder sb = new StringBuilder();
     for (String arr1 : arr) {

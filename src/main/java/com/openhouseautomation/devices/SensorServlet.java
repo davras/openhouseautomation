@@ -4,6 +4,7 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -81,8 +82,8 @@ public class SensorServlet extends HttpServlet {
     String auth = request.getParameter("auth");
     final String sensorid = request.getParameter("k");
     final String sensorval = request.getParameter("v");
-    if (null == sensorid || "".equals(sensorid) || null == sensorval || "".equals(sensorval)) {
-      response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing value");
+    if (Strings.isNullOrEmpty(sensorid) || Strings.isNullOrEmpty(sensorval)) {
+      response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Missing id or value");
       return;
     }
     log.log(Level.INFO, "k={0},v={1}", new Object[]{sensorid, sensorval});
