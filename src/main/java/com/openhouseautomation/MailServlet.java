@@ -7,7 +7,6 @@ package com.openhouseautomation;
 
 import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.openhouseautomation.logic.HouseFan;
-import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,38 +35,25 @@ public class MailServlet extends HttpServlet {
     response.setContentType("text/html;charset=UTF-8");
     try (PrintWriter out = response.getWriter()) {
       String hfnotify = new HouseFan().notifyInManual();
-      if (!Strings.isNullOrEmpty(hfnotify)) {
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Servlet TestServlet</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>Servlet TestServlet</h1>");
-        out.println("<br>You should get a page with:");
-        out.println(hfnotify);
-        out.println("<br>");
-        out.println("</body>");
-        out.println("</html>");
-        NotificationHandler nhnotif = new NotificationHandler();
-        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
-        nhnotif.setSubject("House Fan");
-        out.println("<pre>" + hfnotify + "</pre>");
-        nhnotif.page();
-      } else {
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Servlet TestServlet</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>Servlet TestServlet</h1>");
-        out.println("<br>It's empty:");
-        out.println("<pre>" + hfnotify + "</pre>");
-        out.println("<br>");
-        out.println("</body>");
-        out.println("</html>");
+      if (Strings.isNullOrEmpty(hfnotify)) {
+        hfnotify = "It's empty.";
       }
+      out.println("<!DOCTYPE html>");
+      out.println("<html>");
+      out.println("<head>");
+      out.println("<title>Servlet TestServlet</title>");
+      out.println("</head>");
+      out.println("<body>");
+      out.println("<h1>Servlet TestServlet</h1>");
+      out.println("<br>You should get a page with:");
+      out.println("<pre>" + hfnotify + "</pre>");
+      out.println("<br>");
+      out.println("</body>");
+      out.println("</html>");
+      NotificationHandler nhnotif = new NotificationHandler();
+      nhnotif.setSubject("House Fan");
+      nhnotif.setBody(hfnotify);
+      nhnotif.page();
     }
   }
 
