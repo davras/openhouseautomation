@@ -50,7 +50,7 @@ public class NotificationHandler {
   }
 
   public void send() {
-    log.log(Level.INFO, "starting send({1})", subject);
+    log.log(Level.INFO, "starting send(" + subject + ")");
     if (recipient == null || "".equals(recipient)) {
       recipient = DatastoreConfig.getValueForKey("admin");
     }

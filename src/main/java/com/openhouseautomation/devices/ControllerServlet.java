@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.devices;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
@@ -138,7 +139,7 @@ public class ControllerServlet extends HttpServlet {
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
 
     // check that everything looks good
-    if (controller == null || "".equals(reqpath)) {
+    if (controller == null || Strings.isNullOrEmpty(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
@@ -288,7 +289,7 @@ public class ControllerServlet extends HttpServlet {
   public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
-    if (null == actualstate || "".equals(actualstate)) {
+    if (Strings.isNullOrEmpty(actualstate)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
       return;
     }
@@ -305,7 +306,7 @@ public class ControllerServlet extends HttpServlet {
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
       // safely handle new lights by setting to off
-      if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
+      if (Strings.isNullOrEmpty(c.getDesiredState())) {
         c.setDesiredState("0");
       }
 

@@ -76,8 +76,10 @@ public class HouseFan {
     computeDesiredSpeed();
     int newdesiredfanspeed = safeParseInt(wd.getTopValue());
     if (newdesiredfanspeed > 0) {
-      return "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh
+      String toret = "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh
               + "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
+      log.log(Level.WARNING, toret);
+      return toret;
     }
     return "";
   }

@@ -1,5 +1,6 @@
 package com.openhouseautomation;
 
+import com.google.common.base.Strings;
 import com.google.appengine.api.LifecycleManager;
 import com.google.apphosting.api.ApiProxy;
 import static com.openhouseautomation.OfyService.ofy;
@@ -209,7 +210,7 @@ public class ListenServlet extends HttpServlet {
     pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
     PrintWriter out = response.getWriter();
     final String actualstate = request.getParameter("v");
-    if (null == actualstate || "".equals(actualstate)) {
+    if (Strings.isNullOrEmpty(actualstate)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
       return;
     }
@@ -226,7 +227,7 @@ public class ListenServlet extends HttpServlet {
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
       // handle brand new controllers
-      if (c.getDesiredState() == null || c.getDesiredState().equals("")) {
+      if (Strings.isNullOrEmpty(c.getDesiredState())) {
         c.setDesiredState(curstate);
       }
       if (!curstate.equals(c.getActualState())) {

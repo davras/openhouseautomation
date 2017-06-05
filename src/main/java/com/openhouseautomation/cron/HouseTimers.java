@@ -1,5 +1,6 @@
 package com.openhouseautomation.cron;
 
+import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
@@ -111,7 +112,7 @@ public class HouseTimers extends HttpServlet {
       return; // only after 5pm
     }
     String hfnotify = new HouseFan().notifyInManual();
-    if (null != hfnotify && !"".equals(hfnotify)) {
+    if (!Strings.isNullOrEmpty(hfnotify)) {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
       nhnotif.setSubject("House Fan");

@@ -1,5 +1,6 @@
 package com.openhouseautomation.display;
 
+import com.google.common.base.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import static com.openhouseautomation.OfyService.ofy;
@@ -76,7 +77,7 @@ public class ArchivedReadingDataSourceServlet extends DataSourceServlet {
         if (sensor.getType() == Sensor.Type.TEMPERATURE || sensor.getType() == Sensor.Type.HUMIDITY) {
           data.addRowFromValues(cal, new Double(reading.getHigh()), new Double(reading.getLow()));
         } else if (sensor.getType() == Sensor.Type.LIGHT) {
-          if (reading.getTotal() != null && !"".equals(reading.getTotal())) {
+          if (!Strings.isNullOrEmpty(reading.getTotal())) {
             data.addRowFromValues(cal, new Double(reading.getTotal()));
           } else {
             data.addRowFromValues(cal, new Double(reading.getAverage()));

@@ -6,6 +6,7 @@
 package com.openhouseautomation.devices;
 
 import au.com.forward.sipHash.SipHash;
+import com.google.common.base.Strings;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -22,12 +23,8 @@ public class SipHashHelper {
   public SipHashHelper() { }
   
   public boolean validateHash(String id, String val, String auth) {
-    if (id == null || "".equals(id) || val == null || "".equals(val)) {
-      error = "null or blank id or value";
-      return false;
-    }
-    if (auth == null || "".equals(auth)) {
-      error = "null or blank auth";
+    if (Strings.isNullOrEmpty(id) || Strings.isNullOrEmpty(val) || Strings.isNullOrEmpty(auth)) {
+      error = "You must provide the id, value, and authorization hash";
       return false;
     }
     auth = auth.toUpperCase(); // make sure we are comparing upper case
