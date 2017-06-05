@@ -52,8 +52,8 @@ public class MailServlet extends HttpServlet {
       out.println("</body>");
       out.println("</html>");
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("pager"));
       nhnotif.setSubject("House Fan");
+      nhnotif.setBody(hfnotify);
       nhnotif.page();
     }
   }
