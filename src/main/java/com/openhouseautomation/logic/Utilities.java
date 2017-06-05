@@ -8,7 +8,6 @@ import com.openhouseautomation.model.Reading;
 import com.openhouseautomation.model.Sensor;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
