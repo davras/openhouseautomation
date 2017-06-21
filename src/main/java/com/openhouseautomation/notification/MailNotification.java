@@ -5,8 +5,6 @@
  */
 package com.openhouseautomation.notification;
 
-import com.google.apphosting.api.ApiProxy;
-import com.openhouseautomation.cron.HouseTimers;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -28,7 +26,8 @@ public class MailNotification {
   private static final Logger log = Logger.getLogger(MailNotification.class.getName());
 
   public void send(NotificationHandler nh) {
-    String sender = "notification@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)";
+    //String sender = "admin@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)";
+    String sender = "davras@gmail.com";
     String recipient = nh.getRecipient();
 
     if ("".equals(sender)) {
@@ -48,11 +47,13 @@ public class MailNotification {
       msg.setSubject(nh.getSubject());
       msg.setText(nh.getBody());
       Transport.send(msg);
-      log.log(Level.INFO, "sent e-mail");
+      log.log(Level.INFO, "sent e-mail:\nFrom:" + sender + "\nTo:" + recipient
+              + "\nSubject:" + nh.getSubject() + "\nBody:" + nh.getBody());
       // put in a log of successful notification
     } catch (MessagingException e) {
       // put in a log of failed notification
-      log.log(Level.WARNING, "Failed to send e-mail to: " + recipient + " from: " + sender);
+      log.log(Level.SEVERE, "Failed to send e-mail:\nFrom:" + sender + "\nTo:" + recipient
+              + "\nSubject:" + nh.getSubject() + "\nBody:" + nh.getBody());
     }
   }
 }
