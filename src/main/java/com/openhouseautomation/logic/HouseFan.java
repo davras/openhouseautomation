@@ -92,7 +92,7 @@ public class HouseFan {
   }
 
   public boolean setup() {
-    ofy().clear(); // clear session cache, not memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
       log.log(Level.SEVERE, "null controller");

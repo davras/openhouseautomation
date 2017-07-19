@@ -4,7 +4,6 @@ import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
-import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
@@ -85,7 +84,7 @@ public class HouseTimers extends HttpServlet {
     if (curhour == 8 && (curmin == 0 || curmin == 1)) {
       // House Fan off at 8am
       log.log(Level.INFO, "Turning off house fan");
-      ofy().clear();
+      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
       Controller controller = ofy().load().type(Controller.class).id(4280019022L).now();
       boolean dirty = false;
       if (!"0".equals(controller.getDesiredState())) {
@@ -108,8 +107,8 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void notifyTurnOnHouseFan() {
-    if (curhour < 17) {
-      return; // only after 5pm
+    if (curhour < 17 || curmin > 0) {
+      return; // from 5pm to midnight on the hour
     }
     String hfnotify = new HouseFan().notifyInManual();
     if (!Strings.isNullOrEmpty(hfnotify)) {
@@ -122,7 +121,7 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void setController(Long controllerid, String state) {
-    ofy().clear();
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
     if (controller != null && !controller.getDesiredState().equals(state)) {
       controller.setDesiredState(state);

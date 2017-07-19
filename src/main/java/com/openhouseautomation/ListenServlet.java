@@ -81,7 +81,7 @@ public class ListenServlet extends HttpServlet {
               && !LifecycleManager.getInstance().isShuttingDown()) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
-        ofy().clear(); // clear the session cache, not the memcache
+        if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
         //log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
@@ -131,7 +131,7 @@ public class ListenServlet extends HttpServlet {
   public ArrayList<Controller> arrangeRequest(HttpServletRequest req) throws IOException {
     log.log(Level.INFO, "Starting arrangeRequest");
     ArrayList<Controller> ebs = new ArrayList<>();
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     for (Enumeration<String> paramNames = req.getParameterNames(); paramNames.hasMoreElements();) {
       String controllerid = paramNames.nextElement();
       log.log(Level.INFO, "got an id:{0}", controllerid);
@@ -217,7 +217,7 @@ public class ListenServlet extends HttpServlet {
     // then return desired setting (x10 is one-way for now)
     // TODO listen for x10 signals and report them from microcontroller
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     boolean validinputdata = validateInputData(lights,actualstate);
     boolean dirty = false;
@@ -267,7 +267,7 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
-      ofy().clear(); // clear the session cache
+      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {

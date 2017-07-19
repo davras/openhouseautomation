@@ -57,7 +57,7 @@ public class ControllerServlet extends HttpServlet {
     }
     log.info("1. authorization checked");
     // load the controller entity
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
     if (controller == null || reqpath == null || "".equals(reqpath)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
@@ -135,7 +135,7 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{controllerid, controllervalue, auth});
 
     // load the controller
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
 
     // check that everything looks good
@@ -300,7 +300,7 @@ public class ControllerServlet extends HttpServlet {
     // if the actual setting is not the same as the desired setting,
     // then someone has locally overridden the setting.
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());

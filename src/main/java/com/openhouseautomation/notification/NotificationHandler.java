@@ -68,7 +68,7 @@ public class NotificationHandler {
     ofy().save().entity(nl).now();
   }
   public void page() {
-    recipient = DatastoreConfig.getValueForKey("pager", "nobody@example.com");
+    recipient = DatastoreConfig.getValueForKey("pager", DatastoreConfig.getValueForKey("admin", "nobody@example.com"));
     MailNotification mn = new MailNotification();
     mn.send(this);
   }

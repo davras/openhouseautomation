@@ -101,7 +101,7 @@ public class AddControllerServlet extends HttpServlet {
       hash.update(cont.getZone().getBytes());
       cont.setId(hash.getValue());
 
-      ofy().clear(); // clear the session cache, not the memcache
+      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
       Controller contexists = ofy().load().type(Controller.class).id(cont.getId()).now();
 
       if (contexists == null) {

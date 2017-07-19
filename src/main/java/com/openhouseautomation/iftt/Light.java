@@ -53,7 +53,7 @@ public class Light extends DeferredSensor {
   }
 
   public void setController(Long controllerid, String state) {
-    ofy().clear();
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
     if (controller != null && !controller.getDesiredState().equals(state)) {
       controller.setDesiredState(state);

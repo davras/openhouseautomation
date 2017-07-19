@@ -244,7 +244,7 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     // production
-    ofy().clear();
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     ObjectMapper om = new ObjectMapper();
     om.writeValue(out, ofy().load().type(NotificationLog.class).order("-lastnotification").list());
   }
@@ -285,7 +285,7 @@ public class DisplaySourceServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
 
     // log the event
@@ -326,7 +326,7 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     if (controllerid.equals("100")) { // all lights
-      ofy().clear(); // clear the session cache, not the memcache
+      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
       List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
       for (Controller c : lights) {
         c.setDesiredState(request.getParameter("desiredState"));
@@ -336,7 +336,7 @@ public class DisplaySourceServlet extends HttpServlet {
       ofy().save().entities(lights);
       log.log(Level.INFO, "updated all controllers");
     } else { // an individual light
-      ofy().clear(); // clear the session cache, not the memcache
+      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       String oldcontroller = controller.toString();
       String state = request.getParameter("desiredState");

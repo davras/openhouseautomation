@@ -37,7 +37,7 @@ public class ExpirationCheck extends HttpServlet {
           throws ServletException, IOException {
 
     // do all the sensors
-    ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
     List<Sensor> sensors = ofy().load().type(Sensor.class).list();
     for (Sensor s : sensors) {
       if (s.isExpired()) {

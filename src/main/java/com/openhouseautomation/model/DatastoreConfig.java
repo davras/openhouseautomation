@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * @author dras This class retrieves configuration data from the Datastore
  */
 @Entity(name = "Config")
-@Cache(expirationSeconds = 600)
+@Cache(expirationSeconds = 7200)
 public class DatastoreConfig {
 
   @Ignore
