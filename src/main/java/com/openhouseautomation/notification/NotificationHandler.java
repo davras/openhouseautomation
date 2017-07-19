@@ -54,22 +54,44 @@ public class NotificationHandler {
     if (recipient == null || "".equals(recipient)) {
       recipient = DatastoreConfig.getValueForKey("admin");
     }
+    if (!duplicatePage()) {
+      // get the notification entry for this subject
+      NotificationLog nl = ofy().load().type(NotificationLog.class)
+              .filter("subject", subject).first().now();
+      if (nl == null) {
+        nl = new NotificationLog();
+        nl.setRecipient(recipient);
+        nl.setSubject(subject);
+      }
+      nl.setLastnotification(Convutils.getNewDateTime());
+      nl.setBody(body);
+      ofy().save().entity(nl).now();
+    }
+  }
 
+  public void page() {
+    if (!duplicatePage()) {
+      recipient = DatastoreConfig.getValueForKey("pager", DatastoreConfig.getValueForKey("admin", "nobody@example.com"));
+      MailNotification mn = new MailNotification();
+      mn.send(this);
+    } else {
+      log.log(Level.FINE, "suppressing duplicate page");
+    }
+  }
+
+  public boolean duplicatePage() {
     // get the notification entry for this subject
     NotificationLog nl = ofy().load().type(NotificationLog.class)
             .filter("subject", subject).first().now();
     if (nl == null) {
-      nl = new NotificationLog();
-      nl.setRecipient(recipient);
-      nl.setSubject(subject);
+      // happens when there are no previous notifications
+      return false;
     }
     nl.setLastnotification(Convutils.getNewDateTime());
     nl.setBody(body);
     ofy().save().entity(nl).now();
-  }
-  public void page() {
-    recipient = DatastoreConfig.getValueForKey("pager", DatastoreConfig.getValueForKey("admin", "nobody@example.com"));
-    MailNotification mn = new MailNotification();
-    mn.send(this);
+    // returns true if the last notification was within the last 4 hrs.
+    // returns false otherwise
+    return !nl.getLastnotification().isBefore(Convutils.getNewDateTime().minusHours(4));
   }
 }

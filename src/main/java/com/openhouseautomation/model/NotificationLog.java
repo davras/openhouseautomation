@@ -27,14 +27,23 @@ public class NotificationLog {
   public NotificationLog() {
   }
 
+  /** 
+   * Sets the body of the message
+   * @param body String with message to send as body
+   */
   public void setBody(String body) {
     this.body = body;
   }
   
+  /** 
+   * Gets the body of the message
+   * @return String with body of message
+   */
   public String getBody() {
     return body;
   }
   /**
+   * Gets the recipient of the message
    * @return the recipient of the notification
    */
   public String getRecipient() {
@@ -49,7 +58,8 @@ public class NotificationLog {
   }
 
   /**
-   * @return the Date the last notification was sent
+   * Gets the DateTime the last notification was sent
+   * @return the DateTime the last notification was sent
    */
   public DateTime getLastnotification() {
     return lastnotification;
@@ -62,13 +72,23 @@ public class NotificationLog {
     this.lastnotification = lastnotification;
   }
 
+  /**
+   * Returns a human readable string with the last notification time
+   * @return String with human readable time, like "2 hours ago"
+   */
   public String getHumantime() {
     return Convutils.timeAgoToString(this.lastnotification.getMillis() / 1000);
   }
+
+  /**
+   * Returns millisecond timestamp of the message
+   * @return long with millisecond timestamp
+   */
   public long getNotificationtime() {
     return lastnotification.getMillis();
   }
   /**
+   * Gets the subject of the message
    * @return the subject
    */
   public String getSubject() {
@@ -76,6 +96,7 @@ public class NotificationLog {
   }
 
   /**
+   * Sets the subject of the message
    * @param subject the subject to set
    */
   public void setSubject(String subject) {
@@ -83,7 +104,8 @@ public class NotificationLog {
   }
 
   /**
-   * @return the id
+   * Gets the ID of this notification message
+   * @return Long
    */
   public Long getId() {
     return id;

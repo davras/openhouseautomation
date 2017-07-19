@@ -190,7 +190,7 @@ public class HouseFan {
 
   public void computeDesiredSpeed() {
     // compute setpoint based on forecast high for tomorrow
-    setpoint = (forecasthigh * -2 / 5) + 102;
+    setpoint = (forecasthigh * -2 / 5) + 100;
     int desiredfanspeedtemperatureforecast = Math.min(new Double(insidetemp - setpoint).intValue(), 5);
     wd.addElement("Recording Setpoint", 1000, setpoint);
     wd.addElement("Fan Speed from Forecast", 20, desiredfanspeedtemperatureforecast);

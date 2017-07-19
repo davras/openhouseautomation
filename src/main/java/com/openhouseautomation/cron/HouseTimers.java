@@ -93,7 +93,7 @@ public class HouseTimers extends HttpServlet {
         nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
         nhnotif.setSubject("Fan Speed");
         nhnotif.setBody("Turned off House Fan");
-        nhnotif.send();
+        nhnotif.page();
         dirty = true;
       }
       if (!Controller.DesiredStatePriority.MANUAL.equals(controller.getDesiredStatePriority())) {
@@ -114,7 +114,7 @@ public class HouseTimers extends HttpServlet {
     if (!Strings.isNullOrEmpty(hfnotify)) {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
-      nhnotif.setSubject("House Fan");
+      nhnotif.setSubject("Recommend House Fan in AUTO");
       nhnotif.setBody(hfnotify);
       nhnotif.page();
     }
