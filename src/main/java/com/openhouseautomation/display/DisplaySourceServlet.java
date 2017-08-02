@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.common.base.Strings;
 import com.googlecode.objectify.cmd.Query;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
@@ -199,7 +200,14 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     // production
     String type = request.getParameter("type");
-    // doesn't change frequently, no need to clear ofy() session cache
+    // only lights change quickly, so clear the instance cache
+    // to catch when the light controller reports an update
+    // so we can update the web page faster
+    if (!Strings.isNullOrEmpty(type) && "lights".equalsIgnoreCase(type)) {
+      ofy().clear();
+    }
+    // the rest of the controllers don't change frequently, so
+    // no need to clear ofy() session cache
     ObjectMapper om = new ObjectMapper();
     om.writeValue(out, ofy().load().type(Controller.class).filter("type", type).list());
   }

@@ -130,10 +130,12 @@
         devices.data = []; // clear the current data
         devices.currenttab = newval; // save the new tab
         console.log("tab set to " + newval);
+        devices.lastcomm = 0;
+        devices.fastpull = true;
         // immediately load the controller data for this device
-        $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).then(function successCallback(response) {
-          devices.data = response.data;  // now filled with new tab's data
-        });
+        //$http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab).then(function successCallback(response) {
+        //  devices.data = response.data;  // now filled with new tab's data
+        //});
       };
       this.isSet = function(tabname) {
         return devices.currenttab == tabname;
@@ -168,6 +170,7 @@
         $scope.id = id;
         $scope.state = state;
         console.log("a button was pushed:" + id + "=>" + state);
+        devices.fastpull = true;
         var len = devices.data.length;
         for (var p = 0; p < len; p++) {
           if ($scope.id === devices.data[p].id) {
@@ -186,10 +189,9 @@
             return str.join("&");
           },
           data: {id: $scope.id, desiredState: $scope.state}
-        }).success(function() {
-          // should check for a 200 return
+        }).then(function() {
+          devices.fastpull = true;
         });
-        devices.fastpull = true;
       };
 
       $scope.processFormDSP = function(id, state) {

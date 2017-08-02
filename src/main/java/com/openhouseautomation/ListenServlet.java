@@ -217,7 +217,7 @@ public class ListenServlet extends HttpServlet {
     // then return desired setting (x10 is one-way for now)
     // TODO listen for x10 signals and report them from microcontroller
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
     boolean validinputdata = validateInputData(lights,actualstate);
     boolean dirty = false;
@@ -267,7 +267,7 @@ public class ListenServlet extends HttpServlet {
     while (ApiProxy.getCurrentEnvironment().getRemainingMillis() > timeout && !out.checkError() && !foundachange) {
       // do we have new info to hand back?
       // walk the ArrayList, load each Controller, compare values against original
-      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+      ofy().clear(); // clear the session cache, not the memcache
       for (Controller controllercompareinitial : cinitial) {
         Controller controllernew = null;
         try {
