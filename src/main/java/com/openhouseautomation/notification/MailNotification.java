@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.notification;
 
+import com.google.api.client.util.Strings;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -30,11 +31,11 @@ public class MailNotification {
     String sender = "davras@gmail.com";
     String recipient = nh.getRecipient();
 
-    if ("".equals(sender)) {
+    if (Strings.isNullOrEmpty(sender)) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
       sender = DatastoreConfig.getValueForKey("admin", "bob@example.com");
-      if (null == sender || "".equals(sender)) {
+      if (Strings.isNullOrEmpty(sender)) {
         return;
       }
     }
@@ -43,6 +44,7 @@ public class MailNotification {
       Session session = Session.getDefaultInstance(props, null);
       Message msg = new MimeMessage(session);
       msg.setFrom(new InternetAddress(sender));
+      msg.setReplyTo(new InternetAddress[]{new InternetAddress("pager-reply@gautoard.appspotmail.com")});
       msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
       msg.setSubject(nh.getSubject());
       msg.setText(nh.getBody());
