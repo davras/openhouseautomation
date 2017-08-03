@@ -92,10 +92,15 @@ public class HouseFan {
   }
 
   public boolean setup() {
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
       log.log(Level.SEVERE, "null controller");
+      return false;
+    }
+    Controller alarm = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
+    if (alarm.getActualState().equalsIgnoreCase("Away")) {
+      // don't check house fan if nobody is home
       return false;
     }
     return true;
