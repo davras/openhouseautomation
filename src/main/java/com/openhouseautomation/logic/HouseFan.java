@@ -98,11 +98,6 @@ public class HouseFan {
       log.log(Level.SEVERE, "null controller");
       return false;
     }
-    Controller alarm = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
-    if (alarm.getActualState().equalsIgnoreCase("Away")) {
-      // don't check house fan if nobody is home
-      return false;
-    }
     return true;
   }
 
@@ -271,7 +266,7 @@ public class HouseFan {
 
   public void sendNotification() {
     NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     nhnotif.send();

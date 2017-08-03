@@ -59,7 +59,7 @@ public class Light extends DeferredSensor {
       controller.setDesiredState(state);
       ofy().save().entity(controller).now();
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Den Lights");
       if ("1".equals(state)) {
         nhnotif.setBody("Lights On");

@@ -33,7 +33,7 @@ public class MailNotification {
     if ("".equals(sender)) {
       // will change s~gautoard to gautoard with substring
       // will not work on Master-Slave apps
-      sender = DatastoreConfig.getValueForKey("admin");
+      sender = DatastoreConfig.getValueForKey("admin", "bob@example.com");
       if (null == sender || "".equals(sender)) {
         return;
       }

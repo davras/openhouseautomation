@@ -46,7 +46,7 @@ public class HouseTimers extends HttpServlet {
     doBoatPump();
     turnOffHouseFan();
     notifyTurnOnHouseFan();
-    response.sendError(HttpServletResponse.SC_OK);
+    response.setStatus(HttpServletResponse.SC_OK);
   }
 
   public void updateTime() {
@@ -61,19 +61,19 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Turning boat pump on");
       setController(3960328784L, "1");
     } else if (curmin == 1) {
-      // turn off 1 mon after every hour
+      // turn off 1 min after every hour
       log.log(Level.INFO, "Turning boat pump off");
       setController(3960328784L, "0");
     }
   }
 
   public void doChargers() {
-    if (curhour == 23 && (curmin == 0 || curmin == 1)) {
+    if (curhour == 23 && curmin < 2) {
       // Charger on at 11pm
       log.log(Level.INFO, "Turning chargers on");
       setController(91125605L, "1");
     }
-    if (curhour == 8 && (curmin == 0 || curmin == 1)) {
+    if (curhour == 8 && curmin < 2) {
       // Charger off at 8am
       log.log(Level.INFO, "Turning chargers off");
       setController(91125605L, "0");
@@ -81,7 +81,7 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void turnOffHouseFan() {
-    if (curhour == 8 && (curmin == 0 || curmin == 1)) {
+    if (curhour == 8 && curmin < 2) {
       // House Fan off at 8am
       log.log(Level.INFO, "Turning off house fan");
       if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
@@ -90,7 +90,7 @@ public class HouseTimers extends HttpServlet {
       if (!"0".equals(controller.getDesiredState())) {
         controller.setDesiredState("0");
         NotificationHandler nhnotif = new NotificationHandler();
-        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
         nhnotif.setSubject("Fan Speed");
         nhnotif.setBody("Turned off House Fan");
         nhnotif.page();
@@ -110,10 +110,15 @@ public class HouseTimers extends HttpServlet {
     if (curhour < 17 || curmin > 0) {
       return; // from 5pm to midnight on the hour
     }
+    Controller alarm = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
+    if (alarm.getActualState().equalsIgnoreCase("Away")) {
+      // don't check house fan if nobody is home
+      return;
+    }
     String hfnotify = new HouseFan().notifyInManual();
     if (!Strings.isNullOrEmpty(hfnotify)) {
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Recommend House Fan in AUTO");
       nhnotif.setBody(hfnotify);
       nhnotif.page();

@@ -43,7 +43,7 @@ public class Temperature extends DeferredSensor {
   public void logTestNotification() {
     if (super.sensor.getId() == 2154791004L) {
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Outside Temperature");
       nhnotif.setBody("Outside Temperature: " + super.sensor.getLastReading());
       nhnotif.send();

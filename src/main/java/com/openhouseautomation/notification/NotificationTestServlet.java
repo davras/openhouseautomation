@@ -36,7 +36,7 @@ public class NotificationTestServlet extends HttpServlet {
           throws ServletException, IOException {
     response.setContentType("text/plain");
     PrintWriter out = response.getWriter();
-    String recipient = DatastoreConfig.getValueForKey("admin");
+    String recipient = DatastoreConfig.getValueForKey("admin", "bob@example.com");
     try {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(recipient);

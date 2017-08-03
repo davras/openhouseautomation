@@ -29,7 +29,7 @@ public class Alarm extends DeferredController {
             && super.controller.getLastActualStateChange().plusMinutes(5).isBeforeNow()) {
       // a door or window was left open for > 5 mins
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Alarm Not Ready");
       nhnotif.setBody("Door/Window left open");
       nhnotif.send();
