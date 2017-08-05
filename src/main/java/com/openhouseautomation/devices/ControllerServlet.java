@@ -216,7 +216,7 @@ public class ControllerServlet extends HttpServlet {
         // send notification of manual transition
         NotificationHandler nhnotif = new NotificationHandler();
         nhnotif.setBody(controller.getName() + " in MANUAL");
-        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+        nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
         nhnotif.setSubject("Controller AUTO->MANUAL");
         nhnotif.send();
       }

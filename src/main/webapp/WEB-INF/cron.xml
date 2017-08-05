@@ -9,7 +9,7 @@
   <cron>
     <url>/cron/datastorelogtruncator</url>
     <description>Remove old log entries from the Datastore</description>
-    <schedule>every day 01:00</schedule>
+    <schedule>every day 12:00</schedule>
     <timezone>America/Los_Angeles</timezone>
   </cron>
   <cron>

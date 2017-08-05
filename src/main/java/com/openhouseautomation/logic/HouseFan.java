@@ -92,7 +92,7 @@ public class HouseFan {
   }
 
   public boolean setup() {
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
       log.log(Level.SEVERE, "null controller");
@@ -266,7 +266,7 @@ public class HouseFan {
 
   public void sendNotification() {
     NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     nhnotif.send();

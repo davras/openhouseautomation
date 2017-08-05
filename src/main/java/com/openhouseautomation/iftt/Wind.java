@@ -21,7 +21,7 @@ public class Wind extends DeferredSensor {
 
     // now that we are done sanity checking
     NotificationHandler nhnotif = new NotificationHandler();
-    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin"));
+    nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
     nhnotif.setSubject("High Wind Warning");
     if (fold < 30 && fnew > 30) {
       nhnotif.setBody("High Winds: " + fnew + " mph");

@@ -52,7 +52,7 @@ public class NotificationHandler {
   public void send() {
     log.log(Level.INFO, "starting send(" + subject + ")");
     if (recipient == null || "".equals(recipient)) {
-      recipient = DatastoreConfig.getValueForKey("admin");
+      recipient = DatastoreConfig.getValueForKey("admin", "bob@example.com");
     }
     if (!duplicatePage()) {
       // get the notification entry for this subject

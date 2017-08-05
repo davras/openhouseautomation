@@ -81,8 +81,9 @@ public class ListenServlet extends HttpServlet {
               && !LifecycleManager.getInstance().isShuttingDown()) {
         // do we have new info to hand back?
         // walk the ArrayList, load each Controller, compare values against original
-        if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
-        //log.log(Level.INFO, "cleared cache");
+        if (com.openhouseautomation.Flags.clearCache) {
+          ofy().clear(); // clear the session cache, not the memcache
+        }        //log.log(Level.INFO, "cleared cache");
         for (Controller controllercompareinitial : cinitial) {
           Controller controllernew = ofy().load().type(Controller.class).id(controllercompareinitial.getId()).now();
           // this block should handle memcache flushes
@@ -131,7 +132,9 @@ public class ListenServlet extends HttpServlet {
   public ArrayList<Controller> arrangeRequest(HttpServletRequest req) throws IOException {
     log.log(Level.INFO, "Starting arrangeRequest");
     ArrayList<Controller> ebs = new ArrayList<>();
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
     for (Enumeration<String> paramNames = req.getParameterNames(); paramNames.hasMoreElements();) {
       String controllerid = paramNames.nextElement();
       log.log(Level.INFO, "got an id:{0}", controllerid);
@@ -170,13 +173,14 @@ public class ListenServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-// handles sensor updates
+    // handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
     log.log(Level.INFO, "request path:" + reqpath);
 
     if (reqpath.startsWith("/lights")) {
-      doLightsListen(request, response);    }
+      doLightsListen(request, response);
+    }
   }
 
   private boolean validateInputData(List<Controller> lights, String actualstate) {
@@ -185,24 +189,24 @@ public class ListenServlet extends HttpServlet {
     //      0x00x1xxxxxxxxxxx if there were 4 lights configured
     // but  1101001xx1x0x0x10 means controllercount != devicecount
     // so mark it dirty
-    int controllercount=lights.size();
-    int devicecount=getDeviceCount(actualstate);
+    int controllercount = lights.size();
+    int devicecount = getDeviceCount(actualstate);
     if (controllercount == devicecount) {
       return true;
     }
     return false;
   }
-  
+
   private int getDeviceCount(String actualstate) {
-    int devicecount=0;
-    for (int i=0; i < actualstate.length();i++) {
-      if (actualstate.charAt(i)!='x') {
+    int devicecount = 0;
+    for (int i = 0; i < actualstate.length(); i++) {
+      if (actualstate.charAt(i) != 'x') {
         devicecount++;
       }
     }
     return devicecount;
   }
-  
+
   private void doLightsListen(HttpServletRequest request, HttpServletResponse response) throws IOException {
     timeout = Long.parseLong(DatastoreConfig.getValueForKey("listentimeoutms", "8000"));
     pollinterval = Long.parseLong(DatastoreConfig.getValueForKey("listenpollintervalms", "2500"));
@@ -219,7 +223,7 @@ public class ListenServlet extends HttpServlet {
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
     ofy().clear(); // clear the session cache, not the memcache
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
-    boolean validinputdata = validateInputData(lights,actualstate);
+    boolean validinputdata = validateInputData(lights, actualstate);
     boolean dirty = false;
     for (Controller c : lights) {
       int lightnum = Integer.parseInt(c.getZone());
@@ -257,6 +261,7 @@ public class ListenServlet extends HttpServlet {
     if (dirty) {
       ofy().save().entities(lights).now();
       log.log(Level.INFO, "fast returning " + new String(toret));
+      response.setStatus(HttpServletResponse.SC_OK);
       out.print(new String(toret));
       out.flush();
       return;
