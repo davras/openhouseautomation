@@ -17,18 +17,19 @@ public class Convutils {
 
   static String timezone = "America/Los_Angeles";
 
+  public static String timeAgoToString(DateTime dt) {
+    return timeAgoToString(dt.getMillis()/1000);
+  }
   /**
    * Converts seconds to a human-eyeball friendly format
    *
-   * @param secs
+   * @param secsago
    * @return A human readable String
    */
-  public static String timeAgoToString(long secs) {
-    long thistime = System.currentTimeMillis() / 1000;
-    long eventtime = secs;
-    long timeago = thistime - eventtime;
+  public static String timeAgoToString(long secsago) {
+    long timeago = (System.currentTimeMillis() / 1000) - secsago;
     if (timeago < 0) {
-      return "unknown: " + eventtime;
+      return "unknown: " + secsago;
     }
     if (timeago < 60) { // up to one minute
       return timeago + " seconds ago";

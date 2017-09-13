@@ -1,14 +1,15 @@
 package com.openhouseautomation.logic;
 
+import org.joda.time.DateTime;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.Sensor;
-import org.joda.time.DateTime;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -26,6 +27,7 @@ public class TestHouseFan {
   Sensor insidesensor;
 
   public TestHouseFan() {
+    JodaTimeTranslators.add(ObjectifyService.factory());
     ObjectifyService.register(Controller.class);
   }
   private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
@@ -52,6 +54,7 @@ public class TestHouseFan {
   @Test
   public void testSetup() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
   }
@@ -59,6 +62,7 @@ public class TestHouseFan {
   @Test
   public void testConsiderStatePriority() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     boolean result = hftester.considerStatePriority();
@@ -68,6 +72,7 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeAuto() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertTrue(hftester.considerControlMode());
@@ -77,6 +82,7 @@ public class TestHouseFan {
   public void testConsiderControlModeManual() {
     // test the positives as well
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());
@@ -85,6 +91,7 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeLocal() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.LOCAL);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());
@@ -93,6 +100,7 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeEmergency() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
+    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());

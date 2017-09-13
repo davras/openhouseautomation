@@ -6,6 +6,7 @@
 package com.openhouseautomation.notification;
 
 import com.google.api.client.util.Strings;
+import com.google.apphosting.api.ApiProxy;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -27,8 +28,7 @@ public class MailNotification {
   private static final Logger log = Logger.getLogger(MailNotification.class.getName());
 
   public void send(NotificationHandler nh) {
-    //String sender = "admin@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)";
-    String sender = "davras@gmail.com";
+    String sender = "admin@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)";
     String recipient = nh.getRecipient();
 
     if (Strings.isNullOrEmpty(sender)) {

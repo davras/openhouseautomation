@@ -1,5 +1,6 @@
 package com.openhouseautomation.logic;
 
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
@@ -95,7 +96,12 @@ public class HouseFan {
     ofy().clear(); // clear session cache, not memcache
     controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
     if (controller == null) {
-      log.log(Level.SEVERE, "null controller");
+      log.log(Level.SEVERE, "Controller not found: Whole House Fan");
+      return false;
+    }
+    if (controller.isExpired()) {
+      log.log(Level.WARNING, "Controller offline: {0}", 
+              Convutils.timeAgoToString(controller.getLastContactDate()));
       return false;
     }
     return true;
