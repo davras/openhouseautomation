@@ -26,6 +26,6 @@ public class Wind extends DeferredSensor {
     if (fold < 30 && fnew > 30) {
       nhnotif.setBody("High Winds: " + fnew + " mph");
     }
-    nhnotif.send();
+    nhnotif.page();
   }
 }

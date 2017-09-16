@@ -45,7 +45,7 @@ public class ExpirationCheck extends HttpServlet {
         NotificationHandler nh = new NotificationHandler();
         nh.setSubject("Sensor OFFLINE: " + s.getName());
         nh.setBody("Sensor OFFLINE: " + s.getName());
-        nh.send();
+        nh.page();
       }
     }
 
@@ -57,7 +57,7 @@ public class ExpirationCheck extends HttpServlet {
         NotificationHandler nh = new NotificationHandler();
         nh.setSubject("Controller OFFLINE: " + c.getName());
         nh.setBody("Controller OFFLINE: " + c.getName());
-        nh.send();
+        nh.page();
       }
     }
     

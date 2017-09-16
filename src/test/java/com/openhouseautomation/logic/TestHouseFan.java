@@ -44,6 +44,7 @@ public class TestHouseFan {
     outsidesensor.setName("Outside Temperature");
     insidesensor = new Sensor();
     insidesensor.setName("Inside Temperature");
+    controller.setLastContactDate(Convutils.getNewDateTime());
   }
 
   @After
@@ -54,7 +55,6 @@ public class TestHouseFan {
   @Test
   public void testSetup() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
   }
@@ -62,7 +62,6 @@ public class TestHouseFan {
   @Test
   public void testConsiderStatePriority() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     boolean result = hftester.considerStatePriority();
@@ -72,7 +71,6 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeAuto() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertTrue(hftester.considerControlMode());
@@ -82,7 +80,6 @@ public class TestHouseFan {
   public void testConsiderControlModeManual() {
     // test the positives as well
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());
@@ -91,7 +88,6 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeLocal() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.LOCAL);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());
@@ -100,7 +96,6 @@ public class TestHouseFan {
   @Test
   public void testConsiderControlModeEmergency() {
     controller.setDesiredStatePriority(Controller.DesiredStatePriority.EMERGENCY);
-    controller.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(controller).now();
     assertTrue(hftester.setup());
     assertFalse(hftester.considerControlMode());

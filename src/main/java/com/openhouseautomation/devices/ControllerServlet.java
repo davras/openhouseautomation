@@ -157,7 +157,7 @@ public class ControllerServlet extends HttpServlet {
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Controller online: " + controller.getName());
       nh.setBody("Controller online: " + controller.getName());
-      nh.send();
+      nh.page();
     }
     controller.setLastContactDate(Convutils.getNewDateTime());
     // handle device requests
@@ -274,7 +274,7 @@ public class ControllerServlet extends HttpServlet {
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Light Controller online");
       nh.setBody("Controller online: " + cexpir.getName());
-      nh.send();
+      nh.page();
     }
     cexpir.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(cexpir).now();

@@ -49,7 +49,7 @@ public class Rain extends DeferredSensor {
       nhnotif.setBody("Rain stopped");
     }
     if (nhnotif.getBody() != null && !"".equals(nhnotif.getBody())) {
-      nhnotif.send();
+      nhnotif.page();
     }
   }
 }

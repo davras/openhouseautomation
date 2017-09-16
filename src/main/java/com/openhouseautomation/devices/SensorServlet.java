@@ -109,7 +109,7 @@ public class SensorServlet extends HttpServlet {
       NotificationHandler nh = new NotificationHandler();
       nh.setSubject("Sensor online");
       nh.setBody("Sensor online: " + sensor.getName());
-      nh.send();
+      nh.page();
     }
 
     // set the value
