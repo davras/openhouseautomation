@@ -30,7 +30,15 @@
       MANUAL
     </label>
   </div>
-    <img ng-show="device.expired" src="/images/ic_cloud_off_black_24dp.png" height="45" width="45"/>
-    <img ng-show="device.desiredState != device.actualState" 
-         src="/images/ic_cloud_upload_grey600_24dp.png" height="45" width="45"/>
+  <img ng-show="device.expired" src="/images/ic_cloud_off_black_24dp.png" height="45" width="45"/>
+
+  <div class="container-fluid list-group" ng-controller="WDSController as wdsc">
+    
+    <ul class="list-group">
+      <li class="list-group-item" ng-repeat="wdl in wdsc.data">
+          {{wdl}}
+      </li>
+    </ul>
+    <hr/>
+  </div>
 </div>

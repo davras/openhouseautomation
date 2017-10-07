@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
@@ -26,6 +27,7 @@ public class Forecast {
     String forecasthigh;
     String forecastlow;
     String forecastpop;
+    @JsonIgnore
     DateTime lastupdate;
     
     public Forecast() {

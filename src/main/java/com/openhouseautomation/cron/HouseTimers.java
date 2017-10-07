@@ -4,6 +4,7 @@ import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
+import com.openhouseautomation.logic.WeightedDecision;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
@@ -115,8 +116,12 @@ public class HouseTimers extends HttpServlet {
       // don't check house fan if nobody is home
       return;
     }
-    String hfnotify = new HouseFan().notifyInManual();
+    HouseFan hf = new HouseFan();
+    String hfnotify = hf.notifyInManual();
     if (!Strings.isNullOrEmpty(hfnotify)) {
+      WeightedDecision wd = hf.getWeightedDecision();
+      wd.setId(4280019022L);
+      ofy().save().entity(wd);
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Recommend House Fan in AUTO");

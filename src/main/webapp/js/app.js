@@ -20,6 +20,10 @@
   /**
    * @const
    */
+  WDS_DATA_URL = "/status/display/wds";
+  /**
+   * @const
+   */
   DEVICE_TYPE_LIST_URL = "/status/devicetypelist";
   /**
    * @const
@@ -68,6 +72,15 @@
       $http.get(FORECAST_DATA_URL)
               .then(function successCallback(response) {
                 forecasts.data = response.data;
+              });
+    }]);
+
+  app.controller('WDSController', ['$http', function($http) {
+      var wds = this;
+      wds.data = [];
+      $http.get(WDS_DATA_URL)
+              .then(function successCallback(response) {
+                wds.data = response.data;
               });
     }]);
 

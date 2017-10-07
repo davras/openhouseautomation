@@ -5,6 +5,9 @@
  */
 package com.openhouseautomation.logic;
 
+import com.googlecode.objectify.annotation.Cache;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -12,12 +15,17 @@ import java.util.PriorityQueue;
  *
  * @author dras
  */
+@Entity
+@Cache
 public class WeightedDecision {
 
+  @Id
+  public Long id; //id of the controller that used this WD.
+  
   // store data
-  PriorityQueue<DecisionElement> queue = new PriorityQueue<>(20, new WDsort());
-
-  static class WDsort implements Comparator<DecisionElement> {
+  PriorityQueue<DecisionElement> queue = new PriorityQueue<>(10, new WDsort());
+  
+  private class WDsort implements Comparator<DecisionElement> {
 
     @Override
     public int compare(DecisionElement one, DecisionElement two) {
@@ -25,9 +33,9 @@ public class WeightedDecision {
     }
   }
 
-  static class DecisionElement {
-
-    public DecisionElement(String name, int weight, Object value) {
+  private static class DecisionElement {
+    
+    private DecisionElement(String name, int weight, Object value) {
       this.name = name;
       this.weight = weight;
       this.value = value;
@@ -58,15 +66,16 @@ public class WeightedDecision {
   public String getTopName() {
     return queue.peek().getName();
   }
-  @Override
-  public String toString() {
+
+  public String toJSONString() {
     String toret = "[";
     for (DecisionElement de: queue) {
-      toret += "{" + de.name + ", " + de.weight + ", " + de.value + "},";
+      toret += "{\"name\": \"" + de.name + "\","
+              + "\"weight\": \"" + de.weight + "\","
+              + "\"value\": \"" + de.value + "\"},";
     }
     //remove last comma
-    toret = toret.substring(0,toret.length()-1);
-    return toret + "]";
+    return toret.substring(0,toret.length()-1) + "]";
   }
   public String toMessage() {
     String toret = "";
@@ -74,5 +83,8 @@ public class WeightedDecision {
       toret += de.name + ": " + de.value + " (Weight: " + de.weight + ")\n";
     }
     return toret;
+  }
+  public void setId(Long id) {
+    this.id = id;
   }
 }

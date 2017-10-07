@@ -104,7 +104,8 @@ public class Controller implements Serializable {
   public Integer expirationtime; // if no update occurs within this time, the controller is 'expired'
   @Ignore
   private String previousstate; // the previous actual state
-
+  private String decision; // holds JSON of why this controller is in the current state
+  
   /**
    * Empty constructor for objectify.
    */
@@ -148,7 +149,8 @@ public class Controller implements Serializable {
     dfc.setController(this);
     queue.add(TaskOptions.Builder.withPayload(dfc));
   }
-
+  
+  // TODO this is crappy change detection
   @OnLoad
   void backupLastReading() {
     setPreviousState(getActualState());
@@ -454,4 +456,10 @@ public class Controller implements Serializable {
     this.validstates = validstates;
   }
 
+  public String getDecision() {
+    return decision;
+  }
+  public void setDecision(String decision) {
+    this.decision = decision;
+  }
 }

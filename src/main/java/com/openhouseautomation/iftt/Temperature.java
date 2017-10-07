@@ -5,12 +5,13 @@
  */
 package com.openhouseautomation.iftt;
 
+import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
-import com.openhouseautomation.model.DatastoreConfig;
-import com.openhouseautomation.notification.NotificationHandler;
+import com.openhouseautomation.model.Controller;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpStatus;
 
 /**
  *
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
 public class Temperature extends DeferredSensor {
 
   public static final Logger log = Logger.getLogger(Temperature.class.getName());
+
   @Override
   public void run() {
     Float fold = null, fnew = null;
@@ -35,9 +37,20 @@ public class Temperature extends DeferredSensor {
             || sensor.getName().equals("Inside Temperature")) {
       HouseFan hf = new HouseFan();
       hf.process();
-      log.log(Level.INFO, "Decision:" + hf.getWeightedDecision().toMessage());
-      new HouseFan().process();
+      // this part sucks
+      // have to reload the controller, put in the decision, save it again
+      // TODO find a better way
+      // problem is that the hf.process() can bail out early, which saves DS reads
+      // but causes one extra write
+      Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+      if (controller == null) {
+        log.log(Level.SEVERE, "Controller not found: Whole House Fan");
+        return;
+      }
+      controller.setDecision(hf.getWeightedDecision().toJSONString());
+      ofy().save().entity(controller).now();
+      // end suckage
+      log.log(Level.INFO, "Temperature.WHF.Decision:" + hf.getWeightedDecision().toMessage());
     }
   }
-  
 }

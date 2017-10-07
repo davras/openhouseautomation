@@ -116,7 +116,6 @@ public class HouseFan {
     // check for EMERGENCY
     if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.EMERGENCY) {
       wd.addElement("DesiredStatePriority", 1, 5); // full speed
-      log.log(Level.WARNING, wd.toString());
       return false;
     }
     return true;
@@ -131,7 +130,6 @@ public class HouseFan {
     // skip everything if the controller is not in AUTO
     if (controller.getDesiredStatePriority() != Controller.DesiredStatePriority.AUTO) {
       wd.addElement("Reading DesiredStatePriority", 1000, "Not in " + Controller.DesiredStatePriority.AUTO.name());
-      log.log(Level.INFO, wd.toString());
       return false;
     }
     return true;
@@ -157,7 +155,6 @@ public class HouseFan {
     // do not run fan when outside is hotter than inside
     if (outsidetemp > (insidetemp - 1)) {
       wd.addElement("It is hotter outside than inside", 5, 0);
-      log.log(Level.INFO, wd.toString());
       return true; // return true so that fan speed processing will happen
     }
     return false;
@@ -243,13 +240,11 @@ public class HouseFan {
       wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
     }
     // if no changes are necessary
-    log.log(Level.INFO, wd.toString());
     if (olddesiredfanspeed == newfanspeed) {
       log.log(Level.INFO, "No changes needed");
       return;
     }
-
-    // save new speed
+    // otherwise, save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
     ofy().save().entity(controller);
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
@@ -276,5 +271,10 @@ public class HouseFan {
     nhnotif.setSubject("Fan Speed");
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     nhnotif.send();
+  }
+  public void saveDecision() {
+    if (controller == null) {
+      controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+    } 
   }
 }

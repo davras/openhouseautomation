@@ -3,11 +3,12 @@ package com.openhouseautomation.display;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.common.base.Strings;
 import com.googlecode.objectify.cmd.Query;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
+import static com.openhouseautomation.logic.HouseFan.log;
+import com.openhouseautomation.logic.WeightedDecision;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
 import com.openhouseautomation.model.EventLog;
@@ -52,7 +53,7 @@ public class DisplaySourceServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    log.log(Level.INFO, this.getClass().getName() + " " + request.getMethod() + " " + request.getPathInfo());
+    log.log(Level.INFO, request.getMethod() + " " + request.getPathInfo());
     if (request.getPathInfo() == null) {
       return;
     }
@@ -62,6 +63,10 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     if (request.getPathInfo().startsWith("/display/forecast")) {
       doDisplayForecast(request, response);
+      return;
+    }
+    if (request.getPathInfo().startsWith("/display/wds")) {
+      doDisplayWDS(request, response);
       return;
     }
     if (request.getPathInfo().startsWith("/display/devices")) {
@@ -88,8 +93,24 @@ public class DisplaySourceServlet extends HttpServlet {
     response.sendError(HttpStatus.SC_NOT_FOUND, "path not supported");
   }
 
+  private void doDisplayWDS(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    PrintWriter out = response.getWriter();
+    ofy().clear(); // clear session cache, not memcache
+    //Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
+    Controller controller = ofy().load().type(Controller.class).id(4280019022L).now();
+    if (controller == null) {
+      log.log(Level.SEVERE, "Controller not found: Whole House Fan");
+      response.sendError(HttpStatus.SC_NOT_FOUND, "No House Fan found");
+      return;
+    }
+    String toret = controller.getDecision();
+    out.print(controller.getDecision());
+  }
+
   private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
+    // TODO change from query to batch get so loop is not needed (addAll instead)
+    // see above function doDisplayWDS()
     Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);
     QueryResultIterator<Forecast> iterator = query.iterator();
     List forecasts = new ArrayList();
@@ -243,7 +264,6 @@ public class DisplaySourceServlet extends HttpServlet {
     }
   }
 
-  
   private void doDisplayNotifications(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
     // dev on localhost
@@ -252,10 +272,13 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     // production
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
     ObjectMapper om = new ObjectMapper();
     om.writeValue(out, ofy().load().type(NotificationLog.class).order("-lastnotification").list());
   }
+
   /**
    * Handles the HTTP <code>POST</code> method.
    *
@@ -293,7 +316,9 @@ public class DisplaySourceServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
     Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
 
     // log the event
@@ -334,7 +359,9 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     if (controllerid.equals("100")) { // all lights
-      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+      if (com.openhouseautomation.Flags.clearCache) {
+        ofy().clear(); // clear the session cache, not the memcache
+      }
       List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
       for (Controller c : lights) {
         c.setDesiredState(request.getParameter("desiredState"));
@@ -344,7 +371,9 @@ public class DisplaySourceServlet extends HttpServlet {
       ofy().save().entities(lights);
       log.log(Level.INFO, "updated all controllers");
     } else { // an individual light
-      if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+      if (com.openhouseautomation.Flags.clearCache) {
+        ofy().clear(); // clear the session cache, not the memcache
+      }
       Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
       String oldcontroller = controller.toString();
       String state = request.getParameter("desiredState");
@@ -378,5 +407,5 @@ public class DisplaySourceServlet extends HttpServlet {
   String testSensorString = "[{\"expired\":false,\"id\":5744863563743232,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"outsideshadtemp\",\"type\":\"TEMPERATURE\",\"name\":\"Outside Temperature Shaded\",\"unit\":\"F\",\"lastreading\":\"70.25\"}]";
   String testControllerString = "[{\"id\":4280019022,\"owner\":\"dras\",\"location\":\"home\",\"zone\":\"atticwhf\",\"type\":\"WHOLEHOUSEFAN\",\"name\":\"Whole House Fan\",\"desiredStatePriority\":\"MANUAL\",\"validStates\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\"],\"lastDesiredStateChange\":1414987381855,\"lastActualStateChange\":1414987381855,\"desiredState\":\"0\",\"actualState\":\"0\"}]";
   String testSceneString = "";
-  String testNotificationString="";
+  String testNotificationString = "";
 }
