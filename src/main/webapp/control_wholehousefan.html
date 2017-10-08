@@ -13,7 +13,7 @@
       {{state}}
     </label>
   </div>
-  <br>
+  <br/>&nbsp;<br/>
   <div class="btn-group">
     <label class="btn btn-primary"
            ng-model="device.desiredStatePriority"
@@ -31,14 +31,15 @@
     </label>
   </div>
   <img ng-show="device.expired" src="/images/ic_cloud_off_black_24dp.png" height="45" width="45"/>
-
+<hr/>
   <div class="container-fluid list-group" ng-controller="WDSController as wdsc">
-    
-    <ul class="list-group">
-      <li class="list-group-item" ng-repeat="wdl in wdsc.data">
-          {{wdl}}
-      </li>
-    </ul>
-    <hr/>
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>Weight</th><th>Value</th>
+      </thead>
+      <tr ng-repeat="wdl in wdsc.data">
+        <td>{{ wdl.name}}</td><td>{{wdl.weight}}</td><td>{{wdl.value}}</td>
+      </tr>
+    </table>
   </div>
 </div>

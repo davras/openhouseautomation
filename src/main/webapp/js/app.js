@@ -158,7 +158,7 @@
       };
       var devicePromise = $interval(function() {
         //console.log(new Date().getTime() + ">" + (devices.lastcomm + 15000));
-        if (devices.fastpull || (new Date().getTime() > (devices.lastcomm + 15000))) {
+        if (devices.fastpull || (new Date().getTime() > (devices.lastcomm + 30000))) {
           devices.lastcomm = new Date().getTime();
           $http.get(DEVICE_TYPESPECIFIC_LIST_URL + devices.currenttab)
                   .then(function successCallback(response) {
