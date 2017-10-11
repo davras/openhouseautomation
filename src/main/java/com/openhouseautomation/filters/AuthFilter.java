@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.filters;
 
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.openhouseautomation.model.DatastoreConfig;
@@ -41,19 +42,16 @@ public class AuthFilter implements Filter {
     String thisURL = req.getRequestURI();
     /**
      * debug below is commented out
-     * 
-    // if the user is logged in, populate username
-    log.log(Level.INFO, "Auth: " + userService.getCurrentUser());
-    if (userService.isUserLoggedIn()) {
-      log.log(Level.INFO, "isAdmin()=" + userService.isUserAdmin());
-    } else {
-      log.log(Level.INFO, "not an Admin: ");
-    }
-    log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
-    log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
-    log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
-    */
-            
+     *
+     * // if the user is logged in, populate username log.log(Level.INFO,
+     * "Auth: " + userService.getCurrentUser()); if
+     * (userService.isUserLoggedIn()) { log.log(Level.INFO, "isAdmin()=" +
+     * userService.isUserAdmin()); } else { log.log(Level.INFO, "not an Admin:
+     * "); } log.log(Level.INFO, "getPathInfo()={0}", req.getPathInfo());
+     * log.log(Level.INFO, "getUserPrincipal()={0}", req.getUserPrincipal());
+     * log.log(Level.INFO, "source ip={0}", req.getRemoteAddr());
+     */
+
     boolean approved = false;
     if (req.getUserPrincipal() != null) {
       // needs a user logged in
@@ -72,13 +70,23 @@ public class AuthFilter implements Filter {
     } else {
       log.log(Level.INFO, "Not approved by trusted ips");
     }
-    if (req.getRemoteAddr().startsWith("0.")) {
+    if (!approved && req.getRemoteAddr().startsWith("0.")) {
       log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by internal ip");
       approved = true;
     } else {
       log.log(Level.INFO, "Not an internal IP");
     }
 
+    /*
+    // PubSub
+    String ua = req.getHeader("User-Agent");
+    if (!approved && !Strings.isNullOrEmpty(ua)
+            && "CloudPubSub-Google".equals(ua)
+            && req.getRemoteAddr().startsWith("10.")) {
+      log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by pubsub UA+IP");
+      approved = true;
+    }
+    */
     // pass the request along the filter chain
     if (approved) {
       chain.doFilter(request, response);

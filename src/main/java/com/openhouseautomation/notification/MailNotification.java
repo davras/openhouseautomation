@@ -6,7 +6,7 @@
 package com.openhouseautomation.notification;
 
 import com.google.api.client.util.Strings;
-import com.google.apphosting.api.ApiProxy;
+import com.openhouseautomation.Convutils;
 import com.openhouseautomation.model.DatastoreConfig;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -28,23 +28,18 @@ public class MailNotification {
   private static final Logger log = Logger.getLogger(MailNotification.class.getName());
 
   public void send(NotificationHandler nh) {
-    String sender = "admin@" + ApiProxy.getCurrentEnvironment().getAppId().substring(2) + ".appspotmail.com (OpenHouseAutomation Notification)";
-    String recipient = nh.getRecipient();
-
+    String sender = DatastoreConfig.getValueForKey("admin", "bob@example.com");
+    String replyto = "admin@" + Convutils.getProjectId() + ".appspotmail.com (OpenHouseAutomation Notification)";
     if (Strings.isNullOrEmpty(sender)) {
-      // will change s~gautoard to gautoard with substring
-      // will not work on Master-Slave apps
-      sender = DatastoreConfig.getValueForKey("admin", "bob@example.com");
-      if (Strings.isNullOrEmpty(sender)) {
-        return;
-      }
+      return;
     }
+    String recipient = nh.getRecipient();
     try {
       Properties props = new Properties();
       Session session = Session.getDefaultInstance(props, null);
       Message msg = new MimeMessage(session);
       msg.setFrom(new InternetAddress(sender));
-      msg.setReplyTo(new InternetAddress[]{new InternetAddress("pager-reply@gautoard.appspotmail.com")});
+      msg.setReplyTo(new InternetAddress[]{new InternetAddress(replyto)});
       msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
       msg.setSubject(nh.getSubject());
       msg.setText(nh.getBody());

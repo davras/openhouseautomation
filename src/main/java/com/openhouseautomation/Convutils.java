@@ -1,6 +1,9 @@
 package com.openhouseautomation;
 
+import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.appengine.api.appidentity.AppIdentityServiceFactory;
 import com.google.appengine.repackaged.com.google.common.base.Strings;
+import com.google.apphosting.api.ApiProxy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -18,8 +21,9 @@ public class Convutils {
   static String timezone = "America/Los_Angeles";
 
   public static String timeAgoToString(DateTime dt) {
-    return timeAgoToString(dt.getMillis()/1000);
+    return timeAgoToString(dt.getMillis() / 1000);
   }
+
   /**
    * Converts seconds to a human-eyeball friendly format
    *
@@ -99,4 +103,8 @@ public class Convutils {
     return dt;
   }
 
+  public static String getProjectId() {
+    AppIdentityService identityService = AppIdentityServiceFactory.getAppIdentityService();
+    return identityService.parseFullAppId(ApiProxy.getCurrentEnvironment().getAppId()).getId();
+  }
 }

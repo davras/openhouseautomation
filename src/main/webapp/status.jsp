@@ -25,7 +25,7 @@
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- gAutoArd core CSS -->
+    <!-- OHA core CSS -->
     <link href="/css/main.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/jquery-ui.css">
@@ -50,7 +50,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">gAutoArd</a>
+          <a class="navbar-brand" href="/">OpenHouseAutomation</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">

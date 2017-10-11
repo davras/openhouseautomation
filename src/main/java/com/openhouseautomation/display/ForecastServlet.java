@@ -31,11 +31,6 @@ public class ForecastServlet extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     response.setContentType("text/plain;charset=UTF-8");
-    // <ver>.gautoard.appspot.com/forecast?k=95376&v=high
-    // <ver>.gautoard.appspot.com/forecast?k=95376&v=low
-    // <ver>.gautoard.appspot.com/forecast?k=95376&v=pop
-    // <ver>.gautoard.appspot.com/forecast?k=95376&v=all
-    // wget -q -O- "test.gautoard.appspot.com/forecast?k=95376&v=forecasthigh"
 
     try (PrintWriter out = response.getWriter()) {
       String zipcode = request.getParameter("k");

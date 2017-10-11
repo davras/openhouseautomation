@@ -1,0 +1,50 @@
+Documentation for PubSub communications with Particle Photon controllers and sensors.
+
+1234567890 is the sensor id or controller id in the following examples
+
+For Sensors, they will send a message like:
+Particle.publish("sens", "1234567890/12.3", 60, PRIVATE);
+
+For Controllers, they will send a status update like:
+Particle.publish("cont", "1234567890/On", 60, PRIVATE);
+
+          
+
+void setup() {
+  // Subscribe to the integration response event
+  Particle.subscribe("hook-response/cont", subscribeHandler, MY_DEVICES);
+  Particle.subscribe("cont", &subscribeHandler, MY_DEVICES);
+}
+void subscribeHandler(const char *event, const char *data) {
+  event="cont"
+  event="hook-response/cont"
+  data="1234567890/On"
+}
+
+PubSub push subscription endpoint gets a body of:
+
+{"data":"395430086/74.3",
+  "ttl":60,
+  "published_at":"2017-10-09T21:58:03.568Z",
+  "coreid":"26002e000b47343432313031",
+  "name":"sens"
+}
+
+which goes to an endpoint like:
+https://YOUR_APP_ID.appspot.com/senspushsub?token=YOUR_TOKEN
+and a body like:
+{"message":
+  {"data":"Mzk1NDMwMDg2Lzc0LjM=",
+    "attributes":
+      {"device_id":"26002e000b47343432313031",
+        "event":"sens",
+        "published_at":"2017-10-09T21:58:03.568Z"
+      },
+    "message_id":"77306793724474",
+    "messageId":"77306793724474",
+    "publish_time":"2017-10-09T21:58:03.856Z",
+    "publishTime":"2017-10-09T21:58:03.856Z"
+  },
+  "subscription":"projects/gautoard/subscriptions/senspushsub"
+}
+
