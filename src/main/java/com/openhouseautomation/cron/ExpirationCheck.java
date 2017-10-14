@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.cron;
 
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.NotificationLog;
@@ -45,7 +46,7 @@ public class ExpirationCheck extends HttpServlet {
         NotificationHandler nh = new NotificationHandler();
         nh.setSubject("Sensor OFFLINE: " + s.getName());
         nh.setBody("Sensor OFFLINE: " + s.getName());
-        nh.page();
+        nh.send();
       }
     }
 
@@ -57,7 +58,10 @@ public class ExpirationCheck extends HttpServlet {
         NotificationHandler nh = new NotificationHandler();
         nh.setSubject("Controller OFFLINE: " + c.getName());
         nh.setBody("Controller OFFLINE: " + c.getName());
-        nh.page();
+        nh.send();
+        // reset timer
+        c.setLastContactDate(Convutils.getNewDateTime());
+        ofy().save().entity(c);
       }
     }
     
