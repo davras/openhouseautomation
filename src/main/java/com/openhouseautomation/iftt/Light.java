@@ -35,7 +35,7 @@ public class Light extends DeferredSensor {
     DateTime now = Convutils.getNewDateTime();
     int curhour = now.getHourOfDay();
     boolean lights = false;
-    if (outsidelight < 3) {
+    if (outsidelight < 70) {
       lights = true;
     }
     // turn off between midnight and 6am
@@ -49,10 +49,10 @@ public class Light extends DeferredSensor {
     }
     if (lights) {
       setController(3640433672L, "1");
-      log.log(Level.INFO, "Turning den light on");
+      log.log(Level.INFO, "Den light on");
     } else {
       setController(3640433672L, "0");
-      log.log(Level.INFO, "Turning den light off");
+      log.log(Level.INFO, "Den light off");
     }
   }
 
