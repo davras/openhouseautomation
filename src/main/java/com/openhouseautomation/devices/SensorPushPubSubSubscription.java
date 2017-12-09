@@ -88,6 +88,12 @@ public class SensorPushPubSubSubscription extends HttpServlet {
         nh.page();
       }
 
+      if (sensor.getType() == Sensor.Type.TEMPERATURE
+              && Float.parseFloat(sensorval) < -195.0) {
+        log.log(Level.SEVERE, "Bad temperature reading: " + sensorval);
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return;
+      }
       // set the value
       sensor.setLastReadingDate(Convutils.getNewDateTime());
       sensor.setLastReading(sensorval);
