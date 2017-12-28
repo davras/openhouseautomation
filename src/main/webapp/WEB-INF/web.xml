@@ -24,22 +24,6 @@
         <filter-name>ObjectifyFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <!--
-Appstats does not work with ListenServlet.  The 25 per Controller reads per request is too large for Memcache
-  
-  <filter>
-    <filter-name>appstats</filter-name>
-    <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
-    <init-param>
-      <param-name>logMessage</param-name>
-      <param-value>Appstats available: /appstats/details?time={ID}</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>appstats</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  -->
     <servlet>
         <servlet-name>SensorServlet</servlet-name>
         <servlet-class>com.openhouseautomation.devices.SensorServlet</servlet-class>
@@ -174,19 +158,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <servlet-name>AddController</servlet-name>
         <url-pattern>/addcontroller</url-pattern>
     </servlet-mapping>
-    <!-- APPSTATS -->
-    <servlet>
-        <servlet-name>appstats</servlet-name>
-        <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
-        <init-param>
-            <param-name>requireAdminAuthentication</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>appstats</servlet-name>
-        <url-pattern>/appstats/*</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ControllerServlet</servlet-name>
         <url-pattern>/controller/*</url-pattern>
@@ -289,7 +260,6 @@ Appstats does not work with ListenServlet.  The 25 per Controller reads per requ
         <web-resource-collection>
             <url-pattern>/cron/*</url-pattern>
             <url-pattern>/mapreduce/*</url-pattern>
-            <url-pattern>/appstats/*</url-pattern>
             <url-pattern>/_ah/push-handlers/*</url-pattern>
             <url-pattern>/_ah/mail/*</url-pattern>
         </web-resource-collection>

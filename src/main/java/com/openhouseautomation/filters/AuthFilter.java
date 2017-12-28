@@ -5,7 +5,7 @@
  */
 package com.openhouseautomation.filters;
 
-import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.openhouseautomation.model.DatastoreConfig;

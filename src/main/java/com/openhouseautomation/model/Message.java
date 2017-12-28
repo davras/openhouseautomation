@@ -6,7 +6,7 @@
 
 package com.openhouseautomation.model;
 
-import com.google.appengine.repackaged.com.google.api.client.util.Strings;
+import com.google.api.client.util.Strings;
 import java.util.StringTokenizer;
 
 /**

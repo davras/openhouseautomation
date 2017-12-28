@@ -2,7 +2,7 @@ package com.openhouseautomation;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
 import com.google.appengine.api.appidentity.AppIdentityServiceFactory;
-import com.google.appengine.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import com.google.apphosting.api.ApiProxy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

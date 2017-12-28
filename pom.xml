@@ -10,7 +10,7 @@
 
   <properties>
     <appengine.app.version>1</appengine.app.version>
-    <appengine.target.version>1.9.30</appengine.target.version>
+    <appengine.target.version>1.9.59</appengine.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -33,13 +33,6 @@
       <version>4.3.2</version>
     </dependency>
     
-    <!-- necessary for appstats to work -->
-    <dependency> 
-      <groupId>com.google.appengine</groupId> 
-      <artifactId>appengine-api-labs</artifactId> 
-      <version>${appengine.target.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
@@ -162,8 +155,8 @@
         <version>2.5.1</version>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>

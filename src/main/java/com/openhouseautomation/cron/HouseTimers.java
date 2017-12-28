@@ -1,6 +1,6 @@
 package com.openhouseautomation.cron;
 
-import com.google.appengine.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
@@ -44,6 +44,7 @@ public class HouseTimers extends HttpServlet {
     updateTime();
     log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
     doChargers();
+    doLights();
     doBoatPump();
     turnOffHouseFan();
     notifyTurnOnHouseFan();
@@ -74,10 +75,23 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Turning chargers on");
       setController(91125605L, "1");
     }
-    if (curhour == 8 && curmin < 2) {
-      // Charger off at 8am
+    if (curhour == 2 && curmin < 2) {
+      // Charger off at 2am
       log.log(Level.INFO, "Turning chargers off");
       setController(91125605L, "0");
+    }
+  }
+  
+    public void doLights() {
+    if (curhour == 0 && curmin < 2) {
+      // Lights off at midnight
+      log.log(Level.INFO, "Turning lights off");
+      setController(3640433672L, "0");
+    }
+    if (curhour == 6 && curmin > 29 && curmin < 32) {
+      // Lights on a 6:30am
+      log.log(Level.INFO, "Turning chargers off");
+      setController(3640433672L, "1");
     }
   }
 

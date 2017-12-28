@@ -5,7 +5,7 @@
  */
 package com.openhouseautomation;
 
-import com.google.appengine.repackaged.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;

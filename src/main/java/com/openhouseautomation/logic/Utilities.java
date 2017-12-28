@@ -51,7 +51,7 @@ public class Utilities {
       sreg.addData(histval, Double.parseDouble(readhistory.getValue()));
       loggedreadings++;
     }
-    log.log(Level.INFO, "read {0} values\nslope is: delta T of {1}F/hr", new Object[]{loggedreadings, sreg.getSlope()});
+    log.log(Level.INFO, "read {0} values\nslope is: delta of {1}/hr", new Object[]{loggedreadings, sreg.getSlope()});
     return sreg.getSlope();
   }
 
