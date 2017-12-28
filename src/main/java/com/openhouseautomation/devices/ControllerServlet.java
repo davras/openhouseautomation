@@ -227,7 +227,7 @@ public class ControllerServlet extends HttpServlet {
       }
     }
     ofy().save().entity(controller).now();
-    log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
+    log.log(Level.INFO, "POST /device, saved controller:{0}", controller.toString());
   }
 
   private boolean checkValidation(Controller c, String value, String authhash) {

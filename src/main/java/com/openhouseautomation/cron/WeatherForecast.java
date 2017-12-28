@@ -82,7 +82,7 @@ public class WeatherForecast extends HttpServlet {
       forecast.setForecastPop(pop);
       forecast.setLastUpdate(Convutils.getNewDateTime());
 
-      log.log(Level.INFO, "forecast cron took {0}ms", (System.currentTimeMillis() - curtime));
+      log.log(Level.INFO, "forecast cron successful in {0}ms", (System.currentTimeMillis() - curtime));
       
       if (Strings.isNullOrEmpty(minimum) || Strings.isNullOrEmpty(maximum)) {
         return;
@@ -90,6 +90,7 @@ public class WeatherForecast extends HttpServlet {
       ofy().save().entity(forecast).now();
       out.println(forecast);
     } catch (Exception e) {
+        log.log(Level.SEVERE, e.toString(), e.fillInStackTrace());
     }
   }
 

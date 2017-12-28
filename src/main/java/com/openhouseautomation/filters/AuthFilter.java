@@ -59,22 +59,16 @@ public class AuthFilter implements Filter {
       approved = userService.isUserAdmin();
       log.log(Level.INFO, "{0} is {1}an admin",
               new Object[]{userService.getCurrentUser(), approved ? "" : "not "});
-    } else {
-      log.log(Level.INFO, "No user logged in");
     }
     String trustedips = DatastoreConfig.getValueForKey("trustedips", "192.168.1.1");
     if (!approved && null != trustedips && trustedips.contains(req.getRemoteAddr())) {
       // or be in the house (source ip is home)
       log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by trusted ip: " + trustedips);
       approved = true;
-    } else {
-      log.log(Level.INFO, "Not approved by trusted ips");
     }
     if (!approved && req.getRemoteAddr().startsWith("0.")) {
       log.log(Level.INFO, "IP: " + req.getRemoteAddr() + " approved by internal ip");
       approved = true;
-    } else {
-      log.log(Level.INFO, "Not an internal IP");
     }
 
     /*
