@@ -75,7 +75,7 @@ public class NotificationHandler {
       MailNotification mn = new MailNotification();
       mn.send(this);
     } else {
-      log.log(Level.FINE, "suppressing duplicate page");
+      log.log(Level.INFO, "suppressing duplicate page");
     }
   }
 

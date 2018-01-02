@@ -97,7 +97,6 @@ public class SensorPushPubSubSubscription extends HttpServlet {
       // set the value
       sensor.setLastReadingDate(Convutils.getNewDateTime());
       sensor.setLastReading(sensorval);
-      doPostProcessing(sensor);
       ofy().save().entity(sensor); // async
       log.log(Level.INFO, "saved sensor:{0}", sensor);
       Reading reading = new Reading();
@@ -106,6 +105,7 @@ public class SensorPushPubSubSubscription extends HttpServlet {
       reading.setValue(sensorval);
       ofy().save().entity(reading); // async
       log.log(Level.INFO, "logged reading:{0}", reading);
+      doPostProcessing(sensor);
       // 200, 201, 204, 102 status codes are interpreted as success by the Pub/Sub system
       response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     } catch (Exception e) {

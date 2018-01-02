@@ -11,7 +11,6 @@ import com.openhouseautomation.model.Controller;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.http.HttpStatus;
 
 /**
  *

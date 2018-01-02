@@ -100,6 +100,9 @@ public class ControllerServlet extends HttpServlet {
     } else if (controller.type == Controller.Type.PROJECTOR) {
       vs.add("1");
       vs.add("0");
+    } else if (controller.type == Controller.Type.RGB) {
+      vs.add("000000");
+      vs.add("ffffff");
     }
     controller.setValidStates(vs);
   }

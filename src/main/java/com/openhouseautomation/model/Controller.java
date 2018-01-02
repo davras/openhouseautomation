@@ -45,7 +45,8 @@ public class Controller implements Serializable {
     SPRINKLER("Sprinkler"),
     THERMOSTAT("Thermostat"),
     WHOLEHOUSEFAN("Whole House Fan"),
-    DOORLOCK("Door Lock");
+    DOORLOCK("Door Lock"),
+    RGB("RGB");
 
     private final String text;
 
@@ -128,26 +129,21 @@ public class Controller implements Serializable {
     
     // Add the task to the default queue.
     Queue queue = QueueFactory.getDefaultQueue();
-    DeferredController dfc = null;
+    DeferredController dfc;
     String classtoget = "com.openhouseautomation.iftt." + Convutils.toTitleCase(this.getType().name());
     log.log(Level.INFO, "creating class: {0}", classtoget);
     try {
       dfc = (DeferredController) Class.forName(classtoget).newInstance();
       // i.e.: com.openhouseautomation.iftt.ALARM class
+      dfc.setController(this);
+      queue.addAsync(TaskOptions.Builder.withPayload(dfc));
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       // obviously, don't enqueue the task
       log.log(Level.WARNING, "I could not create the class needed: {0}"
               + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
               new Object[]{classtoget, this.getId()}
       );
-      dfc = null;
     }
-    if (dfc == null) {
-      // bail early
-      return;
-    }
-    dfc.setController(this);
-    queue.add(TaskOptions.Builder.withPayload(dfc));
   }
   
   // TODO this is crappy change detection

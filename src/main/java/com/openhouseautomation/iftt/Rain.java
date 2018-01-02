@@ -33,7 +33,7 @@ public class Rain extends DeferredSensor {
     if (Objects.equals(fold, fnew)) {
       return;
     }
-    log.log(Level.FINE, "Rain old: {0}, new: {1}", new Object[]{fold, fnew});
+    log.log(Level.INFO, "Rain old: {0}, new: {1}", new Object[]{fold, fnew});
     // now that we are done sanity checking
     NotificationHandler nhnotif = new NotificationHandler();
     nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));

@@ -98,8 +98,8 @@
         <servlet-class>com.openhouseautomation.devices.SensorPushPubSubSubscription</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ControllerPushPubSubSubscription</servlet-name>
-        <servlet-class>com.openhouseautomation.devices.ControllerPushPubSubSubscription</servlet-class>
+        <servlet-name>ControllerPush</servlet-name>
+        <servlet-class>com.openhouseautomation.devices.ControllerPush</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -253,8 +253,8 @@
         <url-pattern>/_ah/push-handlers/senspushsub</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ControllerPushPubSubSubscription</servlet-name>
-        <url-pattern>/_ah/push-handlers/contpushsub</url-pattern>
+        <servlet-name>ControllerPush</servlet-name>
+        <url-pattern>/pub/push-handlers/contpush</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>
