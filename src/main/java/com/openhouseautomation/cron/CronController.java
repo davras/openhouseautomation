@@ -1,33 +1,35 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.openhouseautomation.cron;
 
 import com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.logic.HouseFan;
-import com.openhouseautomation.logic.WeightedDecision;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
+import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.joda.time.DateTime;
 
 /**
  *
  * @author dave
  */
-public class HouseTimers extends HttpServlet {
+public class CronController extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
-  private static final Logger log = Logger.getLogger(HouseTimers.class.getName());
-
-  private int curhour;
-  private int curmin;
+  Logger log = Logger.getLogger(CronController.class.getName());
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -40,50 +42,40 @@ public class HouseTimers extends HttpServlet {
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
     response.setContentType("text/plain;charset=UTF-8");
-    updateTime();
-    log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
-    notifyTurnOnHouseFan();
-    response.setStatus(HttpServletResponse.SC_OK);
-  }
+    final String reqpath = URLDecoder.decode(request.getPathInfo(), "UTF-8");
+    log.log(Level.INFO, "request path:" + reqpath);
 
-  public void updateTime() {
-    DateTime now = Convutils.getNewDateTime();
-    this.curhour = now.getHourOfDay();
-    this.curmin = now.getMinuteOfHour();
-  }
-
-  public void notifyTurnOnHouseFan() {
-    if (curhour < 17 || curmin > 0) {
-      return; // from 5pm to midnight on the hour
-    }
-    Controller alarm = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
-    if (alarm.getActualState().equalsIgnoreCase("Away")) {
-      // don't check house fan if nobody is home
+    if (Strings.isNullOrEmpty(reqpath)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
-    HouseFan hf = new HouseFan();
-    String hfnotify = hf.notifyInManual();
-    if (!Strings.isNullOrEmpty(hfnotify)) {
-      WeightedDecision wd = hf.getWeightedDecision();
-      wd.setId(4280019022L);
-      ofy().save().entity(wd);
-      NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
-      nhnotif.setSubject("Recommend House Fan in AUTO");
-      nhnotif.setBody(hfnotify);
-      nhnotif.page();
-    }
-  }
 
-  public void setController(Long controllerid, String state) {
+    // extract values from request
+    PrintWriter out = response.getWriter();
+    StringTokenizer st1 = new StringTokenizer(reqpath, "/");
+    String controllerid = (String) st1.nextToken(); // the controller id
+    String desiredvalue = (String) st1.nextToken(); // the desired controller value
+    log.log(Level.INFO, "c={0},v={1}", new Object[]{controllerid, desiredvalue});
+
+    // load the controller
     if (com.openhouseautomation.Flags.clearCache) {
       ofy().clear(); // clear the session cache, not the memcache
     }
-    Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
-    if (controller != null && !controller.getDesiredState().equals(state)) {
-      controller.setDesiredState(state);
+    Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
+
+    // check that everything looks good
+    if (controller == null) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
+      return;
+    }
+
+    if (!controller.getActualState().equals(desiredvalue)) {
+      log.log(Level.INFO, "Setting controller {0} to {1}",
+              new Object[]{controller.getName(), desiredvalue});
+      controller.setDesiredState(desiredvalue);
       ofy().save().entity(controller).now();
     }
+
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -124,4 +116,5 @@ public class HouseTimers extends HttpServlet {
   public String getServletInfo() {
     return "Short description";
   }// </editor-fold>
+
 }

@@ -1,45 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
-  <cron>
-    <url>/ReadingServletMR</url>
-    <description>MapReduce datastore to the archives</description>
-    <schedule>every day 00:00</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/cron/datastorelogtruncator</url>
-    <description>Remove old log entries from the Datastore</description>
-    <schedule>every day 12:00</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/cron/getforecast?zipcode=95376</url>
-    <description>Gets the forecast for the supplied zip code</description>
-    <schedule>every 1 hours</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/cron/getforecast?zipcode=94105</url>
-    <description>Gets the forecast for the supplied zip code</description>
-    <schedule>every 1 hours</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/cron/getforecast?zipcode=94043</url>
-    <description>Gets the forecast for the supplied zip code</description>
-    <schedule>every 1 hours</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/ExpirationCheck</url>
-    <description>Check for expired Sensors and Controllers</description>
-    <schedule>every 15 minutes</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
-  <cron>
-    <url>/HouseTimers</url>
-    <description>Runs timers for automated controls</description>
-    <schedule>every 1 minutes</schedule>
-    <timezone>America/Los_Angeles</timezone>
-  </cron>
+    <cron>
+        <url>/ReadingServletMR</url>
+        <description>MapReduce datastore to the archives</description>
+        <schedule>every day 00:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/datastorelogtruncator</url>
+        <description>Remove old log entries from the Datastore</description>
+        <schedule>every day 12:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/getforecast?zipcode=95376</url>
+        <description>Gets the forecast for the supplied zip code</description>
+        <schedule>every 1 hours</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/getforecast?zipcode=94105</url>
+        <description>Gets the forecast for the supplied zip code</description>
+        <schedule>every 1 hours</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/getforecast?zipcode=94043</url>
+        <description>Gets the forecast for the supplied zip code</description>
+        <schedule>every 1 hours</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/ExpirationCheck</url>
+        <description>Check for expired Sensors and Controllers</description>
+        <schedule>every 15 minutes</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/HouseTimers</url>
+        <description>Runs timers for automated controls</description>
+        <schedule>every 1 minutes</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+
+    <cron>
+        <url>/cron/controller/3960328784/1</url>
+        <description>Run Boat Pump for 1 minute</description>
+        <schedule>every day 18:59</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/controller/3960328784/0</url>
+        <description>Run Boat Pump for 1 minute</description>
+        <schedule>every 1 hours synchronized</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+
+    <cron>
+        <url>/cron/controller/91125605/1</url>
+        <description>Chargers on at 11pm</description>
+        <schedule>every day 23:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/controller/91125605/0</url>
+        <description>Chargers off at 7am</description>
+        <schedule>every day 07:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+
+    <cron>
+        <url>/cron/controller/3640433672/0</url>
+        <description>Den lights off at midnight</description>
+        <schedule>every day 00:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/controller/3640433672/1</url>
+        <description>Den lights on at 6:30am</description>
+        <schedule>every day 06:30</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    
+    <cron>
+        <url>/cron/controller/4280019022/0</url>
+        <description>Turn off Whole House Fan at 8am</description>
+        <schedule>every day 08:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
 </cronentries>

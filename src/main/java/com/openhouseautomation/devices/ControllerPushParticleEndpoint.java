@@ -5,16 +5,12 @@
  */
 package com.openhouseautomation.devices;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.iftt.DeferredController;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.PrintWriter;
@@ -32,9 +28,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author dave
  */
-public class ControllerPush extends HttpServlet {
+public class ControllerPushParticleEndpoint extends HttpServlet {
 
-  private static final Logger log = Logger.getLogger(ControllerPush.class.getName());
+  private static final Logger log = Logger.getLogger(ControllerPushParticleEndpoint.class.getName());
   private final Gson gson = new Gson();
   private final JsonParser jsonParser = new JsonParser();
 

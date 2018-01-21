@@ -26,7 +26,7 @@ PubSub push subscription endpoint gets a body of:
 {"data":"395430086/74.3",
   "ttl":60,
   "published_at":"2017-10-09T21:58:03.568Z",
-  "coreid":"26002e000b47343432313031",
+  "coreid":"26002e000b47343432123456",
   "name":"sens"
 }
 

@@ -392,7 +392,6 @@ public class DisplaySourceServlet extends HttpServlet {
         controller.setDesiredState(state.substring(1));
       }
       controller.setLastDesiredStateChange(Convutils.getNewDateTime());
-      controller.setLastContactDate(Convutils.getNewDateTime());
       ofy().save().entity(controller).now();
       log.log(Level.INFO, "updated controller: " + controller.toString());
       // log the event

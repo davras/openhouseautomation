@@ -21,6 +21,7 @@ public class Reading {
   @Parent Key<Sensor> sensor;
   @Id Long id;
   String value;
+  // todo, move @Index down here
   DateTime timestamp;
   
   /**

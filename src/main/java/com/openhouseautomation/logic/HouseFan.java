@@ -52,10 +52,12 @@ public class HouseFan {
       processFanChange();
       return;
     }
+    // load forecast readings
+    if (!considerForecast()) {
+      return;
+    }
     // load many temperature readings
     considerSlope();
-    // load forecast readings
-    considerForecast();
     computeDesiredSpeed();
     processFanChange();
   }
@@ -72,8 +74,11 @@ public class HouseFan {
     if (hotterOutside()) {
       return "";
     }
+    // load forecast readings
+    if (!considerForecast()) {
+      return "";
+    }
     considerSlope();
-    considerForecast();
     computeDesiredSpeed();
     int newdesiredfanspeed = safeParseInt(wd.getTopValue());
     if (newdesiredfanspeed > 0) {
@@ -100,7 +105,7 @@ public class HouseFan {
       return false;
     }
     if (controller.isExpired()) {
-      log.log(Level.WARNING, "Controller offline: {0}", 
+      log.log(Level.WARNING, "Controller offline: {0}",
               Convutils.timeAgoToString(controller.getLastContactDate()));
       return false;
     }
@@ -178,17 +183,19 @@ public class HouseFan {
     }
   }
 
-  public void considerForecast() {
+  public boolean considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
     forecasthigh = Utilities.getForecastHigh("95376");
     wd.addElement("Reading Forecast High", 1000, forecasthigh);
     if (forecasthigh == 0 || forecasthigh < -100 || forecasthigh > 150) {
       log.log(Level.INFO, "bad forecasthigh: {0}", forecasthigh);
-      return;
+      return false;
     }
     if (forecasthigh < 80) {
       wd.addElement("Forecast High < 80F", 5, 0);
+      return false;
     }
+    return true;
   }
 
   public void computeDesiredSpeed() {
@@ -272,9 +279,10 @@ public class HouseFan {
     nhnotif.setBody("Fan Speed change: " + olddesiredfanspeed + " -> " + newfanspeed);
     nhnotif.send();
   }
+
   public void saveDecision() {
     if (controller == null) {
       controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
-    } 
+    }
   }
 }

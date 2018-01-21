@@ -40,7 +40,7 @@ public class Utilities {
     int loggedreadings = 0;
     double firsttime = 0;
     for (Reading readhistory : readings) {
-      double histval = readhistory.getTimestamp().getMillis() / 1000 / 60 / 100;
+      double histval = readhistory.getTimestamp().getMillis() / 1000;
       // reference later times to the zero time of the first reading
       if (firsttime == 0) {
         firsttime = histval;
@@ -49,9 +49,12 @@ public class Utilities {
         histval -= firsttime;
       }
       sreg.addData(histval, Double.parseDouble(readhistory.getValue()));
+      if (id == 3885021817L) {
+        log.log(Level.WARNING, "added reading: {0} @ {1}", new Object[]{Double.parseDouble(readhistory.getValue()), histval});
+      }
       loggedreadings++;
     }
-    log.log(Level.INFO, "read {0} values\nslope is: delta of {1}/hr", new Object[]{loggedreadings, sreg.getSlope()});
+    log.log(Level.INFO, "read {0} values\nslope has delta of {1}/hr", new Object[]{loggedreadings, sreg.getSlope()});
     return sreg.getSlope();
   }
 

@@ -99,7 +99,11 @@
     </servlet>
     <servlet>
         <servlet-name>ControllerPush</servlet-name>
-        <servlet-class>com.openhouseautomation.devices.ControllerPush</servlet-class>
+        <servlet-class>com.openhouseautomation.devices.ControllerPushParticleEndpoint</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CronController</servlet-name>
+        <servlet-class>com.openhouseautomation.cron.CronController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WeatherForecast</servlet-name>
@@ -255,6 +259,10 @@
     <servlet-mapping>
         <servlet-name>ControllerPush</servlet-name>
         <url-pattern>/pub/push-handlers/contpush</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CronController</servlet-name>
+        <url-pattern>/cron/controller/*</url-pattern>
     </servlet-mapping>
     <security-constraint>
         <web-resource-collection>

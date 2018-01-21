@@ -33,7 +33,7 @@ public class ControllerServlet extends HttpServlet {
   private static final Logger log = Logger.getLogger(ControllerServlet.class.getName());
 
   /**
-   * Handles the HTTP <code>GET</code> method.
+   * Handles the Controllers reads for Open House Automation returns the Controller.getDesiredState()
    *
    * @param request servlet request
    * @param response servlet response
@@ -43,23 +43,20 @@ public class ControllerServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    // handles sensor reads
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
-    String auth = request.getParameter("auth");
-    final String controllerid = request.getParameter("k");
-    final String reqpath = request.getPathInfo();
-    if (!"test".equals(auth)) {
-      // with hashkey
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized, please use your auth key");
-      return;
-      // TODO: move auth to filter servlet
-    }
-    log.info("1. authorization checked");
+    String controllerid = request.getParameter("k");
+    String reqpath = request.getPathInfo();
     // load the controller entity
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
+    if (Strings.isNullOrEmpty(controllerid) || Strings.isNullOrEmpty(reqpath)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
+      return;
+    }
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
-    if (controller == null || reqpath == null || "".equals(reqpath)) {
+    if (controller == null) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
@@ -97,7 +94,8 @@ public class ControllerServlet extends HttpServlet {
       vs.add("HOME");
       vs.add("AWAY");
       vs.add("NOT READY");
-    } else if (controller.type == Controller.Type.PROJECTOR) {
+    } else if (controller.type == Controller.Type.PROJECTOR
+            || controller.type == Controller.Type.LIGHTS) {
       vs.add("1");
       vs.add("0");
     } else if (controller.type == Controller.Type.RGB) {
@@ -108,7 +106,7 @@ public class ControllerServlet extends HttpServlet {
   }
 
   /**
-   * Handles the HTTP <code>POST</code> method.
+   * Handles the Controllers reads for Open House Automation updates the Controller.setActualState()
    *
    * @param request servlet request
    * @param response servlet response
@@ -118,10 +116,14 @@ public class ControllerServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-// handles sensor updates
     response.setContentType("text/plain;charset=UTF-8");
     final String reqpath = request.getPathInfo();
     log.log(Level.INFO, "request path:" + reqpath);
+
+    if (Strings.isNullOrEmpty(reqpath)) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
+      return;
+    }
 
     // lights handle 16 at a time vs one, split out early
     if (reqpath.startsWith("/lights")) {
@@ -138,11 +140,13 @@ public class ControllerServlet extends HttpServlet {
     log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{controllerid, controllervalue, auth});
 
     // load the controller
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
     Controller controller = ofy().load().type(Controller.class).id(Long.parseLong(controllerid)).now();
 
     // check that everything looks good
-    if (controller == null || Strings.isNullOrEmpty(reqpath)) {
+    if (controller == null) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing controller or path");
       return;
     }
@@ -174,9 +178,8 @@ public class ControllerServlet extends HttpServlet {
   }
 
   /**
-   * A controller calls this path to update the actual state of a device If the
-   * actual state changes with no desired change, someone overrode it locally
-   * So, will go into manual mode. Window is 3 mins.
+   * A controller calls this path to update the actual state of a device If the actual state changes with no desired
+   * change, someone overrode it locally So, will go into manual mode. Window is 3 mins.
    *
    * @return a String containing servlet description
    */
@@ -223,6 +226,9 @@ public class ControllerServlet extends HttpServlet {
         nhnotif.setSubject("Controller AUTO->MANUAL");
         nhnotif.send();
       }
+      if (controller.getValidStates() == null) {
+        initalizeValidStates(controller);
+      }
       if (controller.getValidStates().contains(controllervalue)) {
         controller.setDesiredState(controllervalue);
         log.log(Level.INFO, "POST /device, desired state:{0} @{1}",
@@ -234,7 +240,7 @@ public class ControllerServlet extends HttpServlet {
   }
 
   private boolean checkValidation(Controller c, String value, String authhash) {
-    log.log(Level.INFO, "k={0},v={1}, auth={2}", new Object[]{c.getName(), value, authhash});
+    log.log(Level.INFO, "name={0},state={1}, auth={2}", new Object[]{c.getName(), value, authhash});
     SipHashHelper shh = new SipHashHelper();
     return shh.validateHash(c.getId().toString(), value, authhash);
   }
@@ -282,6 +288,7 @@ public class ControllerServlet extends HttpServlet {
     cexpir.setLastContactDate(Convutils.getNewDateTime());
     ofy().save().entity(cexpir).now();
   }
+
   /**
    * Handles an X10 light controller, 16 lights at a time
    *
@@ -298,39 +305,85 @@ public class ControllerServlet extends HttpServlet {
     }
     // check if unexpired
     checkLightControllerUnexpired();
-
     // first, set the desired state
     // if the actual setting is not the same as the desired setting,
-    // then someone has locally overridden the setting.
+    // then return desired setting (x10 is one-way for now)
+    // TODO listen for x10 signals and report them from microcontroller
     char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
+
     List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
+    boolean validinputdata = validateInputData(lights, actualstate);
+    boolean dirty = false;
     for (Controller c : lights) {
+      if (c.getZone().equals("SYSTEM")) {
+        continue; // the fake controller for expiration
+      }
       int lightnum = Integer.parseInt(c.getZone());
       String curstate = actualstate.substring(lightnum, lightnum + 1);
-      // safely handle new lights by setting to off
+      // handle brand new controllers
       if (Strings.isNullOrEmpty(c.getDesiredState())) {
         c.setDesiredState("0");
       }
-
-      if (!c.getActualState().equals(curstate)) {
-        // a new update for the actual state of a light
-        log.log(Level.INFO, "POST /lights, D:" + c.getActualState() + " @" + c.getLastActualStateChange());
-        c.setActualState(curstate);
-        c.setLastActualStateChange(Convutils.getNewDateTime());
+      if (!curstate.equals(c.getActualState())) {
+        // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
+        // check for valid input data, as a crashing device can send garbage
+        // in that case, send back known good data and ignore the device data
+        if (!curstate.equals("x") && validinputdata) {
+          log.log(Level.INFO, "updating actual and desired state, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
+          c.setActualState(curstate);
+          c.setLastActualStateChange(Convutils.getNewDateTime());
+          c.setDesiredState(curstate);
+        }
+        dirty = true;
       }
-      // only set the values from network request that make sense
       if (c.getDesiredState().equals("1")) {
         toret[lightnum] = '1';
       }
       if (c.getDesiredState().equals("0")) {
         toret[lightnum] = '0';
       }
+      if (c.getLastContactDate().plusMinutes(20).isBeforeNow()) {
+        // update only 3x per hour to save DS writes
+        // expiration alert after 1 hour
+        log.log(Level.INFO, "updating last contact date");
+        c.setLastContactDate(Convutils.getNewDateTime());
+        dirty = true;
+      }
+    }
+    if (dirty) {
+      ofy().save().entities(lights).now();
+      log.log(Level.INFO, "returning " + new String(toret));
+      response.setStatus(HttpServletResponse.SC_OK);
+      out.print(new String(toret));
+      return;
     }
 
-    ofy().save().entities(lights);
-    log.log(Level.INFO, "returning {0}", new String(toret));
-    out.print(new String(toret));
-    out.flush();
+  }
+
+  private boolean validateInputData(List<Controller> lights, String actualstate) {
+    // validate the device presents a sane state
+    // i.e. xxxxxxxxxxxxxxxxx would be expected (boot-up), as well as
+    //      0x00x1xxxxxxxxxxx if there were 4 lights configured
+    // but  1101001xx1x0x0x10 means controllercount != devicecount
+    // so mark it dirty
+    int controllercount = lights.size();
+    int devicecount = getDeviceCount(actualstate);
+    if (controllercount == devicecount) {
+      return true;
+    }
+    return false;
+  }
+
+  private int getDeviceCount(String actualstate) {
+    int devicecount = 0;
+    for (int i = 0; i < actualstate.length(); i++) {
+      if (actualstate.charAt(i) != 'x') {
+        devicecount++;
+      }
+    }
+    return devicecount;
   }
 }

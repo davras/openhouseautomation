@@ -21,7 +21,8 @@ import java.util.logging.Logger;
  */
 public class Rgb extends DeferredController {
   static String[] DEV_IDS = {
-    ""
+    "3a0032001347343432313031",
+    "55003d000f51353338363333"
   };
   public static final Logger log = Logger.getLogger(Rgb.class.getName());
   
@@ -30,8 +31,8 @@ public class Rgb extends DeferredController {
   
   @Override
   public void run() {
-    for (int i=0; i < DEV_IDS.length; i++) {
-      tickleDevice(DEV_IDS[i]);
+    for (String dev_id : DEV_IDS) {
+      tickleDevice(dev_id);
     }
   }
   
