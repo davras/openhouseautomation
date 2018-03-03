@@ -99,8 +99,8 @@ public class ControllerServlet extends HttpServlet {
       vs.add("1");
       vs.add("0");
     } else if (controller.type == Controller.Type.RGB) {
-      vs.add("000000");
-      vs.add("ffffff");
+      vs.add("#000000");
+      vs.add("#ffffff");
     }
     controller.setValidStates(vs);
   }

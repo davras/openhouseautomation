@@ -20,22 +20,24 @@ import java.util.logging.Logger;
  * @author dave
  */
 public class Rgb extends DeferredController {
+
+  // TODO add automatic discovery
   static String[] DEV_IDS = {
-    "3a0032001347343432313031",
-    "55003d000f51353338363333"
+    "3c0035000747353138383138",
+    "380022000447343138333038"
   };
   public static final Logger log = Logger.getLogger(Rgb.class.getName());
-  
+
   public Rgb() {
   }
-  
+
   @Override
   public void run() {
     for (String dev_id : DEV_IDS) {
       tickleDevice(dev_id);
     }
   }
-  
+
   private void tickleDevice(String device) {
     //make API call to set the color on all devices
     String access_token = DatastoreConfig.getValueForKey("particleapiaccesstoken", "");
@@ -52,24 +54,22 @@ public class Rgb extends DeferredController {
       con.addRequestProperty("Authorization", "Bearer " + access_token);
       con.setRequestMethod("POST");
       //con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-      
-      String urlParameters = "args=" + super.controller.getDesiredState();
+
       log.log(Level.INFO, "Sending 'POST' request to URL : " + url);
-      log.log(Level.INFO, "Post parameters : " + urlParameters);
       // Send post request
       con.setDoOutput(true);
       DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-      wr.writeBytes(urlParameters);
+      wr.writeBytes("ping");
       wr.flush();
       wr.close();
       int responseCode = con.getResponseCode();
       log.log(Level.INFO, "Response Code : " + responseCode);
-      
+
       BufferedReader in = new BufferedReader(
               new InputStreamReader(con.getInputStream()));
       String inputLine;
       StringBuffer response = new StringBuffer();
-      
+
       while ((inputLine = in.readLine()) != null) {
         response.append(inputLine);
       }

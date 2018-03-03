@@ -174,7 +174,7 @@
                     devices.fastpull = false;
                   });
         }
-      }, 2000);
+      }, 5000);
       $scope.$on('$destroy', function() {
         $interval.cancel(devicePromise);
       });

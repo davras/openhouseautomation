@@ -389,7 +389,7 @@ public class DisplaySourceServlet extends HttpServlet {
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
       if (state.startsWith("#")) {
-        controller.setDesiredState(state.substring(1));
+        controller.setDesiredState(state);
       }
       controller.setLastDesiredStateChange(Convutils.getNewDateTime());
       ofy().save().entity(controller).now();

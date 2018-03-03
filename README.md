@@ -1,31 +1,40 @@
 Goals:
 ======
-
+- Make a house intelligent, with independent decision making.
+ - Save energy.
+ - Transparent, house should work like a normal dumb house during failure.
+ - Cheap...each device needs to be < $100 (including the CPU, sensors, displays, comms, etc.)
+ - Easy to use. Set the keys, load the firmware, done.
+ - Use the cloud, not an expensive "central controller".
+ 
 - Use devices to automate a house:
  - Thermostat
- - Lights (X-10) and LED strip accent lighting
- - Home entertainment (IR LED)
- - Alarm monitoring
+ - Lights and LED strip accent lighting
+ - Alarm
  - Whole House Fan
  - Serial control (remote turn on/off, input select, etc.)
-- Cheap...each device needs to be < $100 (including the CPU, sensors, displays, comms, etc.)
-- Easy to use. Set the keys, load the firmware, done.
-- Use the cloud, not an expensive "central controller".
+
 - Control from:
  - Android app
  - Web page
  - RPi controller
- - Arduino controller.
+ - Particle controller.
 
-Features:
+Features done:
 =========
+- Triggers allow if-then. If the front door opens, turn on the porch light. If the garage door opens, turn on the garage lights. If the back door opens, turn on the back porch light for 5 mins.
+- Whole House Fan pre-cools the house the night before based on tomorrow's forecast high.
+ - Saves energy by not running AC on hot days.
+ - Maintains comfortable sleeping temperature during the night.
+ - Integrated with Google Cloud Pubsub and webhooks.
 
+Todo:
+=========
 - Open hardware, open software, open firmware
 - Make GAE 'learn' the scenes, like "arrived home", "going to bed", etc.
-- Triggers allow if-then. If the front door opens, turn on the porch light. If the garage door opens, turn on the garage lights. If the back door opens, turn on the back porch light for 5 mins.
-- Simple, secure protocol
- - Each device has a numeric ID
- - Each request will have a "time+shared secret"-based hash
+- RGB LED strips to set lighting for optimal colors.
+ - Blue during daytime, yellow evening, red night, off for sleeping.
+ - Auto-on red night light if movement detected.
 
 Code for:
 =========
@@ -37,24 +46,16 @@ Code for:
 Current status:
 ===============
 
-- Arduino code finished for wired ethernet Arduino
-- Arduino code finished for wireless Arduino (CC3000 and WiFi shields)
-- Arduino code finished for Makershed arLCD + WiFi shield.
-- Arduino code finished for Sparkfun Weather Shield, but needs wiring diagram.
-- Spark code done for BMP180 and DS18B20 sensors
-- Shell script for controlling the Whole House Fan
-- Particle Core for remote projector
-- Arduino code for X10 (lights)
+- Done:
+ - Ambient light/proximity sensor
+ - Temperature (DS18B20 and TMD2271)
+ - Shell script for controlling the Whole House Fan
+ - Particle Core for remote projector
 
-To do:
-======
-
-
-Maybe:
-======
-
-- Insteon (if it gets cheap enough)
-- Wireless X10 (if it gets cheap enough)
+- In progress:
+ - Front Door Lock
+ - Thermostat
+ - PIR/Occupancy/Movement Sensor
 
 Setup Instructions:
 ===================

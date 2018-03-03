@@ -2,7 +2,7 @@
     <!-- <h2>Changing from {{device.actualState}} to {{device.desiredState}}...please wait</h2> -->
     <input type="color"
            ng-model="device.desiredState"
-           ng-value="device.actualState"
+           ng-value="device.desiredState"
            ng-change="processForm(device.id, device.desiredState)" />
     <img ng-show="device.desiredState != device.actualState" 
          src="/images/ic_cloud_upload_grey600_24dp.png" height="45" width="45"/>

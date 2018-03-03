@@ -80,8 +80,8 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         if (controller.getValidStates() == null) {
           if (controller.type == Controller.Type.RGB) {
             List vs = new ArrayList();
-            vs.add("000000");
-            vs.add("ffffff");
+            vs.add("#000000");
+            vs.add("#ffffff");
             controller.setValidStates(vs);
           }
         }
@@ -95,7 +95,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         }
       }
       // also triggers the postprocessing onSave()
-      ofy().save().entity(controller);
+      ofy().save().entity(controller).now();
       log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
       out.println(controller.getDesiredState());
       response.setStatus(HttpServletResponse.SC_OK);
