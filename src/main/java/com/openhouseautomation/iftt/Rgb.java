@@ -21,11 +21,6 @@ import java.util.logging.Logger;
  */
 public class Rgb extends DeferredController {
 
-  // TODO add automatic discovery
-  static String[] DEV_IDS = {
-    "3c0035000747353138383138",
-    "380022000447343138333038"
-  };
   public static final Logger log = Logger.getLogger(Rgb.class.getName());
 
   public Rgb() {
@@ -33,19 +28,13 @@ public class Rgb extends DeferredController {
 
   @Override
   public void run() {
-    for (String dev_id : DEV_IDS) {
-      tickleDevice(dev_id);
-    }
-  }
-
-  private void tickleDevice(String device) {
     //make API call to set the color on all devices
     String access_token = DatastoreConfig.getValueForKey("particleapiaccesstoken", "");
     if (Strings.isNullOrEmpty(access_token)) {
       return;
     }
     try {
-      String url = "https://api.particle.io/v1/devices/" + device + "/updateOHA";
+      String url = "https://api.particle.io/v1/devices/events";
       URL obj = new URL(url);
       HttpURLConnection con = (HttpURLConnection) obj.openConnection();
       con.setDoOutput(true);
@@ -57,9 +46,12 @@ public class Rgb extends DeferredController {
 
       log.log(Level.INFO, "Sending 'POST' request to URL : " + url);
       // Send post request
-      con.setDoOutput(true);
       DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-      wr.writeBytes("ping");
+      wr.writeBytes("name=lightcolor&data=");
+      wr.writeBytes(getController().getId().toString());
+      wr.writeBytes("/");
+      wr.writeBytes(getController().getDesiredState());
+      wr.writeBytes("&private=true&ttl=60");
       wr.flush();
       wr.close();
       int responseCode = con.getResponseCode();
