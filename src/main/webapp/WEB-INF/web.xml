@@ -70,10 +70,6 @@
         <servlet-class>com.openhouseautomation.notification.IncomingMailHandlerServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListenServlet</servlet-name>
-        <servlet-class>com.openhouseautomation.ListenServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
         <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
     </servlet>
@@ -186,11 +182,6 @@
     <servlet-mapping>
         <servlet-name>IncomingMailHandlerServlet</servlet-name>
         <url-pattern>/_ah/mail/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListenServlet</servlet-name>
-        <url-pattern>/listen</url-pattern>
-        <url-pattern>/listen/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CombinedReadingDataSourceServlet</servlet-name>

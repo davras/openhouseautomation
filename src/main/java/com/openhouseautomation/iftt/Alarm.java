@@ -1,5 +1,8 @@
 package com.openhouseautomation.iftt;
 
+import static com.openhouseautomation.OfyService.ofy;
+import static com.openhouseautomation.iftt.Light.log;
+import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.logging.Level;
@@ -32,6 +35,36 @@ public class Alarm extends DeferredController {
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Alarm Not Ready");
       nhnotif.setBody("Door/Window left open");
+      nhnotif.send();
+    }
+    // turn off the Den Light when the Alarm is set (leaving home)
+    if ("Away".equals(super.controller.getActualState()) &&
+            !"Away".equals(super.controller.getPreviousState())) {
+      setController(3640433672L, "0");
+      log.log(Level.INFO, "Den light off");
+    }
+    if ("Disarm".equals(super.controller.getActualState()) &&
+            !"Disarm".equals(super.controller.getPreviousState())) {
+      setController(3640433672L, "1");
+      log.log(Level.INFO, "Den light on");
+    }
+  }
+    public void setController(Long controllerid, String state) {
+    if (com.openhouseautomation.Flags.clearCache) {
+      //ofy().clear(); // clear the session cache, not the memcache
+    }
+    Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
+    if (controller != null && !controller.getDesiredState().equals(state)) {
+      controller.setDesiredState(state);
+      ofy().save().entity(controller).now();
+      NotificationHandler nhnotif = new NotificationHandler();
+      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
+      nhnotif.setSubject("Den Lights");
+      if ("1".equals(state)) {
+        nhnotif.setBody("Lights On");
+      } else {
+        nhnotif.setBody("Lights Off");
+      }
       nhnotif.send();
     }
   }

@@ -98,18 +98,5 @@ public class ControllerServletTest {
     fail("The test case is a prototype.");
   }
 
-  /**
-   * Test of doLights method, of class ControllerServlet.
-   */
-  //@Test
-  public void testDoLights() throws Exception {
-    System.out.println("doLights");
-    HttpServletRequest request = null;
-    HttpServletResponse response = null;
-    ControllerServlet instance = new ControllerServlet();
-    instance.doLights(request, response);
-    // TODO review the generated test code and remove the default call to fail.
-    fail("The test case is a prototype.");
-  }
 
 }

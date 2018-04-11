@@ -125,13 +125,6 @@ public class ControllerServlet extends HttpServlet {
       return;
     }
 
-    // lights handle 16 at a time vs one, split out early
-    if (reqpath.startsWith("/lights")) {
-      doLights(request, response);
-      return;
-    }
-    // this point on, only one controller per device
-
     // extract values from request
     PrintWriter out = response.getWriter();
     String auth = request.getParameter("auth");
@@ -245,24 +238,6 @@ public class ControllerServlet extends HttpServlet {
     return shh.validateHash(c.getId().toString(), value, authhash);
   }
 
-  private Controller makeNewLightExpirationController() {
-    log.log(Level.WARNING, "Making a new light expiration controller");
-    Controller cexpir = new Controller();
-    cexpir.setOwner("SYSTEM");
-    cexpir.setLocation("SYSTEM");
-    cexpir.setZone("SYSTEM");
-    cexpir.setType(Controller.Type.LIGHTS);
-    cexpir.setDesiredState("0");
-    cexpir.setDesiredStatePriority(Controller.DesiredStatePriority.AUTO);
-    cexpir.setActualState("0");
-    cexpir.setLastDesiredStateChange(Convutils.getNewDateTime());
-    cexpir.setLastActualStateChange(Convutils.getNewDateTime());
-    cexpir.setId(1234567890L);
-    cexpir.setName("Lights");
-    cexpir.setLastContactDate(Convutils.getNewDateTime());
-    return cexpir;
-  }
-
   /**
    * Returns a short description of the servlet.
    *
@@ -271,119 +246,5 @@ public class ControllerServlet extends HttpServlet {
   @Override
   public String getServletInfo() {
     return "Handles sensor reads and updates";
-  }
-
-  private void checkLightControllerUnexpired() {
-    Controller cexpir = ofy().load().type(Controller.class).id(1234567890L).now();
-    if (cexpir == null) {
-      cexpir = makeNewLightExpirationController();
-    }
-    if (cexpir.getLastContactDate().isBefore(Convutils.getNewDateTime().minusMinutes(10))) {
-      // notify someone
-      NotificationHandler nh = new NotificationHandler();
-      nh.setSubject("Light Controller online");
-      nh.setBody("Controller online: " + cexpir.getName());
-      nh.page();
-    }
-    cexpir.setLastContactDate(Convutils.getNewDateTime());
-    ofy().save().entity(cexpir).now();
-  }
-
-  /**
-   * Handles an X10 light controller, 16 lights at a time
-   *
-   * @param request
-   * @param response
-   * @throws IOException
-   */
-  public void doLights(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    PrintWriter out = response.getWriter();
-    final String actualstate = request.getParameter("v");
-    if (Strings.isNullOrEmpty(actualstate)) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, "passed value needs to have 16x[0,1]");
-      return;
-    }
-    // check if unexpired
-    checkLightControllerUnexpired();
-    // first, set the desired state
-    // if the actual setting is not the same as the desired setting,
-    // then return desired setting (x10 is one-way for now)
-    // TODO listen for x10 signals and report them from microcontroller
-    char[] toret = "xxxxxxxxxxxxxxxxx".toCharArray();
-    if (com.openhouseautomation.Flags.clearCache) {
-      ofy().clear(); // clear the session cache, not the memcache
-    }
-
-    List<Controller> lights = ofy().load().type(Controller.class).filter("type", "LIGHTS").list();
-    boolean validinputdata = validateInputData(lights, actualstate);
-    boolean dirty = false;
-    for (Controller c : lights) {
-      if (c.getZone().equals("SYSTEM")) {
-        continue; // the fake controller for expiration
-      }
-      int lightnum = Integer.parseInt(c.getZone());
-      String curstate = actualstate.substring(lightnum, lightnum + 1);
-      // handle brand new controllers
-      if (Strings.isNullOrEmpty(c.getDesiredState())) {
-        c.setDesiredState("0");
-      }
-      if (!curstate.equals(c.getActualState())) {
-        // the light controller will send 17 'x' characters when it boots up because it doesn't know the state
-        // check for valid input data, as a crashing device can send garbage
-        // in that case, send back known good data and ignore the device data
-        if (!curstate.equals("x") && validinputdata) {
-          log.log(Level.INFO, "updating actual and desired state, D:{0} @{1}", new Object[]{c.getActualState(), c.getLastActualStateChange()});
-          c.setActualState(curstate);
-          c.setLastActualStateChange(Convutils.getNewDateTime());
-          c.setDesiredState(curstate);
-        }
-        dirty = true;
-      }
-      if (c.getDesiredState().equals("1")) {
-        toret[lightnum] = '1';
-      }
-      if (c.getDesiredState().equals("0")) {
-        toret[lightnum] = '0';
-      }
-      if (c.getLastContactDate().plusMinutes(20).isBeforeNow()) {
-        // update only 3x per hour to save DS writes
-        // expiration alert after 1 hour
-        log.log(Level.INFO, "updating last contact date");
-        c.setLastContactDate(Convutils.getNewDateTime());
-        dirty = true;
-      }
-    }
-    if (dirty) {
-      ofy().save().entities(lights).now();
-      log.log(Level.INFO, "returning " + new String(toret));
-      response.setStatus(HttpServletResponse.SC_OK);
-      out.print(new String(toret));
-      return;
-    }
-
-  }
-
-  private boolean validateInputData(List<Controller> lights, String actualstate) {
-    // validate the device presents a sane state
-    // i.e. xxxxxxxxxxxxxxxxx would be expected (boot-up), as well as
-    //      0x00x1xxxxxxxxxxx if there were 4 lights configured
-    // but  1101001xx1x0x0x10 means controllercount != devicecount
-    // so mark it dirty
-    int controllercount = lights.size();
-    int devicecount = getDeviceCount(actualstate);
-    if (controllercount == devicecount) {
-      return true;
-    }
-    return false;
-  }
-
-  private int getDeviceCount(String actualstate) {
-    int devicecount = 0;
-    for (int i = 0; i < actualstate.length(); i++) {
-      if (actualstate.charAt(i) != 'x') {
-        devicecount++;
-      }
-    }
-    return devicecount;
   }
 }

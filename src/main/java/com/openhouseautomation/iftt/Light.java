@@ -5,15 +5,12 @@
  */
 package com.openhouseautomation.iftt;
 
-import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -33,16 +30,12 @@ public class Light extends DeferredSensor {
       outsidelight = Float.parseFloat(super.sensor.getLastReading());
     } catch (NumberFormatException e) {
     }
-    DateTime now = Convutils.getNewDateTime();
-    int curhour = now.getHourOfDay();
-    boolean lights = false;
-    double lightslope = Utilities.getSlope(3885021817L, 60 * 30);
-    log.log(Level.INFO, "Light slope: " + lightslope);
-    if (lightslope > 25) {
+    log.log(Level.INFO, "Light value: " + outsidelight);
+    if (outsidelight > 75) {
       setController(3640433672L, "0");
       log.log(Level.INFO, "Den light off");
     }
-    if (lightslope < -25) {
+    if (outsidelight < 25) {
       setController(3640433672L, "1");
       log.log(Level.INFO, "Den light on");
     }
@@ -65,6 +58,7 @@ public class Light extends DeferredSensor {
         nhnotif.setBody("Lights Off");
       }
       nhnotif.send();
+      log.log(Level.INFO, "Notification sent");
     }
   }
 }
