@@ -3,7 +3,7 @@
   <application>gautoard</application>
   <runtime>java8</runtime>
   <!-- <url-stream-handler>urlfetch</url-stream-handler> -->
-  <version>64d</version>
+  <version>65ui</version>
   <!-- Allows App Engine to send multiple requests to one instance in parallel: -->
   <threadsafe>true</threadsafe>
   <system-properties>

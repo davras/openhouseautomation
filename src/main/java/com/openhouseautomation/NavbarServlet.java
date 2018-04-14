@@ -34,41 +34,56 @@ public class NavbarServlet extends HttpServlet {
     response.setContentType("text/html;charset=UTF-8");
     try (PrintWriter out = response.getWriter()) {
       UserService userService = UserServiceFactory.getUserService();
-      out.println(
-              "<nav class=\"navbar navbar-default navbar-fixed-top navbar-inverse\">\n"
-              + "  <div class=\"container-fluid\">\n"
-              + "<!--ver 30d-->"
-              + "    <!-- Brand and toggle get grouped for better mobile display -->\n"
-              + "    <div class=\"navbar-header\">\n"
-              + "      <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#oha-navbar-collapse-1\" aria-expanded=\"false\">\n"
-              + "        <span class=\"sr-only\">Toggle navigation</span>\n"
-              + "        <span class=\"icon-bar\"></span>\n"
-              + "        <span class=\"icon-bar\"></span>\n"
-              + "        <span class=\"icon-bar\"></span>\n"
-              + "      </button>\n"
-      );
       if (request.getUserPrincipal() != null) {
-        //out.println("<a class=\"navbar-brand\" href=\"/\">" + request.getUserPrincipal().getName() + "</a>");
-        out.println("<a class=\"navbar-brand\" href=\"/\"><img src=\"/images/ic_home_white_24dp.png\" height=\"36\" width=\"36\"></a>");
-      } else {
-        out.print("<a class=\"navbar-brand\" href=\"" + userService.createLoginURL(request.getRequestURI().replace("navbar.html", "")) + "\">Login</a>");
+        out.println(getLogout(userService.createLogoutURL(request.getRequestURI().replace("navbar.html", ""))));
+        return;
       }
-      out.println(
-              "    </div>\n"
-              + "    <!-- Collect the nav links, forms, and other content for toggling -->\n"
-              + "    <div class=\"collapse navbar-collapse\" id=\"oha-navbar-collapse-1\">\n"
-              + "      <ul class=\"nav navbar-nav\">\n"
-      );
-      if (request.getUserPrincipal() != null) {
-        out.println("<nav class=\"navbar\" style=\"margin-bottom: 0px; \">" +
-                "<a class=\"navbar-brand text-center\" href=\"" + userService.createLogoutURL(request.getRequestURI().replace("navbar.html", "")) + "\">Logout</a>");
-      }
-      out.println(
-              "      </nav>\n"
-              + "    </div><!-- /.navbar-collapse -->\n"
-              + "  </div><!-- /.container-fluid -->\n"
-              + "</nav>");
+      out.println(getLogin(userService.createLoginURL(request.getRequestURI().replace("navbar.html", ""))));
     }
+  }
+
+  protected String getLogout(String logoutURL) {
+    String logoutpage = "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
+            + "        <a class=\"pull-left\"><img src=\"/images/ic_home_white_24dp.png\"></a>"
+            + "        <div class=\"navbar-header\">"
+            + "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">"
+            + "            <span class=\"icon-bar\"></span>"
+            + "            <span class=\"icon-bar\"></span>"
+            + "            <span class=\"icon-bar\"></span>"
+            + "          </button>"
+            + "        </div>"
+            + "        <div class=\"navbar-collapse collapse\">"
+            + "          <ul class=\"nav navbar-nav\">"
+            + "            <li><a href=\"/status.html\">Status</a></li>"
+            + "            <li><a href=\"/control.html\">Control</a></li>"
+            + "            <li><a href=\"/scenes.html\">Scenes</a></li>"
+            + "            <li><a class=\"pull-left\" href=\"" + logoutURL + "\">Logout</a>"
+            + "          </ul>"
+            + "        </div><!--/.nav-collapse -->"
+            + "      </div>";
+    return logoutpage;
+  }
+
+  protected String getLogin(String loginURL) {
+    // separated for readability
+    String loginpage = "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
+            + "        <a class=\"pull-left\" href=\"" + loginURL + "\">Login</a>"
+            + "        <div class=\"navbar-header\">"
+            + "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">"
+            + "            <span class=\"icon-bar\"></span>"
+            + "            <span class=\"icon-bar\"></span>"
+            + "            <span class=\"icon-bar\"></span>"
+            + "          </button>"
+            + "        </div>"
+            + "        <div class=\"navbar-collapse collapse\">"
+            + "          <ul class=\"nav navbar-nav\">"
+            + "            <li><b><a href=\"" + loginURL + "\">Login</b></a>"
+            + "          </ul>"
+            + "        </div><!--/.nav-collapse -->"
+            + "      </div>"
+            + "    </div>"
+            + "  </nav>";
+    return loginpage;
   }
 
   /**
