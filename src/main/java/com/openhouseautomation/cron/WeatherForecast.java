@@ -30,7 +30,7 @@ public class WeatherForecast extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger log = Logger.getLogger(WeatherForecast.class.getName());
   String surl
-          = "http://graphical.weather.gov/xml/SOAP_server/ndfdXMLclient.php?whichClient=NDFDgenMultiZipCode&product=time-series&Unit=e&maxt=maxt&mint=mint&pop12=pop12&Submit=Submit";
+          = "https://graphical.weather.gov/xml/SOAP_server/ndfdXMLclient.php?whichClient=NDFDgenMultiZipCode&product=time-series&Unit=e&maxt=maxt&mint=mint&pop12=pop12&Submit=Submit";
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
