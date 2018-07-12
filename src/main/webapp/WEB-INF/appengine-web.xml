@@ -3,13 +3,14 @@
   <application>gautoard</application>
   <runtime>java8</runtime>
   <!-- <url-stream-handler>urlfetch</url-stream-handler> -->
-  <version>66</version>
+  <version>67</version>
   <!-- Allows App Engine to send multiple requests to one instance in parallel: -->
   <threadsafe>true</threadsafe>
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties" />
     <property name="appengine.api.urlfetch.defaultDeadline" value="30"/>
   </system-properties>
+  <!-- Inbound mail must be enabled to send mail, to handle bounces -->
   <inbound-services>
     <service>mail</service>
   </inbound-services>

@@ -14,11 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author dras
  */
+@WebServlet(name = "notificationtest", description = "Tests the owners pager", urlPatterns = "/notificationtest")
 public class NotificationTestServlet extends HttpServlet {
 
   private static final Logger log = Logger.getLogger(NotificationTestServlet.class.getName());
@@ -34,15 +36,16 @@ public class NotificationTestServlet extends HttpServlet {
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
+    log.log(Level.SEVERE, "TESTING PAGER");
     response.setContentType("text/plain");
     PrintWriter out = response.getWriter();
-    String recipient = DatastoreConfig.getValueForKey("admin", "bob@example.com");
+    String recipient = DatastoreConfig.getValueForKey("pager", "bob@example.com");
     try {
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(recipient);
-      nhnotif.setSubject("Test notification");
+      nhnotif.setSubject("Test notification from " + request.getRemoteHost());
       nhnotif.setBody("This was a test notification");
-      nhnotif.send();
+      nhnotif.page();
       out.println("SENT To: " + recipient);
     } catch (Exception e) {
       log.log(Level.WARNING, "error:" + e.fillInStackTrace());
