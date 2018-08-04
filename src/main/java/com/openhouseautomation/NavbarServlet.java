@@ -66,23 +66,10 @@ public class NavbarServlet extends HttpServlet {
 
   protected String getLogin(String loginURL) {
     // separated for readability
-    String loginpage = "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
+    String loginpage = ""
+            + "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
             + "        <a class=\"pull-left\" href=\"" + loginURL + "\">Login</a>"
-            + "        <div class=\"navbar-header\">"
-            + "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">"
-            + "            <span class=\"icon-bar\"></span>"
-            + "            <span class=\"icon-bar\"></span>"
-            + "            <span class=\"icon-bar\"></span>"
-            + "          </button>"
-            + "        </div>"
-            + "        <div class=\"navbar-collapse collapse\">"
-            + "          <ul class=\"nav navbar-nav\">"
-            + "            <li><b><a href=\"" + loginURL + "\">Login</b></a>"
-            + "          </ul>"
-            + "        </div><!--/.nav-collapse -->"
-            + "      </div>"
-            + "    </div>"
-            + "  </nav>";
+            + "      </div>";
     return loginpage;
   }
 
