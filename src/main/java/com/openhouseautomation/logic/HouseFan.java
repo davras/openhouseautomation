@@ -59,6 +59,7 @@ public class HouseFan {
     // load many temperature readings
     considerSlope();
     computeDesiredSpeed();
+    checkDoorWearInhibit();
     processFanChange();
   }
 
@@ -206,46 +207,41 @@ public class HouseFan {
     wd.addElement("Fan Speed from Forecast", 20, desiredfanspeedtemperatureforecast);
   }
 
-  public boolean shouldTurnOff() {
+  public void shouldTurnOff() {
     // only turn the fan off if insidetemperature is more than 2 deg below setpoint
     if ((insidetemp + 1) < setpoint) {
-      wd.addElement("Door Wear Prevention", newfanspeed, log);
-      return true;
+      wd.addElement("Shutdown Door Wear Prevention", 7, olddesiredfanspeed);
     }
-    return false;
   }
 
-  public boolean shouldTurnOn() {
+  public void shouldTurnOn() {
     if ((insidetemp - 1) > setpoint) {
-      return true;
+      wd.addElement("Startup Door Wear Prevention", 7, olddesiredfanspeed);
     }
-    return false;
+  }
+
+  public void checkDoorWearInhibit() {
+    olddesiredfanspeed = safeParseInt(controller.getDesiredState());
+    wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
+    olddesiredfanspeed = safeParseInt(controller.getDesiredState());
+    // now, what does the weighted decision say?
+    newfanspeed = olddesiredfanspeed;
+    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
+    // check hysteresis
+    if (newdesiredfanspeed == 0 && olddesiredfanspeed == 1) {
+      shouldTurnOff();
+    }
+    if (newdesiredfanspeed == 1 && olddesiredfanspeed == 0) {
+      shouldTurnOn();
+    }
   }
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    olddesiredfanspeed = safeParseInt(controller.getDesiredState());
-    wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
-
-    // now, what does the weighted decision say?
-    newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
-    log.log(Level.INFO, "trying for fan speed: " + newdesiredfanspeed + " because of: " + wd.getTopName());
-
-    if (olddesiredfanspeed < newdesiredfanspeed) {
-      newfanspeed++;
-    }
-    if (olddesiredfanspeed > newdesiredfanspeed) {
-      newfanspeed--;
-    }
+    
+    log.log(Level.INFO, "trying for fan speed: " + safeParseInt(wd.getTopValue()) + " because of: " + wd.getTopName());
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-    // create hysteresis to prevent damper door motor wear
-    if ((olddesiredfanspeed == 0 && newfanspeed == 1 && !shouldTurnOn())
-            || (olddesiredfanspeed == 1 && newfanspeed == 0 && !shouldTurnOff())) {
-      newfanspeed = olddesiredfanspeed;
-      wd.addElement("Damper Door Motor Wear Inhibitor", 8, newfanspeed);
-    }
     // if no changes are necessary
     if (olddesiredfanspeed == newfanspeed) {
       log.log(Level.INFO, "No changes needed");
@@ -253,7 +249,7 @@ public class HouseFan {
     }
     // otherwise, save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
-    ofy().save().entity(controller);
+    ofy().save().entity(controller).now();
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     if (olddesiredfanspeed == 0 || newfanspeed == 0) {
       // log the event
