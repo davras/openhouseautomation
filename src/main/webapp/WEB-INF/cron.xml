@@ -88,4 +88,10 @@
         <schedule>every day 08:00</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
+    <cron>
+        <url>/cron/controller/4280019022/0</url>
+        <description>Turn off Whole House Fan at 8am</description>
+        <schedule>every day 08:01</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
 </cronentries>

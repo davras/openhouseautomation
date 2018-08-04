@@ -316,9 +316,6 @@ public class DisplaySourceServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
-    if (com.openhouseautomation.Flags.clearCache) {
-      ofy().clear(); // clear the session cache, not the memcache
-    }
     Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
 
     // log the event
@@ -339,6 +336,10 @@ public class DisplaySourceServlet extends HttpServlet {
     //List<SceneController> scconts = mapper.readValue(config, List.class);
     for (SceneController scdes : scconts) {
       Controller controller = ofy().load().type(Controller.class).id(scdes.getId()).now();
+      if (controller == null) {
+        log.log(Level.WARNING, "Controller " + scdes.getId() + " does not exist");
+        continue;
+      }
       String state = scdes.getDesiredState();
       if (state == null || "".equals(state)) {
         response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
