@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
   <filter>
     <description>Make sure only authorized users can change house settings</description>
     <filter-name>AuthFilter</filter-name>
@@ -59,10 +62,6 @@
     <servlet-class>com.openhouseautomation.display.DisplaySourceServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>NotificationTest</servlet-name>
-    <servlet-class>com.openhouseautomation.notification.NotificationTestServlet</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>IncomingMailHandlerServlet</servlet-name>
     <servlet-class>com.openhouseautomation.notification.IncomingMailHandlerServlet</servlet-class>
   </servlet>
@@ -70,10 +69,12 @@
     <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
     <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
   </servlet>
+  <!--
   <servlet>
-    <servlet-name>NavbarServlet</servlet-name>
-    <servlet-class>com.openhouseautomation.NavbarServlet</servlet-class>
+      <servlet-name>NavbarServlet</servlet-name>
+      <servlet-class>com.openhouseautomation.NavbarServlet</servlet-class>
   </servlet>
+  -->
   <servlet>
     <servlet-name>ExpirationCheck</servlet-name>
     <servlet-class>com.openhouseautomation.cron.ExpirationCheck</servlet-class>
@@ -173,10 +174,6 @@
     <url-pattern>/status</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>NotificationTest</servlet-name>
-    <url-pattern>/notificationtest</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>IncomingMailHandlerServlet</servlet-name>
     <url-pattern>/_ah/mail/*</url-pattern>
   </servlet-mapping>
@@ -228,10 +225,12 @@
     <servlet-name>ExpirationCheck</servlet-name>
     <url-pattern>/ExpirationCheck</url-pattern>
   </servlet-mapping>
+  <!--
   <servlet-mapping>
-    <servlet-name>NavbarServlet</servlet-name>
-    <url-pattern>/navbar.html</url-pattern>
+      <servlet-name>NavbarServlet</servlet-name>
+      <url-pattern>/navbar.html</url-pattern>
   </servlet-mapping>
+  -->
   <servlet-mapping>
     <servlet-name>HouseTimers</servlet-name>
     <url-pattern>/HouseTimers</url-pattern>

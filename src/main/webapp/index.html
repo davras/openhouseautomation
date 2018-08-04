@@ -6,67 +6,88 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="OpenHouseAutomation landing site">
 
-        <title>Open House Automation</title>
-        <script src="/js/angular.min.js"></script>
-        <script src="/js/angularbootstrap.min.js"></script>
-        <script type="text/javascript" src="/js/app.js"></script>   
-        <!-- Bootstrap core CSS -->
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <title>Open House Automation</title>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  <ng-include src="'/navbar.html'"></ng-include>
 
-        <!-- OHA core CSS -->
-        <link href="/css/main.css" rel="stylesheet">
-
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
-    </head>
-    <body>
-    <ng-include src="'/navbar.html'"></ng-include>
-
-    <div class="container-fluid">
-        <div class="jumbotron col-lg-12">
-            <p>
-                <a href="/status.html" class="btn btn-primary btn-lg">Status</a>
-                <a href="/control.html" class="btn btn-primary btn-lg">Control</a>
-                <a href="/scenes.html" class="btn btn-primary btn-lg">Scenes</a>
-                <a href="/manage/" class="btn btn-primary btn-lg">Manage</a>
-            </p>
-        </div>
-        <hr/>
-        <!--
-        <div ng-controller="AlertsReader as alertsz">
-          <div uib-alert ng-repeat="alertz in alertsz.data" ng-class="alert-danger">
-            {{alertz.msg}}
-          </div>
-        </div>
-        -->
-        <div ng-controller="AlertsReader as alertsz">
-            <script type="text/ng-template" id="alert.html">
-                <div ng-transclude></div>
-            </script>
-            <div ng-repeat="alert in alertsz.data" class="alert alert-danger" >{{alert.msg}}</div>
-        </div>
-        <hr/>
-        <div class="table-condensed" ng-controller="NotificationLog as notifications">
-            <table class="table">
-                <thead>
-                    <tr><th>Time</th><th>Recipient</th><th>Subject</th><th>Body</th>
-                </thead>
-                <tr ng-repeat="notification in notifications.data">
-                    <td>{{notification.notificationtime| date:'short' }}<br>
-                        {{notification.humantime}}</td>
-                    <td>{{notification.recipient}}</td>
-                    <td>{{notification.subject}}</td>
-                    <td>{{notification.body}}</td>
-                </tr>
-            </table>
-        </div>
+  <div class="container-fluid">
+    <div class="col-sm-3 col-md-2 sidebar">
+      <ul class="nav nav-sidebar">
+        <li class="nav-header">Overview</li>
+        <li class="divider"></li>
+        <li class="nav-header"><a href="/status.html">Status</a></li>
+        <li class="divider"></li>
+        <li class="nav-header"><a href="/control.html">Control</a></li>
+        <li class="divider"></li>
+        <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
+        <li class="divider"></li>
+        <li class="nav-header"><a href="/charts.html">Charts</a></li>
+        <li class="divider"></li>
+        <li class="nav-header"><a href="/manage.html">Manage</a></li>
+      </ul>
     </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/bootstrap.min.js"></script>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <div class="jumbotron">
+        <p>
+          <a href="/status.html" class="btn btn-primary btn-lg">Status</a>
+          <a href="/control.html" class="btn btn-primary btn-lg">Control</a>
+        </p>
+        <p>
+          <a href="/scenes.html" class="btn btn-primary btn-lg">Scenes</a>
+          <a href="/manage/" class="btn btn-primary btn-lg">Manage</a>
+        </p>
+      </div>
+      <hr/>
+      <!--
+      <div ng-controller="AlertsReader as alertsz">
+        <div uib-alert ng-repeat="alertz in alertsz.data" ng-class="alert-danger">
+          {{alertz.msg}}
+        </div>
+      </div>
+      -->
+      <div ng-controller="AlertsReader as alertsz">
+        <script type="text/ng-template" id="alert.html">
+          <div ng-transclude></div>
+        </script>
+        <div ng-repeat="alert in alertsz.data" class="alert alert-danger" >{{alert.msg}}</div>
+      </div>
+      <hr/>
+      <div class="table-condensed" ng-controller="NotificationLog as notifications">
+        <table class="table">
+          <thead>
+            <tr><th>Time</th><th>Recipient</th><th>Subject</th><th>Body</th>
+          </thead>
+          <tr ng-repeat="notification in notifications.data">
+            <td>{{notification.notificationtime| date:'short' }}<br>
+              {{notification.humantime}}</td>
+            <td>{{notification.recipient}}</td>
+            <td>{{notification.subject}}</td>
+            <td>{{notification.body}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/angular.min.js"></script>
+<script src="/js/angularbootstrap.min.js"></script>
+<script type="text/javascript" src="/js/app.js"></script>   
+<!-- Bootstrap core CSS -->
+<link href="/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- OHA core CSS -->
+<link href="/css/main.css" rel="stylesheet">
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/js/bootstrap.min.js"></script>
 </body>
 </html>

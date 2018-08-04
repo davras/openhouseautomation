@@ -13,11 +13,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.annotation.WebServlet;
 
 /**
  *
  * @author dave
  */
+
+@WebServlet(name="NavBar", urlPatterns={"/navbar.html"})
 public class NavbarServlet extends HttpServlet {
 
   /**
@@ -43,8 +46,9 @@ public class NavbarServlet extends HttpServlet {
   }
 
   protected String getLogout(String logoutURL) {
-    String logoutpage = "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
-            + "        <a class=\"pull-left\"><img src=\"/images/ic_home_white_24dp.png\"></a>"
+    String logoutpage = 
+              "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
+            + "        <a class=\"pull-left\" href=\"/\"><img src=\"/images/ic_home_white_24dp.png\"></a>"
             + "        <div class=\"navbar-header\">"
             + "          <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">"
             + "            <span class=\"icon-bar\"></span>"
@@ -66,9 +70,9 @@ public class NavbarServlet extends HttpServlet {
 
   protected String getLogin(String loginURL) {
     // separated for readability
-    String loginpage = ""
-            + "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
-            + "        <a class=\"pull-left\" href=\"" + loginURL + "\">Login</a>"
+    String loginpage = 
+              "      <div class=\"navbar navbar-inverse navbar-fixed-top\">"
+            + "        <a class=\"pull-left\" href=\"" + loginURL + "\"><h1>Login</h1></a>"
             + "      </div>";
     return loginpage;
   }
