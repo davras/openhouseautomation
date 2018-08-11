@@ -10,6 +10,10 @@
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties" />
     <property name="appengine.api.urlfetch.defaultDeadline" value="30"/>
   </system-properties>
+  <!-- Inbound mail must be enabled to send mail, to handle bounces -->
+  <inbound-services>
+    <service>mail</service>
+  </inbound-services>
   <automatic-scaling>
     <min-pending-latency>5000ms</min-pending-latency>
     <max-idle-instances>1</max-idle-instances>

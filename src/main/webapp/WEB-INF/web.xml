@@ -69,12 +69,12 @@
     <servlet-name>CombinedReadingDataSourceServlet</servlet-name>
     <servlet-class>com.openhouseautomation.display.CombinedReadingDataSourceServlet</servlet-class>
   </servlet>
-  <!--
+  
   <servlet>
       <servlet-name>NavbarServlet</servlet-name>
       <servlet-class>com.openhouseautomation.NavbarServlet</servlet-class>
   </servlet>
-  -->
+  
   <servlet>
     <servlet-name>ExpirationCheck</servlet-name>
     <servlet-class>com.openhouseautomation.cron.ExpirationCheck</servlet-class>
@@ -225,12 +225,12 @@
     <servlet-name>ExpirationCheck</servlet-name>
     <url-pattern>/ExpirationCheck</url-pattern>
   </servlet-mapping>
-  <!--
+  
   <servlet-mapping>
       <servlet-name>NavbarServlet</servlet-name>
       <url-pattern>/navbar.html</url-pattern>
   </servlet-mapping>
-  -->
+  
   <servlet-mapping>
     <servlet-name>HouseTimers</servlet-name>
     <url-pattern>/HouseTimers</url-pattern>
