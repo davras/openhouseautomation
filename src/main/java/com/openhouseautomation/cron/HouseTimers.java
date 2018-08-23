@@ -64,9 +64,6 @@ public class HouseTimers extends HttpServlet {
     HouseFan hf = new HouseFan();
     String hfnotify = hf.notifyInManual();
     if (!Strings.isNullOrEmpty(hfnotify)) {
-      WeightedDecision wd = hf.getWeightedDecision();
-      wd.setId(4280019022L);
-      ofy().save().entity(wd);
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Recommend House Fan in AUTO");

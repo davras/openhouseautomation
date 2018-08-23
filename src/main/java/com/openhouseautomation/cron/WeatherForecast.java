@@ -65,21 +65,26 @@ public class WeatherForecast extends HttpServlet {
               = xpath.compile("/dwml/data/parameters/temperature[@type='minimum']/value[1]");
       String minimum = (String) exprmin.evaluate(doc, XPathConstants.STRING);
       // update datastore
+      // This is a lazy load so invalid zipcodes do not create invalid entities.
+      // Helps prevent user error
       Forecast forecast = ofy().load().type(Forecast.class).id(zipcode).now();
       if (forecast == null) {
         forecast = new Forecast();
         forecast.setZipCode(zipcode);
       }
-
+      forecast.setForecastLow(minimum);
+      log.log(Level.INFO, "forecast low=" + minimum);
       XPathExpression exprmax
               = xpath.compile("/dwml/data/parameters/temperature[@type='maximum']/value[1]");
       String maximum = (String) exprmax.evaluate(doc, XPathConstants.STRING);
       forecast.setForecastHigh(maximum);
+      log.log(Level.INFO, "forecast high=" + minimum);
 
       XPathExpression exprpop
               = xpath.compile("/dwml/data/parameters/probability-of-precipitation[@type='12 hour']/value[1]");
       String pop = (String) exprpop.evaluate(doc, XPathConstants.STRING);
       forecast.setForecastPop(pop);
+      log.log(Level.INFO, "forecast pop=" + pop);
       forecast.setLastUpdate(Convutils.getNewDateTime());
 
       log.log(Level.INFO, "forecast cron successful in {0}ms", (System.currentTimeMillis() - curtime));

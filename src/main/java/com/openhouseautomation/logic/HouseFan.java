@@ -56,8 +56,6 @@ public class HouseFan {
     if (!considerForecast()) {
       return;
     }
-    // load many temperature readings
-    considerSlope();
     computeDesiredSpeed();
     checkDoorWearInhibit();
     processFanChange();
@@ -79,10 +77,9 @@ public class HouseFan {
     if (!considerForecast()) {
       return "";
     }
-    considerSlope();
     computeDesiredSpeed();
-    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
-    if (newdesiredfanspeed > 0) {
+    newfanspeed = safeParseInt(wd.getTopValue());
+    if (newfanspeed > 0) {
       String toret = "Outside: " + outsidetemp + "\nInside: " + insidetemp + "\n:Forecast: " + forecasthigh
               + "\nFan controller: " + Controller.DesiredStatePriority.MANUAL.name();
       log.log(Level.WARNING, toret);
@@ -166,24 +163,6 @@ public class HouseFan {
     return false;
   }
 
-  public void considerSlope() {
-    // decrease fan speed if outside is warming up
-    double tempslope = Utilities.getSlope("Outside Temperature", 60 * 60 * 2); // 2 hours readings
-    wd.addElement("Reading Outside Temperature Slope", 1000, tempslope);
-    if (tempslope >= 0.1) {
-      // this will make the fan slow down if temperature outside is increasing, i.e. warming up
-      // to avoid hysteresis, make sure the slope is > 0.1 (increasing)
-      // but don't slow fan if outside is much colder than inside
-      if ((outsidetemp + 5) > insidetemp) {
-        wd.addElement("Outside Temperature Slope", 10, 0);
-      } else {
-        if (safeParseInt(controller.getActualState()) > 0) {
-          wd.addElement("Colder outside, no fan speed change", 20, controller.getActualState());
-        }
-      }
-    }
-  }
-
   public boolean considerForecast() {
     // if the forecast high tomorrow is less than 80F, don't cool house.
     forecasthigh = Utilities.getForecastHigh("95376");
@@ -225,13 +204,12 @@ public class HouseFan {
     wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
     olddesiredfanspeed = safeParseInt(controller.getDesiredState());
     // now, what does the weighted decision say?
-    newfanspeed = olddesiredfanspeed;
-    int newdesiredfanspeed = safeParseInt(wd.getTopValue());
+    newfanspeed = safeParseInt(wd.getTopValue());
     // check hysteresis
-    if (newdesiredfanspeed == 0 && olddesiredfanspeed == 1) {
+    if (newfanspeed == 0 && olddesiredfanspeed == 1) {
       shouldTurnOff();
     }
-    if (newdesiredfanspeed == 1 && olddesiredfanspeed == 0) {
+    if (newfanspeed == 1 && olddesiredfanspeed == 0) {
       shouldTurnOn();
     }
   }
@@ -244,11 +222,12 @@ public class HouseFan {
     newfanspeed = ensureRange(newfanspeed, 0, 5);
     // if no changes are necessary
     if (olddesiredfanspeed == newfanspeed) {
-      log.log(Level.INFO, "No changes needed");
+      log.log(Level.INFO, "No changes needed, old=" + olddesiredfanspeed + ", new=" + newfanspeed);
       return;
     }
     // otherwise, save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
+    controller.setDecision(wd.toJSONString());
     ofy().save().entity(controller).now();
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     if (olddesiredfanspeed == 0 || newfanspeed == 0) {
