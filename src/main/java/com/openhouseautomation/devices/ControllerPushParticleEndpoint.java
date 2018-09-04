@@ -53,8 +53,8 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         response.sendError(HttpServletResponse.SC_OK);
         return;
       }
-      long controllerid = Long.parseLong((String)st1.nextToken());
-      String controllerval = (String)st1.nextToken();
+      long controllerid = Long.parseLong((String) st1.nextToken());
+      String controllerval = (String) st1.nextToken();
       Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
       if (controller == null || Strings.isNullOrEmpty(controllerval)) {
         log.log(Level.WARNING, "Missing controller or path");
@@ -72,7 +72,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
       controller.setLastContactDate(Convutils.getNewDateTime());
 
       if (!controller.getActualState().equals(controllerval)) {
-        log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
+        log.log(Level.WARNING, "POST /device, LastActualState:{0} @{1}",
                 new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
         controller.setActualState(controllerval);
         controller.setLastActualStateChange(Convutils.getNewDateTime());
@@ -90,9 +90,10 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
           log.log(Level.INFO, "desired state:{0} @{1}",
                   new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange().toLocalTime()});
         }
-        if (controller.getType() == Controller.Type.RGB) {
-          controller.setDesiredState(controllerval);
-        }
+      }
+      // TODO only fire this if lights are in AUTO
+      if (controller.getType() == Controller.Type.RGB) {
+        controller.setDesiredState(new com.openhouseautomation.iftt.Rgb().lightLookup());
       }
       // also triggers the postprocessing onSave()
       ofy().save().entity(controller).now();
@@ -104,7 +105,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.
