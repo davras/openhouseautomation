@@ -87,7 +87,7 @@ public class Rgb extends DeferredController {
     Controller projectorcontroller = ofy().load().type(Controller.class).id(4157520376L).now();
     if (projectorcontroller.getActualState().equals("1")) {
       log.log(Level.INFO, "Movie lights");
-      //return "#653d00";
+      return "#653d00";
     }
     // otherwise, return proper color
     DateTime now = Convutils.getNewDateTime();
