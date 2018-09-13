@@ -99,35 +99,34 @@ public class Rgb extends DeferredController {
       // map blue to bright
       r = g = maptoi(hourmin, 0, 50, 6.45, 7.0);
       b = maptoi(hourmin, 0, 255, 6.45, 7.0);
-    }
-    if (hourmin < 12) {
+    } else if (hourmin < 12) {
       // map to yellow
       r = g = maptoi(hourmin, 50, 204, 7.0, 12.0);
       b = maptoi(hourmin, 255, 0, 7.0, 12.0);
-    }
-    if (hourmin < 20) {
+    } else if (hourmin < 20) {
       // map to orange
       r=204;
       g=maptoi(hourmin, 204, 153, 12.0, 20.0);
       b=0;
-    }
-    if (hourmin < 22) {
+    } else if (hourmin < 22) {
       // map to purple
       r=maptoi(hourmin, 204, 102, 20.0, 22.0);
       g=maptoi(hourmin, 153, 0, 20.0, 22.0);
       b=maptoi(hourmin, 0, 255, 20.0, 22.0);
-    }
-    if (hourmin < 24) {
+    } else if (hourmin < 24) {
       // map to low red
       r=maptoi(hourmin, 102, 60, 22.0, 24.0);
       g=0;
       b=maptoi(hourmin, 255, 0,22.0, 24.0);
     }
-    log.log(Level.INFO, "Response: " + rgbtoHex(r, g, b));
+    log.log(Level.INFO, "Response: @" + hourmin + ":" + r + "/" + g + "/" + b + "=" + rgbtoHex(r, g, b));
     return rgbtoHex(r, g, b);
   }
   
   private String intToHex(int i) {
+    if (i < 10) {
+      return "0" + Integer.toHexString(i);
+    }
     return Integer.toHexString(i);
   }
   private String rgbtoHex(int r, int g, int b) {

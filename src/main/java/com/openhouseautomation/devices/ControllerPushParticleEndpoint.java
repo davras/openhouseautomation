@@ -72,7 +72,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
       controller.setLastContactDate(Convutils.getNewDateTime());
 
       if (!controller.getActualState().equals(controllerval)) {
-        log.log(Level.WARNING, "POST /device, LastActualState:{0} @{1}",
+        log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
                 new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
         controller.setActualState(controllerval);
         controller.setLastActualStateChange(Convutils.getNewDateTime());
