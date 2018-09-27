@@ -56,6 +56,7 @@ public class HouseFan {
     if (!considerForecast()) {
       return;
     }
+    considerSlope();
     computeDesiredSpeed();
     checkDoorWearInhibit();
     processFanChange();
@@ -178,6 +179,22 @@ public class HouseFan {
     return true;
   }
 
+  public void considerSlope() {
+    // decrease fan speed if outside is warming up
+    double outsidetemperatureslope = Utilities.getSlope("Outside Temperature", 60 * 60); // 1 hours readings
+    wd.addElement("Reading Outside Temperature Slope", 1000, outsidetemperatureslope);
+    double insidetemperatureslope = Utilities.getSlope("Inside Temperature", 60 * 60); // 1 hours readings
+    wd.addElement("Reading Inside Temperature Slope", 1000, insidetemperatureslope);
+    double outsidelightslope = Utilities.getSlope("Outside Light Level", 60 * 60); // 1 hours readings
+    wd.addElement("Reading Outside Light Slope", 1000, outsidelightslope);
+
+    if (outsidetemperatureslope > 0.01
+            && insidetemperatureslope > 0.01
+            && outsidelightslope > 0.01) {
+      wd.addElement("Temperature Slope", 6, 0);
+    }
+  }
+
   public void computeDesiredSpeed() {
     // compute setpoint based on forecast high for tomorrow
     setpoint = (forecasthigh * -2 / 5) + 100;
@@ -216,7 +233,7 @@ public class HouseFan {
 
   public void processFanChange() {
     // code to update the whf controllers' desired speed next
-    
+
     log.log(Level.INFO, "trying for fan speed: " + safeParseInt(wd.getTopValue()) + " because of: " + wd.getTopName());
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
