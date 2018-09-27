@@ -53,8 +53,8 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         response.sendError(HttpServletResponse.SC_OK);
         return;
       }
-      long controllerid = Long.parseLong((String)st1.nextToken());
-      String controllerval = (String)st1.nextToken();
+      long controllerid = Long.parseLong((String) st1.nextToken());
+      String controllerval = (String) st1.nextToken();
       Controller controller = ofy().load().type(Controller.class).id(controllerid).now();
       if (controller == null || Strings.isNullOrEmpty(controllerval)) {
         log.log(Level.WARNING, "Missing controller or path");
@@ -105,7 +105,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.

@@ -237,8 +237,8 @@ public class HouseFan {
     log.log(Level.INFO, "trying for fan speed: " + safeParseInt(wd.getTopValue()) + " because of: " + wd.getTopName());
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-    // if no changes are necessary
-    if (olddesiredfanspeed == newfanspeed) {
+    // if no changes are necessary, prevent an extra DS write
+    if (safeParseInt(controller.getActualState()) == newfanspeed) {
       log.log(Level.INFO, "No changes needed, old=" + olddesiredfanspeed + ", new=" + newfanspeed);
       return;
     }
