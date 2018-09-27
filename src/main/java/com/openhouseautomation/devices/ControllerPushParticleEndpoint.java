@@ -90,7 +90,8 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
           log.log(Level.INFO, "desired state:{0} @{1}",
                   new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange().toLocalTime()});
         }
-        if (controller.getType() == Controller.Type.RGB) {
+        if (controller.getType() == Controller.Type.RGB
+                && !controller.getDesiredState().equals(controllerval)) {
           controller.setDesiredState(controllerval);
         }
       }
