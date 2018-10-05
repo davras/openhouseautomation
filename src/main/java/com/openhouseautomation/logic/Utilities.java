@@ -50,7 +50,7 @@ public class Utilities {
       }
       sreg.addData(histval, Double.parseDouble(readhistory.getValue()));
       if (id == 3885021817L) {
-        log.log(Level.INFO, "added reading: {0} @ {1}", new Object[]{Double.parseDouble(readhistory.getValue()), histval});
+        log.log(Level.INFO, "added reading for {0}: {1} @ {2}", new Object[]{id, readhistory.getValue(), histval});
       }
       loggedreadings++;
     }

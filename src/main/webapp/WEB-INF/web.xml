@@ -116,13 +116,6 @@
     <url-pattern>/cron/datastorelogtruncator</url-pattern>
   </servlet-mapping>
   <servlet>
-    <description>A MapReduce that goes through the log looking for temperatures,
-      grabs the highest and lowest temperature for the day and saves them.
-      The rest of the values are deleted.  This saves datastore space and cost.</description>
-    <servlet-name>ReadingServletMR</servlet-name>
-    <servlet-class>com.openhouseautomation.mapreduce.ReadingServletMR</servlet-class>
-  </servlet>
-  <servlet>
     <description>Gives the lat,long coordinates of the IP that called this URL.</description>
     <servlet-name>LocationServlet</servlet-name>
     <servlet-class>com.openhouseautomation.devices.LocationServlet</servlet-class>
@@ -184,10 +177,6 @@
   <servlet-mapping>
     <servlet-name>SensorServlet</servlet-name>
     <url-pattern>/sensor</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>ReadingServletMR</servlet-name>
-    <url-pattern>/ReadingServletMR</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ForecastServlet</servlet-name>

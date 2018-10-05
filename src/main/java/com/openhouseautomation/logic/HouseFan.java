@@ -56,7 +56,7 @@ public class HouseFan {
     if (!considerForecast()) {
       return;
     }
-    considerSlope();
+    stopInTheMorning();
     computeDesiredSpeed();
     checkDoorWearInhibit();
     processFanChange();
@@ -179,19 +179,13 @@ public class HouseFan {
     return true;
   }
 
-  public void considerSlope() {
-    // decrease fan speed if outside is warming up
-    double outsidetemperatureslope = Utilities.getSlope("Outside Temperature", 60 * 60); // 1 hours readings
-    wd.addElement("Reading Outside Temperature Slope", 1000, outsidetemperatureslope);
-    double insidetemperatureslope = Utilities.getSlope("Inside Temperature", 60 * 60); // 1 hours readings
-    wd.addElement("Reading Inside Temperature Slope", 1000, insidetemperatureslope);
-    double outsidelightslope = Utilities.getSlope("Outside Light Level", 60 * 60); // 1 hours readings
-    wd.addElement("Reading Outside Light Slope", 1000, outsidelightslope);
+  public void stopInTheMorning() {
+    // stop fan in morning
+    double outsidelightlevel = Utilities.getDoubleReading("Outside Light Level"); // 1 hours readings
+    wd.addElement("Reading Outside Light Level", 1000, outsidelightlevel);
 
-    if (outsidetemperatureslope > 0.01
-            && insidetemperatureslope > 0.01
-            && outsidelightslope > 0.01) {
-      wd.addElement("Temperature Slope", 6, 0);
+    if (outsidelightlevel > 10) {
+      wd.addElement("Outside Light Level", 6, 0);
     }
   }
 
