@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
+import com.openhouseautomation.iftt.Rgb;
 
 /**
  *
@@ -43,6 +44,7 @@ public class HouseTimers extends HttpServlet {
     updateTime();
     log.log(Level.INFO, "Time:{0}:{1}", new Object[]{curhour, curmin});
     notifyTurnOnHouseFan();
+    updateLightColor();
     response.setStatus(HttpServletResponse.SC_OK);
   }
 
@@ -52,6 +54,10 @@ public class HouseTimers extends HttpServlet {
     this.curmin = now.getMinuteOfHour();
   }
 
+  public void updateLightColor() {
+    setController(28131427L, new Rgb().lightLookup());
+  }
+  
   public void notifyTurnOnHouseFan() {
     if (curhour < 17 || curmin > 0) {
       return; // from 5pm to midnight on the hour
