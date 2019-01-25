@@ -330,8 +330,7 @@ public class DisplaySourceServlet extends HttpServlet {
     // parse and set the controller settings
     String config = scene.getConfig();
     ObjectMapper mapper = new ObjectMapper();
-    TypeReference tr = new TypeReference<List<SceneController>>() {
-    };
+    TypeReference tr = new TypeReference<List<SceneController>>() {};
     List<SceneController> scconts = mapper.readValue(config, tr);
     //List<SceneController> scconts = mapper.readValue(config, List.class);
     for (SceneController scdes : scconts) {

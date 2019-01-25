@@ -41,7 +41,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
   int resolution = 5; // graph resolution in minutes
   int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
   int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
-  
+
   // TODO: only in place for testing, not for production
   @Override
   protected boolean isRestrictedAccessMode() {
@@ -79,7 +79,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
       Sensor s = (Sensor) sensors.get(i);
       // zero if needed
       if (s.getType() == Sensor.Type.RAIN) {
-        for (int clrz=0; clrz < blocks; clrz++) {
+        for (int clrz = 0; clrz < blocks; clrz++) {
           readingsz[i][clrz] = 0.0;
         }
       }
@@ -106,10 +106,10 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     starttime = System.currentTimeMillis();
     // now fill the data table
     try {
+      String szonelocal = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
+      DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
+      DateTimeZone dtzonelocal = DateTimeZone.forID(szonelocal);
       for (int i = 0; i < blocks; i++) {
-        String szonelocal = DatastoreConfig.getValueForKey("timezone", "America/Los_Angeles");
-        DateTimeZone dtzonedisp = DateTimeZone.forID("UTC");
-        DateTimeZone dtzonelocal = DateTimeZone.forID(szonelocal);
         long tzoffset = dtzonelocal.getOffsetFromLocal(cutoffdate.getMillis() + i * resolution * 60 * 1000);
         long offsettime = cutoffdate.getMillis() + i * resolution * 60 * 1000 + tzoffset;
         DateTime dt = new DateTime(offsettime, dtzonedisp);
