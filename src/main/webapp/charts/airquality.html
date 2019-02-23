@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="gAutoArd" >
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>OpenHouseAutomation</title>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angularbootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>    
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- OHA core CSS -->
+    <link href="/css/main.css" rel="stylesheet">
+
+    <style>
+      #slider { margin: 15px; }
+    </style>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script type='text/javascript'>
+      google.load('visualization', '1.1', {'packages': ['annotationchart']});
+      function drawVisualization() {
+        google.visualization.drawChart({
+          "containerId": "visualization_div",
+          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=AIRQUALITY',
+          "chartType": "AnnotationChart",
+          "options": {
+            "title": 'Air Quality (pm25)',
+            "colors": ['blue', 'red', 'orange', 'green', 'black'],
+            "scaleType": 'maximized',
+            "thickness": 2,
+            "displayRangeSelector": false,
+            "displayExactValues": true,
+            "scaleFormat": "###.0"
+          }
+        });
+      }
+      google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+  <body>
+  <ng-include src="'/navbar.html'"></ng-include>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li class="nav-header"><a href="/index.html">Overview</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/status.html">Status</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/control.html">Control</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
+          <li class="divider"></li>
+          <li class="nav-header active"><a href="/charts.html">Charts</a></li>
+          <li class="divider"></li>
+          <li class="nav-header"><a href="/manage.html">Manage</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="jumbotron" style="text-align:center">
+          <h2>Light</h2>
+        </div>
+        <div id="visualization_div" style="width: 90%; height: 400px;"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

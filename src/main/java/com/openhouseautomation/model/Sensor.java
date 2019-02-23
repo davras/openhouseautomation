@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @Cache
 public class Sensor implements Serializable {
 
-  private static final long serialVersionUID = 101010L;
+  private static final long serialVersionUID = 101011L;
   private static final Logger log = Logger.getLogger(Sensor.class.getName());
 
   /**
@@ -35,9 +35,6 @@ public class Sensor implements Serializable {
   public void setPreviousReading(String previousreading) {
     this.previousreading = previousreading;
   }
-
-  //TODO Fields for the type of reduction for history
-  // like: Highs, Lows, Average, NonZeroAverage, NoReduction
 
   /**
    * Enum for the type of sensor. Self-explanatory
@@ -66,7 +63,8 @@ public class Sensor implements Serializable {
      */
     ROTATION_VECTOR,
     CURRENT,
-    COLOR;
+    COLOR,
+    AIRQUALITY;
   }
 
   @Id

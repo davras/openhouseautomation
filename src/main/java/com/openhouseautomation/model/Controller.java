@@ -451,11 +451,4 @@ public class Controller implements Serializable {
   public void setValidStates(List validstates) {
     this.validstates = validstates;
   }
-
-  public String getDecision() {
-    return decision;
-  }
-  public void setDecision(String decision) {
-    this.decision = decision;
-  }
 }

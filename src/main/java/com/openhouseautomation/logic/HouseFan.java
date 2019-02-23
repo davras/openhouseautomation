@@ -238,7 +238,6 @@ public class HouseFan {
     }
     // otherwise, save new speed
     controller.setDesiredState(Integer.toString(newfanspeed));
-    controller.setDecision(wd.toJSONString());
     ofy().save().entity(controller).now();
     log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
     if (olddesiredfanspeed == 0 || newfanspeed == 0) {
