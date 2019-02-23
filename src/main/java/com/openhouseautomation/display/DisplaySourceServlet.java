@@ -65,10 +65,6 @@ public class DisplaySourceServlet extends HttpServlet {
       doDisplayForecast(request, response);
       return;
     }
-    if (request.getPathInfo().startsWith("/display/wds")) {
-      doDisplayWDS(request, response);
-      return;
-    }
     if (request.getPathInfo().startsWith("/display/devices")) {
       doDisplayControllers(request, response);
       return;
@@ -93,33 +89,17 @@ public class DisplaySourceServlet extends HttpServlet {
     response.sendError(HttpStatus.SC_NOT_FOUND, "path not supported");
   }
 
-  private void doDisplayWDS(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    PrintWriter out = response.getWriter();
-    ofy().clear(); // clear session cache, not memcache
-    //Controller controller = ofy().load().type(Controller.class).filter("name", "Whole House Fan").first().now();
-    Controller controller = ofy().load().type(Controller.class).id(4280019022L).now();
-    if (controller == null) {
-      log.log(Level.SEVERE, "Controller not found: Whole House Fan");
-      response.sendError(HttpStatus.SC_NOT_FOUND, "No House Fan found");
-      return;
-    }
-    String toret = controller.getDecision();
-    out.print(controller.getDecision());
-  }
-
   private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
-    // TODO change from query to batch get so loop is not needed (addAll instead)
-    // see above function doDisplayWDS()
-    Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);
-    QueryResultIterator<Forecast> iterator = query.iterator();
-    List forecasts = new ArrayList();
-    while (iterator.hasNext()) {
-      Forecast fc = (Forecast) iterator.next();
-      forecasts.add(fc);
-    }
-    ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, forecasts);
+    // how far can this shrink?
+    new ObjectMapper().writeValue(out, ofy().cache(false).load().type(Forecast.class).list());
+    return;
+    
+//    Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);
+//    final List<Forecast> forecasts = new ArrayList<>();
+//    forecasts.addAll(query.list());
+//    ObjectMapper om = new ObjectMapper();
+//    om.writeValue(out, forecasts);
   }
 
   private void doListDeviceTypes(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -159,15 +139,16 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     // production
-    Query<Sensor> query = ofy().cache(false).load().type(Sensor.class);
-    QueryResultIterator<Sensor> iterator = query.iterator();
-    List sensors = new ArrayList();
-    while (iterator.hasNext()) {
-      Sensor sens = (Sensor) iterator.next();
-      sensors.add(sens);
-    }
-    ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, sensors);
+    new ObjectMapper().writeValue(out, ofy().load().type(Sensor.class).list());
+//    Query<Sensor> query = ofy().cache(false).load().type(Sensor.class);
+//    QueryResultIterator<Sensor> iterator = query.iterator();
+//    List sensors = new ArrayList();
+//    while (iterator.hasNext()) {
+//      Sensor sens = (Sensor) iterator.next();
+//      sensors.add(sens);
+//    }
+//    ObjectMapper om = new ObjectMapper();
+//    om.writeValue(out, sensors);
   }
 
   private void doDisplayScenes(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -201,15 +182,17 @@ public class DisplaySourceServlet extends HttpServlet {
       ofy().save().entity(initscene).now();
     }
 
-    Query<Scene> query = ofy().cache(false).load().type(Scene.class);
-    QueryResultIterator<Scene> iterator = query.iterator();
-    List<Scene> scenes = new ArrayList();
-    while (iterator.hasNext()) {
-      Scene scene = iterator.next();
-      scenes.add(scene);
-    }
-    ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, scenes);
+    new ObjectMapper().writeValue(out, ofy().load().type(Scene.class).list());
+//    
+//    Query<Scene> query = ofy().cache(false).load().type(Scene.class);
+//    QueryResultIterator<Scene> iterator = query.iterator();
+//    List<Scene> scenes = new ArrayList();
+//    while (iterator.hasNext()) {
+//      Scene scene = iterator.next();
+//      scenes.add(scene);
+//    }
+//    ObjectMapper om = new ObjectMapper();
+//    om.writeValue(out, scenes);
   }
 
   private void doDisplayControllers(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -220,21 +203,18 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     // production
-    String type = request.getParameter("type");
-    // only lights change quickly, so clear the instance cache
-    // to catch when the light controller reports an update
-    // so we can update the web page faster
-    if (!Strings.isNullOrEmpty(type) && "lights".equalsIgnoreCase(type)) {
-      ofy().clear();
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
     }
-    // the rest of the controllers don't change frequently, so
-    // no need to clear ofy() session cache
-    ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, ofy().load().type(Controller.class).filter("type", type).list());
+    String type = request.getParameter("type");
+    new ObjectMapper().writeValue(out, ofy().load().type(Controller.class).filter("type", type).list());
   }
 
   private void doDisplayAlerts(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }
     try {
       String json = "";
       JSONArray jsareturn = new JSONArray();
@@ -275,8 +255,7 @@ public class DisplaySourceServlet extends HttpServlet {
     if (com.openhouseautomation.Flags.clearCache) {
       ofy().clear(); // clear the session cache, not the memcache
     }
-    ObjectMapper om = new ObjectMapper();
-    om.writeValue(out, ofy().load().type(NotificationLog.class).order("-lastnotification").list());
+    new ObjectMapper().writeValue(out, ofy().load().type(NotificationLog.class).order("-lastnotification").list());
   }
 
   /**
@@ -316,7 +295,7 @@ public class DisplaySourceServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       return;
     }
-    Scene scene = ofy().cache(false).load().type(Scene.class).id(Long.parseLong(sceneid)).now();
+    Scene scene = ofy().load().type(Scene.class).id(Long.parseLong(sceneid)).now();
 
     // log the event
     EventLog etl = new EventLog();
@@ -334,7 +313,7 @@ public class DisplaySourceServlet extends HttpServlet {
     List<SceneController> scconts = mapper.readValue(config, tr);
     //List<SceneController> scconts = mapper.readValue(config, List.class);
     for (SceneController scdes : scconts) {
-      Controller controller = ofy().load().type(Controller.class).id(scdes.getId()).now();
+      Controller controller = ofy().cache(false).load().type(Controller.class).id(scdes.getId()).now();
       if (controller == null) {
         log.log(Level.WARNING, "Controller " + scdes.getId() + " does not exist");
         continue;

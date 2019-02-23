@@ -71,7 +71,8 @@ public class HouseTimers extends HttpServlet {
     String hfnotify = hf.notifyInManual();
     if (!Strings.isNullOrEmpty(hfnotify)) {
       NotificationHandler nhnotif = new NotificationHandler();
-      nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
+      // don't need to set recipient if paging
+      //nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
       nhnotif.setSubject("Recommend House Fan in AUTO");
       nhnotif.setBody(hfnotify);
       nhnotif.page();

@@ -100,6 +100,7 @@
               <label for="location" class="col-sm-2 col-md-1 control-label">Location</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="location" name="location" placeholder="home, work, etc..">
+                <p>Coarse location geographically.
               </div>
             </div>
 
@@ -107,6 +108,7 @@
               <label for="zone" class="col-sm-2 col-md-1 control-label">Zone</label>
               <div class="col-sm-4 col-md-5">
                 <input type="text" class="form-control" id="zone" name="zone" placeholder="Your downstairs, outside, garage, etc...">
+                <p>Fine location to distinguish between air and ground temperature outside (i.e.)</p>
               </div>
             </div>
 

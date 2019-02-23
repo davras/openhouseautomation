@@ -53,21 +53,22 @@ public class AddSensorServlet extends HttpServlet {
       hash.update(sens.getOwner().getBytes());
       hash.update(sens.getLocation().getBytes());
       hash.update(sens.getZone().getBytes());
+      hash.update(sens.getType().hashCode());
       sens.setId(hash.getValue());
 
       Sensor sensexists = ofy().load().type(Sensor.class).id(sens.getId()).now();
 
       if (sensexists == null) {
         ofy().save().entity(sens).now();
+        log.log(Level.INFO, "Sensor added with id: {0}", sens.getId());
         req.setAttribute("message", "Sensor added successfully, ID is " + sens.getId());
         req.setAttribute("messageLevel", "success");
-        req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       } else {
         log.log(Level.WARNING, "Sensor already exists with id: {0}", sens.getId());
         req.setAttribute("message", "Sensor already exists with id: " + sens.getId());
         req.setAttribute("messageLevel", "danger");
-        req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
       }
+      req.getRequestDispatcher("/WEB-INF/jsp/addsensor.jsp").forward(req, resp);
     }
   }
 
