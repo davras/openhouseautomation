@@ -5,13 +5,14 @@
  */
 package com.openhouseautomation.display;
 
+import com.googlecode.objectify.LoadResult;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Forecast;
 import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Sensor;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,7 +56,7 @@ public class LCDDisplayServlet extends HttpServlet {
      */
     try (PrintWriter out = response.getWriter()) {
       String original = lcdd.getDisplayString();
-      String toret = replaceTokens(original);
+      String toret = replaceTokensAsync(original);
       out.println(toret);
       //out.println(replaceTokens(lcdd.getDisplayString()));
     }
@@ -81,6 +82,61 @@ public class LCDDisplayServlet extends HttpServlet {
         int iprecision = Integer.parseInt(precision);
         String sensrd = "X";
         Sensor sens = ofy().load().type(Sensor.class).id(sensid).now();
+        if (sens == null || sens.isExpired()) {
+          // don't display old readings
+          sensrd = "--";
+        } else {
+          if (iprecision == 99) {
+            // no precision specified
+            sensrd = sens.getLastReading();
+          } else {
+            // precision needed
+            sensrd = sens.getLastReading(iprecision);
+          }
+        }
+        s = s.substring(0, bgnidx) + sensrd + s.substring(endidx + 1);
+      }
+    }
+    return s;
+  }
+
+  public String replaceTokensAsync(String s) {
+    int marker=0;
+    HashMap<Long, LoadResult<Sensor>> sensors = new HashMap();
+    for (int i=0; i < s.length(); i++) {
+      if (s.charAt(i) == '{' || s.charAt(i) == '}') {
+        // start or end of token
+        String tokenz = s.substring(marker, i);
+        if (s.charAt(i) == '}' && !tokenz.startsWith("FC")) {
+          // end of sensor token not forecast
+          String sensstring = tokenz;
+          if (tokenz.contains(".")) {
+            sensstring = tokenz.substring(0, tokenz.indexOf("."));
+          }
+          long sensid = Long.parseLong(sensstring);
+          sensors.put(sensid, ofy().load().type(Sensor.class).id(sensid));
+        }
+        marker = i+1;
+      }
+    }
+    while (s.contains("{")) {
+      int bgnidx = s.indexOf("{");
+      int endidx = s.indexOf("}");
+      String item = s.substring(bgnidx + 1, endidx);
+      if (item.startsWith("FC")) {
+        String tkresp = getForecast(item);
+        s = s.substring(0, bgnidx) + tkresp + s.substring(endidx + 1);
+      } else {
+        String sensstring = item;
+        String precision = "99";
+        if (item.contains(".")) {
+          sensstring = item.substring(0, item.indexOf("."));
+          precision = item.substring(item.indexOf(".") + 1);
+        }
+        long sensid = Long.parseLong(sensstring);
+        int iprecision = Integer.parseInt(precision);
+        String sensrd = "X";
+        Sensor sens = sensors.get(sensid).now();
         if (sens == null || sens.isExpired()) {
           // don't display old readings
           sensrd = "--";

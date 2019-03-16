@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
     <cron>
-        <url>/ReadingServletMR</url>
-        <description>MapReduce datastore to the archives</description>
-        <schedule>every day 00:00</schedule>
-        <timezone>America/Los_Angeles</timezone>
-    </cron>
-    <cron>
         <url>/cron/datastorelogtruncator</url>
         <description>Remove old log entries from the Datastore</description>
         <schedule>every day 12:00</schedule>
@@ -79,6 +73,19 @@
         <url>/cron/controller/3640433672/1</url>
         <description>Den lights on at 6:30am</description>
         <schedule>every day 06:30</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    
+        <cron>
+        <url>/cron/controller/1919502323/1</url>
+        <description>Air freshener/fan on at 7pm</description>
+        <schedule>every day 19:00</schedule>
+        <timezone>America/Los_Angeles</timezone>
+    </cron>
+    <cron>
+        <url>/cron/controller/1919502323/0</url>
+        <description>Air freshener/fan off at 8pm</description>
+        <schedule>every day 20:00</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
 </cronentries>
