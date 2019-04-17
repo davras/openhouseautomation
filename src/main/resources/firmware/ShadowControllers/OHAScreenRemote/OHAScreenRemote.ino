@@ -1,4 +1,5 @@
 // Replace controllerid with your controller's id
+// Replace app-id with your app's id
 
 volatile unsigned long nextcloudcomm=0L;
 const long cloudcomminterval=60000L;
@@ -6,7 +7,7 @@ const char
     controllerid[] = "1234567890",
     endpoint[]      = "/controller/device?",
     access_token[] = "&auth=test",
-    host[]          = "gautoard.appspot.com",
+    host[]          = "<app-id>.appspot.com",
     useragent[]    = "OHA Projector Firmware v.1",
     // these must match valid states for the controller
     desiredpoweroff[] = "=0;",
