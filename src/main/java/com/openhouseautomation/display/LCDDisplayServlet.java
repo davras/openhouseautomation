@@ -114,6 +114,7 @@ public class LCDDisplayServlet extends HttpServlet {
             sensstring = tokenz.substring(0, tokenz.indexOf("."));
           }
           long sensid = Long.parseLong(sensstring);
+          // hold the future async result
           sensors.put(sensid, ofy().load().type(Sensor.class).id(sensid));
         }
         marker = i+1;
