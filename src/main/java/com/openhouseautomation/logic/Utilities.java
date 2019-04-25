@@ -111,11 +111,13 @@ public class Utilities {
     }
   }
 
-  public static Sensor getSensor(String name) {
-    Key<Sensor> ksensor = sensorkeys.get(name);
+  public static Sensor getSensor(String sensorname) {
+    Key<Sensor> ksensor = sensorkeys.get(sensorname);
     if (null != ksensor) {
       Sensor sensor = ofy().load().key(ksensor).now();
       return sensor;
+    } else {
+      fillCache(sensorname);
     }
     return null;
   }
