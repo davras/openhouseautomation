@@ -28,8 +28,9 @@ public class Utilities {
    * @return
    */
   public static double getSlope(Long id, int seconds) {
-    if (com.openhouseautomation.Flags.clearCache) ofy().clear(); // clear the session cache, not the memcache
-    // get the Sensor
+    if (com.openhouseautomation.Flags.clearCache) {
+      ofy().clear(); // clear the session cache, not the memcache
+    }    // get the Sensor
     Sensor sens = ofy().load().type(Sensor.class).id(id).now();
     // get the readings for that sensor
     DateTime dt = Convutils.getNewDateTime().minusSeconds(seconds);
@@ -68,6 +69,9 @@ public class Utilities {
    */
   public static double getSlope(String name, int seconds) {
     Sensor sens = getSensor(name);
+    if (sens == null) {
+      return 0;
+    }
     return getSlope(sens.getId(), seconds);
   }
 
@@ -83,27 +87,37 @@ public class Utilities {
   }
 
   private static final HashMap<String, Key<Sensor>> sensorkeys = new HashMap();
- 
+
   public static double getDoubleReading(String name) {
-    return Double.parseDouble(getSensor(name).getLastReading());  
-  }
-  
-  public static void fillCache(String name) {
-      log.log(Level.INFO, "filling sensor cache");
-      // get the keys
-      Iterable<Key<Sensor>> allsensors = ofy().load().type(Sensor.class).keys();
-      for (Key<Sensor> s: allsensors) {
-        Sensor stemp = ofy().load().key(s).now();
-        sensorkeys.put(stemp.getName(), s);
-      }
-  }
-  public static Sensor getSensor(String name) {
-    if (!sensorkeys.containsKey(name)) {
-      fillCache(name);
+    Sensor s = getSensor(name);
+    if (null != s) {
+      return Double.parseDouble(s.getLastReading());
     }
+    return 0;
+  }
+
+  public static void fillCache(String name) {
+    log.log(Level.INFO, "filling sensor cache");
+    // get the keys
+    Iterable<Key<Sensor>> allsensors = ofy().load().type(Sensor.class).keys();
+    for (Key<Sensor> s : allsensors) {
+      Sensor stemp = ofy().load().key(s).now();
+      sensorkeys.put(stemp.getName(), s);
+    }
+    if (!sensorkeys.containsKey(name)) {
+      // didn't find that key
+      log.log(Level.SEVERE, "Sensor not found: {0}", name);
+      sensorkeys.put(name, null);
+    }
+  }
+
+  public static Sensor getSensor(String name) {
     Key<Sensor> ksensor = sensorkeys.get(name);
-    Sensor sensor = ofy().load().key(ksensor).now();
-    return sensor;
+    if (null != ksensor) {
+      Sensor sensor = ofy().load().key(ksensor).now();
+      return sensor;
+    }
+    return null;
   }
 
   public static double getForecastHigh(String zipcode) {

@@ -8,6 +8,7 @@ import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.LocalTime;
 
 /**
  *
@@ -181,11 +182,8 @@ public class HouseFan {
 
   public void stopInTheMorning() {
     // stop fan in morning
-    double outsidelightlevel = Utilities.getDoubleReading("Outside Light Level"); // 1 hours readings
-    wd.addElement("Reading Outside Light Level", 1000, outsidelightlevel);
-
-    if (outsidelightlevel > 10) {
-      wd.addElement("Outside Light Level", 6, 0);
+    if (LocalTime.now().getHourOfDay() > 6) {
+      wd.addElement("Stop in the morning", 6, 0);
     }
   }
 
