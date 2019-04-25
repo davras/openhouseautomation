@@ -63,7 +63,7 @@ public class SensorPushPubSubSubscription extends HttpServlet {
       // decode message data from base64
       Message message = PubSubUtils.getMessage(request);
       if (!message.parseData()) {
-        log.log(Level.WARNING, "bad data:" + message.getData());
+        log.log(Level.SEVERE, "bad data:" + message.getData());
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         return;
       }
@@ -74,7 +74,7 @@ public class SensorPushPubSubSubscription extends HttpServlet {
       Key<Sensor> sk = Key.create(Sensor.class, sensorid);
       Sensor sensor = ofy().load().now(sk);
       if (sensor == null) {
-        log.log(Level.INFO, "sensor not found:{0}", sensorid);
+        log.log(Level.SEVERE, "sensor not found:{0}", sensorid);
         response.sendError(HttpServletResponse.SC_OK, "Sensor not found");
         return;
       }
@@ -90,7 +90,7 @@ public class SensorPushPubSubSubscription extends HttpServlet {
 
       if (sensor.getType() == Sensor.Type.TEMPERATURE
               && Float.parseFloat(sensorval) < -195.0) {
-        log.log(Level.SEVERE, "Bad temperature reading: " + sensorval);
+        log.log(Level.WARNING, "Bad temperature reading: " + sensorval);
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         return;
       }
