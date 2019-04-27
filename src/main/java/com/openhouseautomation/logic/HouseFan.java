@@ -5,6 +5,7 @@ import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.EventLog;
+import com.openhouseautomation.model.Sensor;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -142,14 +143,20 @@ public class HouseFan {
 
   public boolean considerTemperatures() {
     // get the inside and outside temperatures
-    outsidetemp = Utilities.getDoubleReading("Outside Temperature");
-    insidetemp = Utilities.getDoubleReading("Inside Temperature");
-    //log.log(Level.WARNING, "Outside: " + outsidetemp + " Inside: " + insidetemp);
+    //outsidetemp = Utilities.getDoubleReading("Outside Temperature");
+    //insidetemp = Utilities.getDoubleReading("Inside Temperature");
+    
+    // TODO workaround because the static cache works for inside temp, but not outside.
+    Sensor souttemp = ofy().load().type(Sensor.class).id(2587739430L).now();
+    outsidetemp = Double.parseDouble(souttemp.getLastReading());
+    Sensor sintemp = ofy().load().type(Sensor.class).id(395430086L).now();
+    insidetemp = Double.parseDouble(sintemp.getLastReading());
+    
     wd.addElement("Reading Outside Temperature", 1000, outsidetemp);
     wd.addElement("Reading Inside Temperature", 1000, insidetemp);
     if (outsidetemp == 0 || insidetemp == 0 || outsidetemp < -100
             || outsidetemp > 150 || insidetemp < -100 || insidetemp > 150) {
-      log.log(Level.WARNING, "bad temperature read, outside={0}, inside={1}",
+      log.log(Level.SEVERE, "bad temperature read, outside={0}, inside={1}",
               new Object[]{outsidetemp, insidetemp});
       return false;
     }

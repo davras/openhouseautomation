@@ -42,8 +42,10 @@ public class TestHouseFan {
     controller.setName("Whole House Fan");
     outsidesensor = new Sensor();
     outsidesensor.setName("Outside Temperature");
+    outsidesensor.setId(2587739430L);
     insidesensor = new Sensor();
     insidesensor.setName("Inside Temperature");
+    insidesensor.setId(395430086L);
     controller.setLastContactDate(Convutils.getNewDateTime());
   }
 

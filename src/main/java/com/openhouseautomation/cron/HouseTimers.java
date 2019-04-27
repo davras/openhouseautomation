@@ -59,8 +59,12 @@ public class HouseTimers extends HttpServlet {
   }
   
   public void notifyTurnOnHouseFan() {
-    if (curhour < 17 || curmin > 0) {
+    if (curhour < 17 || curmin > 0 ) {
       return; // from 5pm to midnight on the hour
+    }
+    if (curmin%15 > 0) {
+      // only run once every 15m
+      return;
     }
     Controller alarm = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
     if (alarm.getActualState().equalsIgnoreCase("Away")) {

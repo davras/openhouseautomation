@@ -74,12 +74,16 @@ public class Sensor implements Serializable {
   String zone; // the specific place in location, like "Living Room", "Outside", "Garage"
   Type type; // See enum above
   String name;  // "Downstairs Temperature", "Wind Speed"
+  @Unindex
   String unit; // F, C, millibars, etc.
+  @Unindex
   String lastReading; // "89" for 89F
   @JsonIgnore
+  @Unindex
   DateTime lastReadingDate; // Date lastReading was last updated
   @JsonIgnore
   String secret; // the password for this sensor, used in SipHash
+  @Unindex
   Integer expirationtime; // if no update occurs within this time, the sensor is 'expired'
   //TODO: add boolean privacy flag (if true, requires auth)
   @Ignore
@@ -87,6 +91,7 @@ public class Sensor implements Serializable {
   @Ignore
   boolean expired;
   @Ignore
+  @Unindex
   public String previousreading; // the reading when the entity was loaded
   @JsonIgnore
   private boolean postprocessing = false;
