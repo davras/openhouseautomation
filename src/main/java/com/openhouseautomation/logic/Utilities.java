@@ -95,7 +95,13 @@ public class Utilities {
     }
     return 0;
   }
-
+  public static int safeParseInt(Object o) {
+    if (o instanceof java.lang.String) {
+      return Integer.parseInt((String) o);
+    }
+    return (Integer) o;
+  }
+  
   public static void fillCache(String name) {
     log.log(Level.INFO, "filling sensor cache");
     // get the keys

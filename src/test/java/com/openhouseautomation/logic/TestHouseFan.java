@@ -22,7 +22,7 @@ import org.junit.Test;
 public class TestHouseFan {
 
   Controller controller;
-  HouseFan hftester;
+  HouseFanImpl hftester;
   Sensor outsidesensor;
   Sensor insidesensor;
 
@@ -37,7 +37,7 @@ public class TestHouseFan {
   @Before
   public void setUp() {
     helper.setUp();
-    hftester = new HouseFan();
+    hftester = new HouseFanImpl();
     controller = new Controller();
     controller.setName("Whole House Fan");
     outsidesensor = new Sensor();

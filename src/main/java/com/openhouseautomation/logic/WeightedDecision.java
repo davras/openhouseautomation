@@ -33,7 +33,8 @@ public class WeightedDecision {
     }
   }
 
-  private static class DecisionElement {
+    // why was this static?
+  private class DecisionElement {
     
     private DecisionElement(String name, int weight, Object value) {
       this.name = name;
@@ -59,7 +60,7 @@ public class WeightedDecision {
     DecisionElement de = new DecisionElement(name, weight, value);
     queue.offer(de);
   }
-  
+
   public Object getTopValue() {
     return queue.peek().getValue();
   }

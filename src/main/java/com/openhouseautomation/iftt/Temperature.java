@@ -35,8 +35,8 @@ public class Temperature extends DeferredSensor {
 
     if (sensor.getType().equals(Sensor.Type.TEMPERATURE)) {
       HouseFan hf = new HouseFan();
-      hf.process();
-      log.log(Level.INFO, "Temperature.WHF.Decision:" + hf.getWeightedDecision().toMessage());
+      hf.autoControlWHF();
+      log.log(Level.INFO, "Temperature.WHF.Decision:\n" + hf.getWeightedDecision().toMessage());
     }
   }
 }
