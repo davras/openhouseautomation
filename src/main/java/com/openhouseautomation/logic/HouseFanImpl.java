@@ -182,8 +182,8 @@ public class HouseFanImpl {
 
   public boolean stopInTheMorning() {
     // stop fan in morning
-    if (LocalTime.now().getHourOfDay() > 6) {
-      wd.addElement("Stop in the morning", 6, 0);
+    if (Convutils.getNewDateTime().getHourOfDay() > 6) {
+      wd.addElement("Stop in the morning, hour=" + Convutils.getNewDateTime().getHourOfDay(), 6, 0);
       return true;
     }
     return false;
