@@ -3,11 +3,7 @@ package com.openhouseautomation.model;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Parent;
+import com.googlecode.objectify.annotation.*;
 
 /**
  * A class representing a reading from a sensor device.
@@ -15,13 +11,20 @@ import com.googlecode.objectify.annotation.Parent;
  * @author jfmontesdeoca@google.com (Jose Montes de Oca)
  */
 @Entity
-@Index
 @Cache
+@Unindex
 public class Reading {
-  @Parent Key<Sensor> sensor;
-  @Id Long id;
+  @Parent 
+  @Index 
+  Key<Sensor> sensor;
+  
+  @Id
+  @Index
+  Long id;
+  
   String value;
   // todo, move @Index down here
+  @Index
   DateTime timestamp;
   
   /**

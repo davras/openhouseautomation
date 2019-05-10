@@ -15,26 +15,11 @@ import java.util.logging.Logger;
  * @author jfmontesdeoca@google.com (Jose Montes de Oca)
  */
 @Entity
-@Index
 @Cache
 public class Sensor implements Serializable {
 
   private static final long serialVersionUID = 101011L;
   private static final Logger log = Logger.getLogger(Sensor.class.getName());
-
-  /**
-   * @return the previousreading
-   */
-  public String getPreviousReading() {
-    return previousreading;
-  }
-
-  /**
-   * @param previousreading the previousreading to set
-   */
-  public void setPreviousReading(String previousreading) {
-    this.previousreading = previousreading;
-  }
 
   /**
    * Enum for the type of sensor. Self-explanatory
@@ -69,10 +54,15 @@ public class Sensor implements Serializable {
 
   @Id
   Long id; // hash for this unique sensor
+  @Unindex
   String owner; // your user name
+  @Unindex
   String location; // home, work, 
+  @Unindex
   String zone; // the specific place in location, like "Living Room", "Outside", "Garage"
+  @Unindex
   Type type; // See enum above
+  @Unindex
   String name;  // "Downstairs Temperature", "Wind Speed"
   @Unindex
   String unit; // F, C, millibars, etc.
@@ -82,6 +72,7 @@ public class Sensor implements Serializable {
   @Unindex
   DateTime lastReadingDate; // Date lastReading was last updated
   @JsonIgnore
+  @Unindex
   String secret; // the password for this sensor, used in SipHash
   @Unindex
   Integer expirationtime; // if no update occurs within this time, the sensor is 'expired'
@@ -94,7 +85,14 @@ public class Sensor implements Serializable {
   @Unindex
   public String previousreading; // the reading when the entity was loaded
   @JsonIgnore
+  @Unindex
   private boolean postprocessing = false;
+
+  /**
+   * Empty constructor for objectify.
+   */
+  public Sensor() {
+  }
 
   @OnLoad
   void updateAge() {
@@ -151,9 +149,17 @@ public class Sensor implements Serializable {
   }
 
   /**
-   * Empty constructor for objectify.
+   * @return the previousreading
    */
-  public Sensor() {
+  public String getPreviousReading() {
+    return previousreading;
+  }
+
+  /**
+   * @param previousreading the previousreading to set
+   */
+  public void setPreviousReading(String previousreading) {
+    this.previousreading = previousreading;
   }
 
   /**
@@ -234,8 +240,7 @@ public class Sensor implements Serializable {
   /**
    * Returns the {@code type} of the {@link Sensor}.
    *
-   * @return Type of sensor, like temperature, pressure, etc. from the Sensor
-   * ENUM
+   * @return Type of sensor, like temperature, pressure, etc. from the Sensor ENUM
    */
   @JsonProperty("type")
   public Type getType() {
@@ -300,9 +305,8 @@ public class Sensor implements Serializable {
   }
 
   /**
-   * Returns the {@code lastReading} of the {@link Sensor} rounded to the
-   * precision A precision of zero will return no decimal or places (i.e. 2.6 ->
-   * 3, not 3.0)
+   * Returns the {@code lastReading} of the {@link Sensor} rounded to the precision A precision of zero will return no
+   * decimal or places (i.e. 2.6 -> 3, not 3.0)
    *
    * @param precision number of decimal places to round to
    * @return String of the rounded number
@@ -366,8 +370,7 @@ public class Sensor implements Serializable {
   /**
    * Returns the {@code secret} for this {@link Sensor}.
    *
-   * @return String secret for this sensor used to authenticate devices'
-   * updates.
+   * @return String secret for this sensor used to authenticate devices' updates.
    */
   public String getSecret() {
     return secret;

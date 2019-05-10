@@ -1,9 +1,7 @@
 package com.openhouseautomation.model;
 
 import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 
@@ -12,6 +10,7 @@ import org.joda.time.DateTime;
  * @author dras
  */
 @Entity
+@Unindex
 @Cache
 public class NotificationLog {
 

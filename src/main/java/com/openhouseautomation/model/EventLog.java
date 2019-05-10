@@ -5,10 +5,7 @@
  */
 package com.openhouseautomation.model;
 
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.OnSave;
+import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 import org.joda.time.DateTime;
 
@@ -17,6 +14,7 @@ import org.joda.time.DateTime;
  * @author dave
  */
 @Entity
+@Unindex
 public class EventLog {
 
   @Id
@@ -31,7 +29,8 @@ public class EventLog {
   public String previousstate;
   // the new state
   public String newstate;
-  // the time this event was logged, set automatically when the EventLog is saved and will not be overwritten by multiple saves
+  // the time this event was logged
+  // set automatically when the EventLog is saved and will not be overwritten by multiple saves
   @Index
   public DateTime eventtime;
 

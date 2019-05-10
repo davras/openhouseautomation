@@ -8,21 +8,19 @@ package com.openhouseautomation.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 
 /**
  *
  * @author dras
  */
 @Entity
-@Index
+@Unindex
 @Cache
 public class Forecast {
 
     @Id
+    @Index
     String zipcode;
     String forecasthigh;
     String forecastlow;
