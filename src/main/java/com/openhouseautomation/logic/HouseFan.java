@@ -33,12 +33,6 @@ public class HouseFan {
     log.log(Level.INFO, "trying for fan speed: " + newfanspeed + " because of: " + wd.getTopName());
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);
-    // if no changes are necessary, prevent an extra DS write
-    if (!hfl.getFanSpeedChange()) {
-      log.log(Level.INFO, "No changes needed from " + newfanspeed);
-      return;
-    }
-    // otherwise, save new speed
     hfl.setDesiredState(Integer.toString(newfanspeed));
     sendNotification(newfanspeed);
   

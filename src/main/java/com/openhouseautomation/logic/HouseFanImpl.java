@@ -27,7 +27,6 @@ public class HouseFanImpl {
   double insidetemp;
   int olddesiredfanspeed;
   int newfanspeed;
-  boolean fanspeedchange;
   double setpoint;
   double outsidetemp;
   boolean autocontrolflag;
@@ -129,7 +128,7 @@ public class HouseFanImpl {
       wd.addElement("DesiredStatePriority=MANUAL", 2, controller.getActualState());
       autocontrolflag = false;
     } else {
-      wd.addElement("DesiredStatePriority=AUTO", 1000, controller.getActualState());
+      wd.addElement("DesiredStatePriority=AUTO,current speed@" + controller.getActualState(), 1000, 0);
       autocontrolflag = true;
     }
     return autocontrolflag;
@@ -163,7 +162,7 @@ public class HouseFanImpl {
       wd.addElement("It is hotter outside than inside", 5, 0);
       return true; // return true so that fan speed processing will happen
     }
-    return false;
+    return true;
   }
 
   public boolean considerForecast() {
@@ -182,11 +181,12 @@ public class HouseFanImpl {
 
   public boolean stopInTheMorning() {
     // stop fan in morning
-    if (Convutils.getNewDateTime().getHourOfDay() > 6) {
-      wd.addElement("Stop in the morning, hour=" + Convutils.getNewDateTime().getHourOfDay(), 6, 0);
-      return true;
+    int currenthour = Convutils.getNewDateTime().getHourOfDay();
+    if (currenthour > 6 && currenthour < 19) {
+      wd.addElement("Off at 7am, On at 8pm, currently@" + currenthour, 6, 0);
+      return false;
     }
-    return false;
+    return true;
   }
 
   public boolean computeDesiredSpeed() {
@@ -217,7 +217,7 @@ public class HouseFanImpl {
 
   public boolean checkDoorWearInhibit() {
     olddesiredfanspeed = Utilities.safeParseInt(controller.getDesiredState());
-    wd.addElement("Reading Old Fan Speed", 1000, olddesiredfanspeed);
+    wd.addElement("Wear Inhibit, reading old fan speed", 1000, olddesiredfanspeed);
     olddesiredfanspeed = Utilities.safeParseInt(controller.getDesiredState());
     // now, what does the weighted decision say?
     newfanspeed = Utilities.safeParseInt(wd.getTopValue());
@@ -238,19 +238,15 @@ public class HouseFanImpl {
   public boolean checkFanSpeedChange() {
     // return true if a fan speed change is needed
     // return false if fan speed is unchanged
-    fanspeedchange = Utilities.safeParseInt(controller.getActualState()) != newfanspeed;
-    return fanspeedchange;
-  }
-
-  public boolean getFanSpeedChange() {
-    return fanspeedchange;
-  }
-
-  public Controller getController() {
-    return controller;
+    return Utilities.safeParseInt(controller.getActualState()) != Utilities.safeParseInt(wd.getTopValue());
   }
 
   public void setDesiredState(String desstate) {
+    if (controller.getActualState().equals(desstate)) {
+      // no changes needed
+      log.log(Level.INFO, "No change in fan speed: {0} = {1}", new Object[]{olddesiredfanspeed, newfanspeed});
+      return;
+    }
     //save new speed
     controller.setDesiredState(desstate);
     ofy().save().entity(controller).now();
