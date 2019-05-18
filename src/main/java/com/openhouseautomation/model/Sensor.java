@@ -24,6 +24,7 @@ public class Sensor implements Serializable {
   /**
    * Enum for the type of sensor. Self-explanatory
    */
+
   public enum Type {
 
     TEMPERATURE,
@@ -60,7 +61,7 @@ public class Sensor implements Serializable {
   String location; // home, work, 
   @Unindex
   String zone; // the specific place in location, like "Living Room", "Outside", "Garage"
-  @Unindex
+  @Index
   Type type; // See enum above
   @Unindex
   String name;  // "Downstairs Temperature", "Wind Speed"
