@@ -24,6 +24,7 @@ public class Sensor implements Serializable {
   /**
    * Enum for the type of sensor. Self-explanatory
    */
+  @Index
   public enum Type {
 
     TEMPERATURE,
