@@ -13,7 +13,6 @@ import com.openhouseautomation.model.EventLog;
 import com.openhouseautomation.model.Sensor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.LocalTime;
 
 /**
  *
@@ -57,18 +56,22 @@ public class HouseFanImpl {
         }
       case 2:
         if (!considerStatePriority()) {
+          // EMERGENCY has priority 1
           break;
         }
       case 3:
         if (!considerControlMode()) {
+          // MANUAL has priority 2
           break;
         }
       case 4:
         if (!stopInTheMorning()) {
+          // priority 6
           break;
         }
       case 5:
         if (!considerForecast()) {
+          // priority 5 to not run if FCH < 80F
           break;
         }
       case 6:
@@ -77,14 +80,17 @@ public class HouseFanImpl {
         }
       case 7:
         if (!hotterOutside()) {
+          // priority 5
           break;
         }
       case 8:
         if (!computeDesiredSpeed()) {
+          // priority 20
           break;
         }
       case 9:
         if (!checkDoorWearInhibit()) {
+          // priority 7
           break;
         }
       case 10:
