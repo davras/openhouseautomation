@@ -24,7 +24,7 @@ public class HouseFanImpl {
   Controller controller;
   double forecasthigh;
   double insidetemp;
-  int olddesiredfanspeed;
+  int oldfanspeed;
   int newfanspeed;
   double setpoint;
   double outsidetemp;
@@ -48,25 +48,32 @@ public class HouseFanImpl {
     switch (stage) {
       case 0:
         if (!setup()) {
+          // if you do not have a WHF, this exits
           break;
         }
       case 1:
         if (!checkExpiration()) {
+          // if the controller hasn't reported in awhile, exit
           break;
         }
       case 2:
         if (!considerStatePriority()) {
           // EMERGENCY has priority 1
+          // Help clear smoke from house/cooking fire
+          // If desiredstatepriority = emergency, fan speed=5
           break;
         }
       case 3:
         if (!considerControlMode()) {
           // MANUAL has priority 2
+          // If it is in MANUAL or LOCAL, don’t automatically control
+          // if desiredstatepriority != auto, do not alter fan speed
           break;
         }
       case 4:
         if (!stopInTheMorning()) {
           // priority 6
+          
           break;
         }
       case 5:
@@ -81,6 +88,8 @@ public class HouseFanImpl {
       case 7:
         if (!hotterOutside()) {
           // priority 5
+          // Only use the fan if it is colder outside than inside
+          // if outsidetemperature > insidetemperature, fan speed=0 (off)
           break;
         }
       case 8:
@@ -91,6 +100,9 @@ public class HouseFanImpl {
       case 9:
         if (!checkDoorWearInhibit()) {
           // priority 7
+          // Don’t keep starting and stopping the fan (wears out the doors)
+          // if fan speed > 0 and inside temperature < (setpoint-1) turn fan off
+          // if fan speed ==0 and inside temperature > (setpoint+1) turn fan on
           break;
         }
       case 10:
@@ -205,35 +217,34 @@ public class HouseFanImpl {
   }
 
   public boolean shouldTurnOff() {
-    // only turn the fan off if insidetemperature is more than 2 deg below setpoint
-    if ((insidetemp + 1) < setpoint) {
-      wd.addElement("Shutdown Door Wear Prevention", 7, olddesiredfanspeed);
+    // only turn the fan off if insidetemperature is more than 1 deg below setpoint
+    if ((insidetemp + 1) > setpoint) {
+      wd.addElement("Shutdown Door Wear Prevention", 7, oldfanspeed);
       return false;
     }
     return true;
   }
 
   public boolean shouldTurnOn() {
-    if ((insidetemp - 1) > setpoint) {
-      wd.addElement("Startup Door Wear Prevention", 7, olddesiredfanspeed);
+    if ((insidetemp - 1) < setpoint) {
+      wd.addElement("Startup Door Wear Prevention", 7, oldfanspeed);
       return false;
     }
     return true;
   }
 
   public boolean checkDoorWearInhibit() {
-    olddesiredfanspeed = Utilities.safeParseInt(controller.getDesiredState());
-    wd.addElement("Wear Inhibit, reading old fan speed", 1000, olddesiredfanspeed);
-    olddesiredfanspeed = Utilities.safeParseInt(controller.getDesiredState());
+    oldfanspeed = Utilities.safeParseInt(controller.getActualState());
+    wd.addElement("Wear Inhibit, reading old fan speed", 1000, oldfanspeed);
     // now, what does the weighted decision say?
     newfanspeed = Utilities.safeParseInt(wd.getTopValue());
     // check hysteresis
-    if (newfanspeed == 0 && olddesiredfanspeed == 1) {
+    if (newfanspeed == 0 && oldfanspeed == 1) {
       if (!shouldTurnOff()) {
         return false;
       }
     }
-    if (newfanspeed == 1 && olddesiredfanspeed == 0) {
+    if (newfanspeed == 1 && oldfanspeed == 0) {
       if (!shouldTurnOn()) {
         return false;
       }
@@ -250,19 +261,19 @@ public class HouseFanImpl {
   public void setDesiredState(String desstate) {
     if (controller.getActualState().equals(desstate)) {
       // no changes needed
-      log.log(Level.INFO, "No change in fan speed: {0} = {1}", new Object[]{olddesiredfanspeed, newfanspeed});
+      log.log(Level.INFO, "No change in fan speed: {0} = {1}", new Object[]{oldfanspeed, newfanspeed});
       return;
     }
     //save new speed
     controller.setDesiredState(desstate);
     ofy().save().entity(controller).now();
-    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{olddesiredfanspeed, newfanspeed});
-    if (olddesiredfanspeed == 0 || newfanspeed == 0) {
+    log.log(Level.WARNING, "Changed fan speed: {0} -> {1}", new Object[]{oldfanspeed, newfanspeed});
+    if (oldfanspeed == 0 || newfanspeed == 0) {
       // log the event
       EventLog etl = new EventLog();
       etl.setIp("127.0.0.1");
       etl.setNewState(Integer.toString(newfanspeed));
-      etl.setPreviousState(Integer.toString(olddesiredfanspeed));
+      etl.setPreviousState(Integer.toString(oldfanspeed));
       etl.setType("Auto change fan speed");
       etl.setUser(this.getClass().getName());
       ofy().save().entity(etl).now();

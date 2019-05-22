@@ -1,7 +1,6 @@
 package com.openhouseautomation.iftt;
 
 import static com.openhouseautomation.OfyService.ofy;
-import static com.openhouseautomation.iftt.Light.log;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;

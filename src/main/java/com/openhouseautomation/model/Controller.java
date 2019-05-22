@@ -105,7 +105,7 @@ public class Controller implements Serializable {
   public Integer expirationtime; // if no update occurs within this time, the controller is 'expired'
   @Ignore
   private String previousstate; // the previous actual state
-  private String decision; // holds JSON of why this controller is in the current state
+  // private String decision; // holds JSON of why this controller is in the current state
   
   /**
    * Empty constructor for objectify.
