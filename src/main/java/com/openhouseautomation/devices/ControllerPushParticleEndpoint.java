@@ -86,17 +86,16 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
           }
         }
         if (controller.getValidStates().contains(controllerval)) {
-          controller.setDesiredState(controllerval);
+          controller.setActualState(controllerval);
           log.log(Level.INFO, "desired state:{0} @{1}",
                   new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange().toLocalTime()});
         }
-        if (controller.getType() == Controller.Type.RGB
-                && !controller.getDesiredState().equals(controllerval)) {
-          controller.setDesiredState(controllerval);
+        if (controller.getType() == Controller.Type.RGB) {
+          controller.setActualState(controllerval);
         }
       }
       // also triggers the postprocessing onSave()
-      ofy().save().entity(controller).now();
+      ofy().save().entity(controller);
       log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
       out.println(controller.getDesiredState());
       response.setStatus(HttpServletResponse.SC_OK);
