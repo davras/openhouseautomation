@@ -91,7 +91,12 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
                   new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange().toLocalTime()});
         }
         if (controller.getType() == Controller.Type.RGB) {
+          
           controller.setActualState(controllerval);
+          // if manual, set desired to actual
+          if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.MANUAL) {
+            controller.setDesiredState(controllerval);
+          }
         }
       }
       // also triggers the postprocessing onSave()

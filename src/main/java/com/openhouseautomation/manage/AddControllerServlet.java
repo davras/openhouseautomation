@@ -6,7 +6,6 @@
 package com.openhouseautomation.manage;
 
 import com.openhouseautomation.Convutils;
-import org.joda.time.DateTime;
 import com.openhouseautomation.model.Controller;
 import java.io.IOException;
 import java.util.zip.CRC32;

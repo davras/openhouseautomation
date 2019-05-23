@@ -58,21 +58,21 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void updateLightColor() {
-    Controller workcolor = ofy().load().type(Controller.class).filter("name", "Work Color").first().now();
+    Controller workcolor = ofy().load().type(Controller.class).id(2261732907L).now();
     workcolor.setDesiredState(lightLookup());
     ofy().save().entity(workcolor);
     setcolor(workcolor);
     
-    Controller housecolor = ofy().load().type(Controller.class).filter("name", "House Color").first().now();
+    Controller housecolor = ofy().load().type(Controller.class).id(28131427L).now();
     housecolor.setDesiredState(lightLookup());
     
-    Controller projector = ofy().load().type(Controller.class).filter("name", "Projector").first().now();
+    Controller projector = ofy().load().type(Controller.class).id(4157520376L).now();
     if (projector.getActualState().equals("1")) {
       log.log(Level.INFO, "Movie lights");
       housecolor.setDesiredState("#653d00");
     }
     
-    Controller alarmcontroller = ofy().load().type(Controller.class).filter("name", "Alarm").first().now();
+    Controller alarmcontroller = ofy().load().type(Controller.class).id(3964578029L).now();
     if (alarmcontroller.getActualState().equals("Away")) {
       log.log(Level.INFO, "Alarm is set");
       housecolor.setDesiredState("#000000");
@@ -175,7 +175,7 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Sending 'POST' request to URL : " + url);
       // Send post request
       DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-      wr.writeBytes("name=lightcolor%2F");
+      wr.writeBytes("name=lightcolor/");
       wr.writeBytes(cont.getLocation());
       wr.writeBytes("&data=");
       wr.writeBytes(cont.getId().toString());
