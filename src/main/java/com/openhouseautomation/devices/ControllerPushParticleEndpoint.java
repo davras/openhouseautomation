@@ -67,11 +67,15 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         NotificationHandler nh = new NotificationHandler();
         nh.setSubject("Controller online: " + controller.getName());
         nh.setBody("Controller online: " + controller.getName());
-        nh.page();
+        nh.send();
       }
+      
       controller.setLastContactDate(Convutils.getNewDateTime());
 
-      if (!controller.getActualState().equals(controllerval)) {
+      // the first time a controller is setup, it may have a null actual state
+      // this will force the setting of actual state if null or different than controller value
+      if (Strings.isNullOrEmpty(controller.getActualState()) ||
+              !controller.getActualState().equals(controllerval)) {
         log.log(Level.INFO, "POST /device, LastActualState:{0} @{1}",
                 new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
         controller.setActualState(controllerval);
@@ -100,7 +104,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         }
       }
       // also triggers the postprocessing onSave()
-      ofy().save().entity(controller);
+      ofy().save().entity(controller).now();
       log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
       out.println(controller.getDesiredState());
       response.setStatus(HttpServletResponse.SC_OK);
