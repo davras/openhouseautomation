@@ -39,6 +39,8 @@ public class HouseFan {
   }
   
   public String notifyInManual() {
+    // If it is in MANUAL, and it needs to run to cool, send page.
+    // If desiredstatepriority != auto and FCH>80F and Outside<Inside, then page
     process();
     int newfanspeed = Utilities.safeParseInt(wd.getTopValue());
     if (newfanspeed > 0 && !hfl.getAutoControlFlag()) {
