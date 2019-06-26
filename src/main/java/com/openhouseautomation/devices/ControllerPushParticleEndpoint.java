@@ -44,6 +44,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
+    boolean dirtyobj=false;
     response.setContentType("text/plain;charset=UTF-8");
     try (PrintWriter out = response.getWriter()) {
       String message = request.getParameter("data");
@@ -70,7 +71,11 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         nh.send();
       }
       
-      controller.setLastContactDate(Convutils.getNewDateTime());
+      if (controller.getLastContactDate().plusMinutes(4).isAfterNow()) {
+        controller.setLastContactDate(Convutils.getNewDateTime());
+        dirtyobj=true;
+      }
+      
 
       // the first time a controller is setup, it may have a null actual state
       // this will force the setting of actual state if null or different than controller value
@@ -80,6 +85,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
                 new Object[]{controller.getActualState(), controller.getLastActualStateChange()});
         controller.setActualState(controllerval);
         controller.setLastActualStateChange(Convutils.getNewDateTime());
+        dirtyobj=true;
 
         if (controller.getValidStates() == null) {
           if (controller.type == Controller.Type.RGB) {
@@ -87,6 +93,7 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
             vs.add("#000000");
             vs.add("#ffffff");
             controller.setValidStates(vs);
+            dirtyobj=true;
           }
         }
         if (controller.getValidStates().contains(controllerval)) {
@@ -100,12 +107,17 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
           // if manual, set desired to actual
           if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.MANUAL) {
             controller.setDesiredState(controllerval);
+            dirtyobj=true;
           }
         }
       }
       // also triggers the postprocessing onSave()
-      ofy().save().entity(controller).now();
-      log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
+      if (dirtyobj) {
+        ofy().save().entity(controller).now();
+        log.log(Level.INFO, "POST /device, saved controller setting:{0}", controller.toString());
+      } else {
+        log.log(Level.INFO, "skipped saving controller setting:{0}", controller.toString());
+      }
       out.println(controller.getDesiredState());
       response.setStatus(HttpServletResponse.SC_OK);
     } catch (Exception e) {

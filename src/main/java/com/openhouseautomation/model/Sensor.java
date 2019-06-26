@@ -2,11 +2,15 @@ package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -16,6 +20,7 @@ import java.util.logging.Logger;
  */
 @Entity
 @Cache
+@Unindex
 public class Sensor implements Serializable {
 
   private static final long serialVersionUID = 101011L;
@@ -94,6 +99,26 @@ public class Sensor implements Serializable {
   public Sensor() {
   }
 
+  @OnSave
+  void metrics() {
+    MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+    String key = "Sensor";
+    byte[] value;
+    long count = 1;
+    value = (byte[]) syncCache.get(key);
+    if (value == null) {
+      value = BigInteger.valueOf(count).toByteArray();
+      syncCache.put(key, value);
+    } else {
+      // Increment value
+      count = new BigInteger(value).longValue();
+      count++;
+      value = BigInteger.valueOf(count).toByteArray();
+      // Put back in cache
+      syncCache.put(key, value);
+      log.log(Level.INFO, key + " Metrics: " + count);
+    }
+  }
   @OnLoad
   void updateAge() {
     if (getLastReadingDate() != null) {
