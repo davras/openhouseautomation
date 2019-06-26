@@ -12,7 +12,6 @@ import com.openhouseautomation.model.LCDDisplay;
 import com.openhouseautomation.model.Location;
 import com.openhouseautomation.model.NotificationLog;
 import com.openhouseautomation.model.Reading;
-import com.openhouseautomation.model.ReadingHistory;
 import com.openhouseautomation.model.Scene;
 import com.openhouseautomation.model.Sensor;
 
@@ -27,7 +26,6 @@ public class OfyService {
     factory().register(Controller.class);
     factory().register(Sensor.class);
     factory().register(Reading.class);
-    factory().register(ReadingHistory.class);
     factory().register(Forecast.class);
     factory().register(Location.class);
     factory().register(LCDDisplay.class);

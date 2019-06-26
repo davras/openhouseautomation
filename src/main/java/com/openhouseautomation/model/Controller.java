@@ -1,6 +1,8 @@
 package com.openhouseautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -13,9 +15,11 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
+import com.googlecode.objectify.annotation.Unindex;
 import com.openhouseautomation.Convutils;
 import com.openhouseautomation.iftt.DeferredController;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +31,7 @@ import java.util.logging.Logger;
  */
 @Entity
 @Cache
+@Unindex
 public class Controller implements Serializable {
 
   private static final long serialVersionUID = 27L;
@@ -97,6 +102,7 @@ public class Controller implements Serializable {
   @JsonIgnore
   public DateTime lastactualstatechange; // The Date the last time the desired state changed
   @JsonIgnore
+  @Unindex
   public List validstates; // the list of valid states for the desired and actual states
   @JsonIgnore
   public DateTime lastcontactdate; // Date lastReading was last updated
@@ -143,6 +149,27 @@ public class Controller implements Serializable {
               + "\n" + "Please make sure the class exists and is accessible before enabling postprocessing on controller id: {1}",
               new Object[]{classtoget, this.getId()}
       );
+    }
+  }
+  
+  @OnSave
+  void metrics() {
+    MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+    String key = "Controller";
+    byte[] value;
+    long count = 1;
+    value = (byte[]) syncCache.get(key);
+    if (value == null) {
+      value = BigInteger.valueOf(count).toByteArray();
+      syncCache.put(key, value);
+    } else {
+      // Increment value
+      count = new BigInteger(value).longValue();
+      count++;
+      value = BigInteger.valueOf(count).toByteArray();
+      // Put back in cache
+      syncCache.put(key, value);
+      log.log(Level.INFO, key + " Metrics: " + count);
     }
   }
   
