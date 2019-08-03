@@ -35,7 +35,6 @@ public class HouseFan {
     newfanspeed = ensureRange(newfanspeed, 0, 5);
     hfl.setDesiredState(Integer.toString(newfanspeed));
     sendNotification(newfanspeed);
-  
   }
   
   public String notifyInManual() {
