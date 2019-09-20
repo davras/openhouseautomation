@@ -3,12 +3,9 @@ package com.openhouseautomation.display;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.common.base.Strings;
 import com.googlecode.objectify.cmd.Query;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import static com.openhouseautomation.logic.HouseFan.log;
-import com.openhouseautomation.logic.WeightedDecision;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
 import com.openhouseautomation.model.EventLog;
@@ -58,11 +55,11 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     if (request.getPathInfo().startsWith("/display/sensors")) {
-      doDisplaySensors(request, response);
+      new ObjectMapper().writeValue(response.getWriter(), ofy().load().type(Sensor.class).list());
       return;
     }
     if (request.getPathInfo().startsWith("/display/forecast")) {
-      doDisplayForecast(request, response);
+      new ObjectMapper().writeValue(response.getWriter(), ofy().load().type(Forecast.class).list());
       return;
     }
     if (request.getPathInfo().startsWith("/display/devices")) {
@@ -74,7 +71,7 @@ public class DisplaySourceServlet extends HttpServlet {
       return;
     }
     if (request.getPathInfo().startsWith("/display/notifications")) {
-      doDisplayNotifications(request, response);
+      new ObjectMapper().writeValue(response.getWriter(), ofy().load().type(NotificationLog.class).order("-lastnotification").list());
       return;
     }
     if (request.getPathInfo().startsWith("/devicetypelist")) {
@@ -87,19 +84,6 @@ public class DisplaySourceServlet extends HttpServlet {
     }
     log.log(Level.WARNING, "unsupported path: " + request.getPathInfo());
     response.sendError(HttpStatus.SC_NOT_FOUND, "path not supported");
-  }
-
-  private void doDisplayForecast(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    PrintWriter out = response.getWriter();
-    // how far can this shrink?
-    new ObjectMapper().writeValue(out, ofy().cache(false).load().type(Forecast.class).list());
-    return;
-    
-//    Query<Forecast> query = ofy().cache(false).load().type(Forecast.class);
-//    final List<Forecast> forecasts = new ArrayList<>();
-//    forecasts.addAll(query.list());
-//    ObjectMapper om = new ObjectMapper();
-//    om.writeValue(out, forecasts);
   }
 
   private void doListDeviceTypes(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -131,27 +115,7 @@ public class DisplaySourceServlet extends HttpServlet {
     om.writeValue(out, ch);
   }
 
-  private void doDisplaySensors(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    PrintWriter out = response.getWriter();
-    // dev on localhost
-    if (request.getRemoteAddr().equals("127.0.0.1")) {
-      response.getWriter().print(testSensorString);
-      return;
-    }
-    // production
-    new ObjectMapper().writeValue(out, ofy().load().type(Sensor.class).list());
-//    Query<Sensor> query = ofy().cache(false).load().type(Sensor.class);
-//    QueryResultIterator<Sensor> iterator = query.iterator();
-//    List sensors = new ArrayList();
-//    while (iterator.hasNext()) {
-//      Sensor sens = (Sensor) iterator.next();
-//      sensors.add(sens);
-//    }
-//    ObjectMapper om = new ObjectMapper();
-//    om.writeValue(out, sensors);
-  }
-
-  private void doDisplayScenes(HttpServletRequest request, HttpServletResponse response) throws IOException {
+   private void doDisplayScenes(HttpServletRequest request, HttpServletResponse response) throws IOException {
     PrintWriter out = response.getWriter();
 
     // dev on localhost
@@ -183,16 +147,6 @@ public class DisplaySourceServlet extends HttpServlet {
     }
 
     new ObjectMapper().writeValue(out, ofy().load().type(Scene.class).list());
-//    
-//    Query<Scene> query = ofy().cache(false).load().type(Scene.class);
-//    QueryResultIterator<Scene> iterator = query.iterator();
-//    List<Scene> scenes = new ArrayList();
-//    while (iterator.hasNext()) {
-//      Scene scene = iterator.next();
-//      scenes.add(scene);
-//    }
-//    ObjectMapper om = new ObjectMapper();
-//    om.writeValue(out, scenes);
   }
 
   private void doDisplayControllers(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -242,20 +196,6 @@ public class DisplaySourceServlet extends HttpServlet {
     } catch (JSONException e) {
       response.getWriter().print("[{ type: 'danger', msg: 'unable to retrieve alerts' }]");
     }
-  }
-
-  private void doDisplayNotifications(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    PrintWriter out = response.getWriter();
-    // dev on localhost
-    if (request.getRemoteAddr().equals("127.0.0.1")) {
-      response.getWriter().print(testNotificationString);
-      return;
-    }
-    // production
-    if (com.openhouseautomation.Flags.clearCache) {
-      ofy().clear(); // clear the session cache, not the memcache
-    }
-    new ObjectMapper().writeValue(out, ofy().load().type(NotificationLog.class).order("-lastnotification").list());
   }
 
   /**

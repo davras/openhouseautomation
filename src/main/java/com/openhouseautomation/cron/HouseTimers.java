@@ -79,7 +79,7 @@ public class HouseTimers extends HttpServlet {
     }
     ofy().save().entity(housecolor);
     setcolor(housecolor);
-    // update devices
+    // TODO publish a hook response to update devices
     
   }
   
