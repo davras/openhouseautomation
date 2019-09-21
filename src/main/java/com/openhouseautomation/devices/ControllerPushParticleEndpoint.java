@@ -87,29 +87,13 @@ public class ControllerPushParticleEndpoint extends HttpServlet {
         controller.setLastActualStateChange(Convutils.getNewDateTime());
         dirtyobj=true;
 
-        if (controller.getValidStates() == null) {
-          if (controller.type == Controller.Type.RGB) {
-            List vs = new ArrayList();
-            vs.add("#000000");
-            vs.add("#ffffff");
-            controller.setValidStates(vs);
-            dirtyobj=true;
-          }
-        }
         if (controller.getValidStates().contains(controllerval)) {
           controller.setActualState(controllerval);
           log.log(Level.INFO, "desired state:{0} @{1}",
                   new Object[]{controller.getDesiredState(), controller.getLastDesiredStateChange().toLocalTime()});
         }
-        if (controller.getType() == Controller.Type.RGB) {
-          controller.setActualState(controllerval);
-          // if manual, set desired to actual
-          if (controller.getDesiredStatePriority() == Controller.DesiredStatePriority.MANUAL) {
-            controller.setDesiredState(controllerval);
-            dirtyobj=true;
-          }
-        }
       }
+      
       // also triggers the postprocessing onSave()
       if (dirtyobj) {
         ofy().save().entity(controller).now();

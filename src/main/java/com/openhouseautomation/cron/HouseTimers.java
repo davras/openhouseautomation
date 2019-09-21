@@ -34,7 +34,8 @@ public class HouseTimers extends HttpServlet {
   private int curmin;
 
   /**
-   * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+   * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+   * methods.
    *
    * @param request servlet request
    * @param response servlet response
@@ -62,16 +63,18 @@ public class HouseTimers extends HttpServlet {
     workcolor.setDesiredState(lightLookup());
     ofy().save().entity(workcolor);
     setcolor(workcolor);
-    
+
     Controller housecolor = ofy().load().type(Controller.class).id(28131427L).now();
-    housecolor.setDesiredState(lightLookup());
-    
+    if (housecolor.getDesiredStatePriority() == Controller.DesiredStatePriority.AUTO) {
+      housecolor.setDesiredState(lightLookup());
+    }
+
     Controller projector = ofy().load().type(Controller.class).id(4157520376L).now();
     if (projector.getActualState().equals("1")) {
       log.log(Level.INFO, "Movie lights");
       housecolor.setDesiredState("#653d00");
     }
-    
+
     Controller alarmcontroller = ofy().load().type(Controller.class).id(3964578029L).now();
     if (alarmcontroller.getActualState().equals("Away")) {
       log.log(Level.INFO, "Alarm is set");
@@ -79,15 +82,14 @@ public class HouseTimers extends HttpServlet {
     }
     ofy().save().entity(housecolor);
     setcolor(housecolor);
-    // TODO publish a hook response to update devices
-    
+
   }
-  
+
   public void notifyTurnOnHouseFan() {
-    if (curhour < 17 || curmin > 0 ) {
+    if (curhour < 17 || curmin > 0) {
       return; // from 5pm to midnight on the hour
     }
-    if (curmin%15 > 0) {
+    if (curmin % 15 > 0) {
       // only run once every 15m
       return;
     }
@@ -107,13 +109,16 @@ public class HouseTimers extends HttpServlet {
       nhnotif.page();
     }
   }
+
   public String lightLookup() {
     // a pretty, pretty mood setting color for the day
     DateTime now = Convutils.getNewDateTime();
     float hourmin = now.getHourOfDay();
-    hourmin += now.getMinuteOfHour()/60.0;
-    int r=0, g=0, b=0;
-    if (hourmin < 6.45) return "#000000";
+    hourmin += now.getMinuteOfHour() / 60.0;
+    int r = 0, g = 0, b = 0;
+    if (hourmin < 6.45) {
+      return "#000000";
+    }
     if (hourmin < 7) {
       // map blue to bright
       r = g = maptoi(hourmin, 0, 50, 6.45, 7.0);
@@ -124,42 +129,44 @@ public class HouseTimers extends HttpServlet {
       b = maptoi(hourmin, 255, 0, 7.0, 12.0);
     } else if (hourmin < 20) {
       // map to orange
-      r=204;
-      g=maptoi(hourmin, 204, 153, 12.0, 20.0);
-      b=0;
+      r = 204;
+      g = maptoi(hourmin, 204, 153, 12.0, 20.0);
+      b = 0;
     } else if (hourmin < 22) {
       // map to purple
-      r=maptoi(hourmin, 204, 102, 20.0, 22.0);
-      g=maptoi(hourmin, 153, 0, 20.0, 22.0);
-      b=maptoi(hourmin, 0, 255, 20.0, 22.0);
+      r = maptoi(hourmin, 204, 102, 20.0, 22.0);
+      g = maptoi(hourmin, 153, 0, 20.0, 22.0);
+      b = maptoi(hourmin, 0, 255, 20.0, 22.0);
     } else if (hourmin < 24) {
       // map to low red
-      r=maptoi(hourmin, 102, 60, 22.0, 24.0);
-      g=0;
-      b=maptoi(hourmin, 255, 0,22.0, 24.0);
+      r = maptoi(hourmin, 102, 60, 22.0, 24.0);
+      g = 0;
+      b = maptoi(hourmin, 255, 0, 22.0, 24.0);
     }
     log.log(Level.INFO, "Response: @" + hourmin + ":" + r + "/" + g + "/" + b + "=" + rgbtoHex(r, g, b));
     return rgbtoHex(r, g, b);
   }
-  
+
   private String intToHex(int i) {
     if (i < 10) {
       return "0" + Integer.toHexString(i);
     }
     return Integer.toHexString(i);
   }
+
   private String rgbtoHex(int r, int g, int b) {
-    return "#" + intToHex(r)+ intToHex(g) + intToHex(b);
-  }
-  private static int maptoi(final double unscaledNum, final double minOutput, final double maxOutput, final double minInput, final double maxInput) {
-    return (int)((maxOutput - minOutput) * (unscaledNum - minInput) / (maxInput - minInput) + minOutput);
+    return "#" + intToHex(r) + intToHex(g) + intToHex(b);
   }
 
-  public void setcolor(Controller cont) {
+  private static int maptoi(final double unscaledNum, final double minOutput, final double maxOutput, final double minInput, final double maxInput) {
+    return (int) ((maxOutput - minOutput) * (unscaledNum - minInput) / (maxInput - minInput) + minOutput);
+  }
+
+  public int setcolor(Controller cont) {
     //make API call to set the color on all devices
     String access_token = DatastoreConfig.getValueForKey("particleapiaccesstoken", "");
     if (com.google.api.client.util.Strings.isNullOrEmpty(access_token)) {
-      return;
+      return 1;
     }
     try {
       String url = "https://api.particle.io/v1/devices/events";
@@ -178,14 +185,11 @@ public class HouseTimers extends HttpServlet {
       wr.writeBytes("name=lightcolor/");
       wr.writeBytes(cont.getLocation());
       wr.writeBytes("&data=");
-      wr.writeBytes(cont.getId().toString());
-      wr.writeBytes("/");
       wr.writeBytes(cont.getDesiredState());
       wr.writeBytes("&private=true&ttl=60");
       wr.flush();
       wr.close();
       int responseCode = con.getResponseCode();
-      log.log(Level.INFO, "Response Code : " + responseCode);
 
       BufferedReader in = new BufferedReader(
               new InputStreamReader(con.getInputStream()));
@@ -196,11 +200,16 @@ public class HouseTimers extends HttpServlet {
         response.append(inputLine);
       }
       in.close();
-      log.log(Level.INFO, "Response: " + response);
+      if (responseCode != 200) {
+        log.log(Level.SEVERE, "Response Code : " + responseCode + ", " + response);
+        return responseCode;
+      }
     } catch (Exception e) {
       log.log(Level.SEVERE, "ERR:" + e.getMessage(), e.getCause());
     }
+    return 0; // indicating no errors
   }
+
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**
    * Handles the HTTP <code>GET</code> method.

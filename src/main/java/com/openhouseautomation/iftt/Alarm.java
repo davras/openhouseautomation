@@ -40,12 +40,14 @@ public class Alarm extends DeferredController {
     if ("Away".equals(super.controller.getActualState()) &&
             !"Away".equals(super.controller.getPreviousState())) {
       setController(3640433672L, "0");
-      log.log(Level.INFO, "Den light off");
+      setController(28131427L, "#000000");
+      log.log(Level.INFO, "lights off");
     }
     if ("Disarm".equals(super.controller.getActualState()) &&
             !"Disarm".equals(super.controller.getPreviousState())) {
       setController(3640433672L, "1");
-      log.log(Level.INFO, "Den light on");
+      setController(28131427L, "#ffffff");
+      log.log(Level.INFO, "lights on");
     }
   }
     public void setController(Long controllerid, String state) {
@@ -58,7 +60,7 @@ public class Alarm extends DeferredController {
       ofy().save().entity(controller).now();
       NotificationHandler nhnotif = new NotificationHandler();
       nhnotif.setRecipient(DatastoreConfig.getValueForKey("admin", "bob@example.com"));
-      nhnotif.setSubject("Den Lights");
+      nhnotif.setSubject("Lights");
       if ("1".equals(state)) {
         nhnotif.setBody("Lights On");
       } else {

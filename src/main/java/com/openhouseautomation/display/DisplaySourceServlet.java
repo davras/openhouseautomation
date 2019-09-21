@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.cron.HouseTimers;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.ControllerHelper;
 import com.openhouseautomation.model.EventLog;
@@ -289,7 +290,7 @@ public class DisplaySourceServlet extends HttpServlet {
       }
       ofy().save().entities(lights);
       log.log(Level.INFO, "updated all controllers");
-    } else { // an individual light
+    } else { // an individual light or other device
       if (com.openhouseautomation.Flags.clearCache) {
         ofy().clear(); // clear the session cache, not the memcache
       }
@@ -307,8 +308,18 @@ public class DisplaySourceServlet extends HttpServlet {
         controller.setDesiredState(state);
         controller.setDesiredStatePriority(Controller.DesiredStatePriority.MANUAL);
       }
-      if (state.startsWith("#")) {
-        controller.setDesiredState(state);
+      if (controller.getType() == Controller.Type.RGB) {
+        // send update to API
+        // TODO Pull out API layer, abstract to Controller
+        HouseTimers ht = new HouseTimers();
+        if (ht.setcolor(controller) == 0) {
+          // copy desired to actual as signal of completion
+          controller.setActualState(controller.getDesiredState());
+        }
+        // because RGB controllers only listen on the Particle bus
+        // so we fire an event through Particle API
+        // and a 200 response is a probably-safe assumption that the controllers online heard it
+        // if not, the 1 minute HouseTimers will catch it within 60s.
       }
       controller.setLastDesiredStateChange(Convutils.getNewDateTime());
       ofy().save().entity(controller).now();

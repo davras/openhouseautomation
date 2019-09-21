@@ -36,13 +36,13 @@ public class Controller implements Serializable {
 
   private static final long serialVersionUID = 27L;
   private static final Logger log = Logger.getLogger(Controller.class.getName());
-
+  
   /**
    * Enum for the Device type
    */
   public enum Type {
 
-      // if you add a new type, add it's default valid states in the AddControllerServlet
+    // if you add a new type, add it's default valid states in the AddControllerServlet
     ALARM("Alarm"),
     GARAGEDOOR("Garage Door"),
     LIGHTS("Lights"),
@@ -112,7 +112,7 @@ public class Controller implements Serializable {
   @Ignore
   private String previousstate; // the previous actual state
   // private String decision; // holds JSON of why this controller is in the current state
-  
+
   /**
    * Empty constructor for objectify.
    */
@@ -132,7 +132,7 @@ public class Controller implements Serializable {
       log.log(Level.INFO, "No changes, no task");
       return;
     }
-    
+
     // Add the task to the default queue.
     Queue queue = QueueFactory.getDefaultQueue();
     DeferredController dfc;
@@ -151,28 +151,18 @@ public class Controller implements Serializable {
       );
     }
   }
-  
+
   @OnSave
   void metrics() {
-    MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-    String key = "Controller";
-    byte[] value;
-    long count = 1;
-    value = (byte[]) syncCache.get(key);
-    if (value == null) {
-      value = BigInteger.valueOf(count).toByteArray();
-      syncCache.put(key, value);
+    MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService(); // used just for the write metrics
+    String key = "Controller:" + name;
+    if (syncCache.contains(key)) {
+      syncCache.increment(key, 3);
     } else {
-      // Increment value
-      count = new BigInteger(value).longValue();
-      count++;
-      value = BigInteger.valueOf(count).toByteArray();
-      // Put back in cache
-      syncCache.put(key, value);
-      log.log(Level.INFO, key + " Metrics: " + count);
+      syncCache.put(key, 0);
     }
   }
-  
+
   // TODO this is crappy change detection
   @OnLoad
   void backupLastReading() {

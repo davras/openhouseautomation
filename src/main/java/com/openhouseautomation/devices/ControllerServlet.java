@@ -8,6 +8,7 @@ package com.openhouseautomation.devices;
 import com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
+import com.openhouseautomation.cron.HouseTimers;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.model.EventLog;
@@ -163,8 +164,6 @@ public class ControllerServlet extends HttpServlet {
     // handle device requests
     if (reqpath.startsWith("/device")) {
       handleDevice(controller, controllervalue, request, response);
-    } else if (reqpath.startsWith("/fan")) {
-      log.info("doPost Controller");
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, "path not found");
     }
