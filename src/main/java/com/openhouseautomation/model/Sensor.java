@@ -102,21 +102,11 @@ public class Sensor implements Serializable {
   @OnSave
   void metrics() {
     MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-    String key = "Sensor";
-    byte[] value;
-    long count = 1;
-    value = (byte[]) syncCache.get(key);
-    if (value == null) {
-      value = BigInteger.valueOf(count).toByteArray();
-      syncCache.put(key, value);
+    String key = "Sensor:" + id;
+    if (syncCache.contains(key)) {
+      syncCache.increment(key, 3);
     } else {
-      // Increment value
-      count = new BigInteger(value).longValue();
-      count++;
-      value = BigInteger.valueOf(count).toByteArray();
-      // Put back in cache
-      syncCache.put(key, value);
-      log.log(Level.INFO, key + " Metrics: " + count);
+      syncCache.put(key, 0);
     }
   }
   @OnLoad

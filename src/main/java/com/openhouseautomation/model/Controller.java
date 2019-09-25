@@ -155,7 +155,7 @@ public class Controller implements Serializable {
   @OnSave
   void metrics() {
     MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService(); // used just for the write metrics
-    String key = "Controller:" + name;
+    String key = "Controller:" + id;
     if (syncCache.contains(key)) {
       syncCache.increment(key, 3);
     } else {
