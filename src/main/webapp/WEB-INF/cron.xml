@@ -39,27 +39,27 @@
 
     <cron>
         <url>/cron/controller/3960328784/1</url>
-        <description>Run Boat Pump for 1 minute</description>
-        <schedule>every day 18:59</schedule>
+        <description>Lights on in morning</description>
+        <schedule>every day 05:59</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
     <cron>
         <url>/cron/controller/3960328784/0</url>
-        <description>Run Boat Pump for 1 minute</description>
-        <schedule>every 1 hours synchronized</schedule>
+        <description>Lights off at midnight</description>
+        <schedule>every day 23:59</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
 
     <cron>
         <url>/cron/controller/91125605/1</url>
-        <description>Chargers on at 11pm</description>
-        <schedule>every day 23:00</schedule>
+        <description>Chargers on at 10pm</description>
+        <schedule>every day 22:00</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
     <cron>
         <url>/cron/controller/91125605/0</url>
-        <description>Chargers off at 7am</description>
-        <schedule>every day 07:00</schedule>
+        <description>Chargers off at 8am</description>
+        <schedule>every day 08:00</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
 
@@ -78,14 +78,14 @@
     
         <cron>
         <url>/cron/controller/1919502323/1</url>
-        <description>Air freshener/fan on at 7pm</description>
-        <schedule>every day 19:00</schedule>
+        <description>Air freshener/fan on at 6:30am</description>
+        <schedule>every day 06:30</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
     <cron>
         <url>/cron/controller/1919502323/0</url>
-        <description>Air freshener/fan off at 8pm</description>
-        <schedule>every day 20:00</schedule>
+        <description>Air freshener/fan off at 8am</description>
+        <schedule>every day 08:00</schedule>
         <timezone>America/Los_Angeles</timezone>
     </cron>
 </cronentries>
