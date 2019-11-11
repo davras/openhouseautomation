@@ -5,6 +5,7 @@
  */
 package com.openhouseautomation.iftt;
 
+import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
 import com.openhouseautomation.model.Controller;
@@ -37,6 +38,19 @@ public class Temperature extends DeferredSensor {
       HouseFan hf = new HouseFan();
       hf.autoControlWHF();
       log.log(Level.INFO, "Temperature.WHF.Decision:\n" + hf.getWeightedDecision().toMessage());
+      
+      if (sensor.getId()==395430086L) {
+        Controller gardenfan = ofy().load().type(Controller.class).id(2163650315L).now();
+        if (fnew > 82 && "0".equals(gardenfan.getDesiredState())) {
+          // 2163650315 for garden fan
+          gardenfan.setDesiredState("1");
+          ofy().save().entity(gardenfan);
+        }
+        if (fnew < 80 && "1".equals(gardenfan.getDesiredState())) {
+          gardenfan.setDesiredState("0");
+          ofy().save().entity(gardenfan);
+        }
+      }
     }
   }
 }

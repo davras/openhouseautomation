@@ -115,10 +115,12 @@ public class SensorPushPubSubSubscription extends HttpServlet {
   }
 
   public void doPostProcessing(Sensor sensor) {
+    log.log(Level.INFO, "Postprocessing: " + sensor.needsPostprocessing());
     if (!sensor.needsPostprocessing()) {
       return;
     }
     if (Objects.equal(sensor.getPreviousReading(), sensor.getLastReading())) {
+      log.log(Level.INFO, "Readings unchanged");
       return;
     }
     // Add the task to the default queue.
