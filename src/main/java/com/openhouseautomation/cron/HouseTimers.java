@@ -148,7 +148,7 @@ public class HouseTimers extends HttpServlet {
   }
 
   private String intToHex(int i) {
-    if (i < 10) {
+    if (i < 16) {
       return "0" + Integer.toHexString(i);
     }
     return Integer.toHexString(i);
