@@ -45,7 +45,7 @@ public class Sensor implements Serializable {
      */
     MAGNETIC_FIELD,
     ORIENTATION,
-    GYROSCOPE,
+    VOC,
     PROXIMITY,
     GRAVITY,
     LINEAR_ACCELERATION, /**
