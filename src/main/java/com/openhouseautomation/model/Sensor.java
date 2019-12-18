@@ -57,6 +57,34 @@ public class Sensor implements Serializable {
     AIRQUALITY;
   }
 
+  public String getDefaultUnits() {
+    switch (type) {
+      case TEMPERATURE:
+        return "F";
+      case HUMIDITY:
+        return "%";
+      case PRESSURE:
+        return "mmHg";
+      case LIGHT:
+        return "%";
+      case WINDSPEED:
+        return "mph";
+      case VOLTAGE:
+        return "V";
+      case RAIN:
+        return "in/hr";
+      case VOC:
+        return "kOhms";
+      case CURRENT:
+        return "A";
+      case COLOR:
+        return "rgb";
+      case AIRQUALITY:
+        return "pm25";
+    }
+    return "";
+  }
+  
   @Id
   Long id; // hash for this unique sensor
   @Unindex

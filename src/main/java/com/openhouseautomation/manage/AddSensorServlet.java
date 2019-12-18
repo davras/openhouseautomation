@@ -1,7 +1,8 @@
 package com.openhouseautomation.manage;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.openhouseautomation.Convutils;
-import org.joda.time.DateTime;
 import static com.openhouseautomation.OfyService.ofy;
 
 import com.openhouseautomation.model.Sensor;
@@ -31,7 +32,7 @@ public class AddSensorServlet extends HttpServlet {
       IOException {
     log.info("doPost Sensor");
     Sensor sens = new Sensor();
-    String salt = "abc123";
+    String salt = UserServiceFactory.getUserService().getCurrentUser().getUserId();
 
     // has the form been submitted with a setpoint change?
     boolean formvalid =
@@ -43,7 +44,7 @@ public class AddSensorServlet extends HttpServlet {
       sens.setZone(req.getParameter("zone"));
       sens.setType(Sensor.Type.valueOf(req.getParameter("type")));
       sens.setName(req.getParameter("name"));
-      sens.setUnit("F");
+      sens.setUnit(sens.getDefaultUnits());
       sens.setLastReading("99");
       sens.setLastReadingDate(Convutils.getNewDateTime());
       sens.setExpirationTime(3600);
