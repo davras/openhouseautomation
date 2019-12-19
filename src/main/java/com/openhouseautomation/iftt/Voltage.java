@@ -7,7 +7,6 @@ package com.openhouseautomation.iftt;
 
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
-import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.model.DatastoreConfig;
 import com.openhouseautomation.notification.NotificationHandler;
@@ -36,9 +35,11 @@ public class Voltage extends DeferredSensor {
     DateTime now = Convutils.getNewDateTime();
     if (outsidebattery < 12.0) {
         setController(2624005855L, "1");
+        log.log(Level.INFO, "WX charger on at 12V");
     }
-    if (outsidebattery > 13.5) {
+    if (outsidebattery > 14.5) {
         setController(2624005855L, "0");
+        log.log(Level.INFO, "WX charger off at 14.5V");
     }
   }
 

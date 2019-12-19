@@ -1,6 +1,5 @@
 package com.openhouseautomation.manage;
 
-import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;

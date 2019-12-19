@@ -1,85 +1,103 @@
 <!DOCTYPE HTML>
 <html lang="en" ng-app="gAutoArd" >
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="OpenHouseAutomation landing site">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="OpenHouseAutomation landing site">
 
-    <title>Open House Automation</title>
+        <title>Open House Automation</title>
 
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-  <ng-include src="'/navbar.html'"></ng-include>
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+    <ng-include src="'/navbar.html'"></ng-include>
 
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-3 col-md-2 sidebar">
-        <ul class="nav nav-sidebar">
-          <li class="nav-header"><a href="/index.html">Overview</a></li>
-          <li class="divider"></li>
-          <li class="nav-header">Status</li>
-          <li class="divider"></li>
-          <li class="nav-header"><a href="/control.html">Control</a></li>
-          <li class="divider"></li>
-          <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
-          <li class="divider"></li>
-          <li class="nav-header"><a href="/charts.html">Charts</a></li>
-          <li class="divider"></li>
-          <li class="nav-header"><a href="/manage.html">Manage</a></li>
-        </ul>
-      </div>
-      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <div class="jumbotron">
-          <div><h2>
-              Status
-            </h2></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="nav-header"><a href="/index.html">Overview</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header">Status</li>
+                    <li class="divider"></li>
+                    <li class="nav-header"><a href="/control.html">Control</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header"><a href="/scenes.html">Scenes</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header"><a href="/charts.html">Charts</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header"><a href="/manage.html">Manage</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <div class="jumbotron">
+                    Status
+                </div>
+                <uib-tabset active="active">
+                    <uib-tab index="0" heading="By Sensor Type">
+                        <div class="container-fluid list-group" ng-controller="SensorController as sensors">
+                            <!-- Sensor current readings go here -->
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="sensor in sensors.data | orderBy:'type'">
+                                    <a href="http://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
+                                        {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
+                                    <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
+                                        &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>
+                                </li>
+                            </ul>
+                            <hr/>
+                        </div>    
+                    </uib-tab>
+                    <uib-tab index="1" heading="By Sensor Zone">
+                        <div class="container-fluid list-group" ng-controller="SensorController as sensors">
+                            <!-- Sensor current readings go here -->
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="sensor in sensors.data | orderBy:'zone'">
+                                    <a href="http://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
+                                        {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
+                                    <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
+                                        &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>
+                                </li>
+                            </ul>
+                            <hr/>
+                        </div>
+
+                    </uib-tab>
+                </uib-tabset>
+
+                <div class="table-condensed" ng-controller="ForecastController as forecasts">
+                    <table class="table">
+                        <thead>
+                            <tr><th>Zipcode</th><th>High</th><th>Low</th><th>PoP</th>
+                        </thead>
+                        <tr ng-repeat="forecast in forecasts.data">
+                            <td>{{ forecast.zipCode}}</td><td>{{forecast.forecastHigh}}F</td>
+                            <td>{{forecast.forecastLow}}F</td><td>{{forecast.forecastPop}}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="container-fluid list-group" ng-controller="SensorController as sensors">
-          <!-- Sensor current readings go here -->
-          <ul class="list-group">
-            <li class="list-group-item" ng-repeat="sensor in sensors.data">
-              <a href="http://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
-                {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
-              <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
-                &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>
-            </li>
-          </ul>
-          <hr/>
-        </div>
-        <div class="table-condensed" ng-controller="ForecastController as forecasts">
-          <table class="table">
-            <thead>
-              <tr><th>Zipcode</th><th>High</th><th>Low</th><th>PoP</th>
-            </thead>
-            <tr ng-repeat="forecast in forecasts.data">
-              <td>{{ forecast.zipCode}}</td><td>{{forecast.forecastHigh}}F</td>
-              <td>{{forecast.forecastLow}}F</td><td>{{forecast.forecastPop}}%</td>
-            </tr>
-          </table>
-        </div>
-      </div>
     </div>
-  </div>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="/js/angular.min.js"></script>
-  <script src="/js/angularbootstrap.min.js"></script>
-  <script type="text/javascript" src="/js/app.js"></script>    
-  <!-- Bootstrap core CSS -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/angularbootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>    
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- OHA core CSS -->
-  <link href="/css/main.css" rel="stylesheet">
+    <!-- OHA core CSS -->
+    <link href="/css/main.css" rel="stylesheet">
 
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="/js/bootstrap.min.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.min.js"></script>
 </body>
 </html>

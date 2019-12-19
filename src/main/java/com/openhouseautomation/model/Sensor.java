@@ -64,7 +64,7 @@ public class Sensor implements Serializable {
       case HUMIDITY:
         return "%";
       case PRESSURE:
-        return "mmHg";
+        return "hPa";
       case LIGHT:
         return "%";
       case WINDSPEED:
