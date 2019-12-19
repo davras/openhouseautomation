@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.openhouseautomation.Convutils;
 import static com.openhouseautomation.OfyService.ofy;
 import com.openhouseautomation.logic.HouseFan;
+import com.openhouseautomation.logic.Utilities;
 import com.openhouseautomation.model.Controller;
 import com.openhouseautomation.notification.NotificationHandler;
 import java.io.IOException;
@@ -80,9 +81,13 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Alarm is set");
       housecolor.setDesiredState("#000000");
     }
-    ofy().save().entity(housecolor);
-    setcolor(housecolor);
-
+    if (setcolor(housecolor)==0) {
+      // called API successfully, so controller is online
+      // this should be done in setcolor() in another class
+      // but datastore.save() calls multiply...
+      housecolor.setActualState(housecolor.getDesiredState());
+    }
+    ofy().save().entity(housecolor).now();
   }
 
   public void notifyTurnOnHouseFan() {
