@@ -49,12 +49,12 @@ public class HouseFanImpl {
       case 0:
         if (!setup()) {
           // if you do not have a WHF, this exits
-          break;
+          return;
         }
       case 1:
         if (!checkExpiration()) {
           // if the controller hasn't reported in awhile, exit
-          break;
+          return;
         }
       case 2:
         if (!considerStatePriority()) {
