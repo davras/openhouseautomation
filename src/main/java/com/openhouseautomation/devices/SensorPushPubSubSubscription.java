@@ -69,6 +69,11 @@ public class SensorPushPubSubSubscription extends HttpServlet {
       }
       // save sensor reading
       long sensorid = message.getId();
+      if (sensorid == 0) {
+        log.log(Level.SEVERE, "bad data:" + message.getData());
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        return;
+      }
       String sensorval = message.getValue();
       log.log(Level.INFO, "sensorid:" + sensorid + ",data:" + sensorval);
       Key<Sensor> sk = Key.create(Sensor.class, sensorid);
