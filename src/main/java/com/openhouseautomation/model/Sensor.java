@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.*;
 import com.openhouseautomation.Convutils;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -471,7 +470,7 @@ public class Sensor implements Serializable {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass().getName())
+    return MoreObjects.toStringHelper(this)
             .add("id", id)
             .add("owner", owner)
             .add("location", location)

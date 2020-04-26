@@ -13,14 +13,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.annotation.WebServlet;
+//import javax.servlet.annotation.WebServlet;  // 3.1.0 feature, not 2.5
 
 /**
  *
  * @author dave
  */
 
-@WebServlet(name="NavBar", urlPatterns={"/navbar.html"})
+// @WebServlet(name="NavBar", urlPatterns={"/navbar.html"}) // 3.1.0 feature, not 2.5
 public class NavbarServlet extends HttpServlet {
 
   /**

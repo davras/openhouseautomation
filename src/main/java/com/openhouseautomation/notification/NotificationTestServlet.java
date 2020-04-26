@@ -14,13 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.annotation.WebServlet;
+// import javax.servlet.annotation.WebServlet; // 3.1.0 feature, not 2.5
 
 /**
  *
  * @author dras
  */
-@WebServlet(name = "notificationtest", description = "Tests the owners pager", urlPatterns = "/notificationtest")
+// @WebServlet(name = "notificationtest", description = "Tests the owners pager", urlPatterns = "/notificationtest") // 3.1.0 feature, not 2.5
 public class NotificationTestServlet extends HttpServlet {
 
   private static final Logger log = Logger.getLogger(NotificationTestServlet.class.getName());

@@ -29,7 +29,11 @@ public class HouseFan {
   public void autoControlWHF() {
     process();
     // code to update the whf controllers' desired speed next
-    int newfanspeed = Utilities.safeParseInt(wd.getTopValue());
+    Object toparsetopvalue = wd.getTopValue();
+    if (null == toparsetopvalue) {
+      return;
+    }
+    int newfanspeed = Utilities.safeParseInt(toparsetopvalue);
     log.log(Level.INFO, "trying for fan speed: " + newfanspeed + " because of: " + wd.getTopName());
     // bounds checking
     newfanspeed = ensureRange(newfanspeed, 0, 5);

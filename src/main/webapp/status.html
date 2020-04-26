@@ -45,7 +45,7 @@
                             <!-- Sensor current readings go here -->
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="sensor in sensors.data | orderBy:'type'">
-                                    <a href="http://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
+                                    <a href="https://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
                                         {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
                                     <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
                                         &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>
@@ -59,7 +59,7 @@
                             <!-- Sensor current readings go here -->
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="sensor in sensors.data | orderBy:'zone'">
-                                    <a href="http://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
+                                    <a href="https://gautoard.appspot.com/charts/{{sensor.type| lowercase}}.html">
                                         {{sensor.name}}</a>:&nbsp;{{sensor.lastreading}}&nbsp;{{sensor.unit}}
                                     <i ng-class='{red : sensor.expired, black : !sensor.expired}'>
                                         &nbsp;&nbsp;<small>{{sensor.humanAge}}</small></i>

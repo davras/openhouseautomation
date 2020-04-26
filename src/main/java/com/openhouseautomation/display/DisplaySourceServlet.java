@@ -250,9 +250,9 @@ public class DisplaySourceServlet extends HttpServlet {
     // parse and set the controller settings
     String config = scene.getConfig();
     ObjectMapper mapper = new ObjectMapper();
-    TypeReference tr = new TypeReference<List<SceneController>>() {};
-    List<SceneController> scconts = mapper.readValue(config, tr);
+    //TypeReference tr = new TypeReference<List<SceneController>>() {};
     //List<SceneController> scconts = mapper.readValue(config, List.class);
+    List<SceneController> scconts = mapper.readValue(config, List.class);
     for (SceneController scdes : scconts) {
       Controller controller = ofy().cache(false).load().type(Controller.class).id(scdes.getId()).now();
       if (controller == null) {

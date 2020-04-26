@@ -23,13 +23,15 @@
     <style>
       #slider { margin: 10px; }
     </style>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type='text/javascript'>
-      google.load('visualization', '1.1', {'packages': ['annotationchart']});
-      function drawVisualizationTemperature() {
-        google.visualization.drawChart({
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+           google.charts.load('current', {'packages':['annotationchart']});
+           google.charts.setOnLoadCallback(drawChart);
+          
+           function drawChart() {
+             google.visualization.drawChart({
           "containerId": "visualization_div_TEMPERATURE",
-          "dataSourceUrl": 'http://gautoard.appspot.com/ReadingDataSourceServlet?type=TEMPERATURE',
+          "dataSourceUrl": 'https://gautoard.appspot.com/ReadingDataSourceServlet?type=TEMPERATURE',
           "chartType": "AnnotationChart",
           "options": {
             "title": 'Temperatures',
@@ -43,7 +45,6 @@
           }
         });
       }
-      google.setOnLoadCallback(drawVisualizationTemperature);
     </script>
     <script type='text/javascript'>
       google.load('visualization', '1.1', {'packages': ['annotationchart']});

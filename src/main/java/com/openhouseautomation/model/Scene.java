@@ -1,5 +1,6 @@
 package com.openhouseautomation.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
@@ -90,7 +91,7 @@ public class Scene {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass().getName())
+    return MoreObjects.toStringHelper(this)
         .add("id", getId())
         .add("name", getName())
         .add("config", getConfig())

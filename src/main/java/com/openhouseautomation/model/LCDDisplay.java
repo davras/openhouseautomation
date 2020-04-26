@@ -5,7 +5,7 @@
  */
 package com.openhouseautomation.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -46,7 +46,7 @@ public class LCDDisplay {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(getClass().getName())
+        return MoreObjects.toStringHelper(this)
                 .add("displayname", displayname)
                 .add("displaystring", displaystring)
                 .toString();

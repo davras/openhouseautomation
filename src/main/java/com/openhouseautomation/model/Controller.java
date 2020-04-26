@@ -6,6 +6,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.annotation.Cache;
@@ -19,7 +20,6 @@ import com.googlecode.objectify.annotation.Unindex;
 import com.openhouseautomation.Convutils;
 import com.openhouseautomation.iftt.DeferredController;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -364,7 +364,7 @@ public class Controller implements Serializable {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass().getName())
+    return MoreObjects.toStringHelper(this)
             .add("id", getId())
             .add("owner", getOwner())
             .add("location", getLocation())

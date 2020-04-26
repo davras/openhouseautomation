@@ -62,9 +62,15 @@ public class WeightedDecision {
   }
 
   public Object getTopValue() {
+    if (queue.isEmpty()) {
+      return 0;
+    }
     return queue.peek().getValue();
   }
   public String getTopName() {
+    if (queue.isEmpty()) {
+      return "OFFLINE";
+    }
     return queue.peek().getName();
   }
 

@@ -1,5 +1,6 @@
 package com.openhouseautomation.model;
 
+import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 import com.google.common.base.Objects;
 import com.googlecode.objectify.Key;
@@ -119,7 +120,7 @@ public class Reading {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass().getName())
+    return MoreObjects.toStringHelper(this)
         .add("sensor", sensor)
         .add("id", id)
         .add("value", value)

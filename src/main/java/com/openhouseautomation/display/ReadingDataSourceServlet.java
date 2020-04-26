@@ -42,12 +42,6 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
   int shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
   int blocks = 60 / resolution * 24 * shortchartdays; // blocks of time in graph (300k)
 
-  // TODO: only in place for testing, not for production
-  @Override
-  protected boolean isRestrictedAccessMode() {
-    return false;
-  }
-
   @Override
   public DataTable generateDataTable(Query query, HttpServletRequest request) {
     // Create a data table,
@@ -69,7 +63,7 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     }
 
     // use the sensors to get the readings
-    shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "5"));
+    shortchartdays = Integer.parseInt(DatastoreConfig.getValueForKey("shortchartdays", "7"));
     DateTime cutoffdate = Convutils.getNewDateTime().minus(Period.days(shortchartdays));
     log.log(Level.INFO, "filling {0} blocks", blocks);
     Double[][] readingsz = new Double[sensors.size()][blocks + 10]; // fudge for ArrayIndexOutOfBoundsException
@@ -77,16 +71,8 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
     // fill in the readings
     for (int i = 0; i < sensors.size(); i++) {
       Sensor s = (Sensor) sensors.get(i);
-      // zero if needed
-      if (s.getType() == Sensor.Type.RAIN) {
-        for (int clrz = 0; clrz < blocks; clrz++) {
-          readingsz[i][clrz] = 0.0;
-        }
-      }
       long starttime2 = System.currentTimeMillis();
       Iterable<Reading> readings = ofy().load().type(Reading.class).ancestor(s).chunkAll().iterable();
-      log.log(Level.INFO, "retrieve reading iterator took {0}ms", (System.currentTimeMillis() - starttime2));
-      starttime2 = System.currentTimeMillis();
       int readingcount = 0;
       for (Reading reading : readings) {
         readingcount++;
@@ -95,7 +81,8 @@ public class ReadingDataSourceServlet extends DataSourceServlet {
           try {
             readingsz[i][blocknumber] = Double.parseDouble(reading.getValue());
           } catch (java.lang.NumberFormatException e) {
-            log.log(Level.WARNING, "could not parse: {0}", reading);
+            //log.log(Level.WARNING, "could not parse: {0}", reading);
+            readingsz[i][blocknumber] = null;
           }
         }
       }
