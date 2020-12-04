@@ -14,9 +14,9 @@
   <inbound-services>
     <service>mail</service>
   </inbound-services>
-  <manual-scaling>
-      <instances>1</instances>
-  </manual-scaling>
+  <automatic-scaling>
+      <max-instances>1</max-instances>
+  </automatic-scaling>
   <static-error-handlers>
     <handler file="error_page.html" />
     <!--<handler file="over_quota.html" error-code="over_quota" />-->
@@ -27,6 +27,7 @@
     <include path="/**.js" expiration="1d"/>
     <include path="/**.png" expiration="1d"/>
     <include path="/**.ico" expiration="1d"/>
+    <include path="/robots.txt" expiration="180d"/>
     <exclude path="/navbar.html" />
   </static-files>
   

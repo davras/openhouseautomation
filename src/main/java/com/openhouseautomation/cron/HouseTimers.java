@@ -35,8 +35,7 @@ public class HouseTimers extends HttpServlet {
   private int curmin;
 
   /**
-   * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-   * methods.
+   * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
    *
    * @param request servlet request
    * @param response servlet response
@@ -60,6 +59,10 @@ public class HouseTimers extends HttpServlet {
   }
 
   public void updateLightColor() {
+    if (curmin % 5 > 0) {
+      // only run once every 5m
+      return;
+    }
     Controller workcolor = ofy().load().type(Controller.class).id(2261732907L).now();
     workcolor.setDesiredState(lightLookup());
     ofy().save().entity(workcolor);
@@ -81,7 +84,7 @@ public class HouseTimers extends HttpServlet {
       log.log(Level.INFO, "Alarm is set");
       housecolor.setDesiredState("#000000");
     }
-    if (setcolor(housecolor)==0) {
+    if (setcolor(housecolor) == 0) {
       // called API successfully, so controller is online
       // this should be done in setcolor() in another class
       // but datastore.save() calls multiply...

@@ -1,0 +1,11 @@
+indexes:
+- kind: "Reading"
+  ancestor: yes
+  properties:
+  - name: "timestamp"
+    direction: asc
+- kind: "ReadingHistory"
+  ancestor: yes
+  properties:
+  - name: "timestamp"
+    direction: asc
