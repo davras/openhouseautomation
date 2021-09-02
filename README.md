@@ -1,3 +1,9 @@
+This project has been obsoleted by the pricing changes (Summer 2021) for Particle network.
+Previously, up to 720k data operations per month were free, allowing real-time control
+of the house.  Now the same controls will cost $180/month for Particle network.
+
+I now recommend using ESP32+Wifi with HomeAssistant to avoid being extorted.
+
 Goals:
 ======
 - Make a house intelligent, with independent decision making.
