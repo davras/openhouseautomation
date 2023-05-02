@@ -1,20 +1,20 @@
 cron:
-- description: 'Remove old log entries from the Datastore'
-  url: /cron/datastorelogtruncator
-  schedule: every day 12:00
-  timezone: America/Los_Angeles
-- description: 'Gets the forecast for the supplied zip code'
-  url: /cron/getforecast?zipcode=95376
-  schedule: every 1 hours
-  timezone: America/Los_Angeles
-- description: 'Check for expired Sensors and Controllers'
-  url: /ExpirationCheck
-  schedule: every 1 hours
-  timezone: America/Los_Angeles
-- description: 'Runs timers for automated controls'
-  url: /HouseTimers
-  schedule: every 5 minutes
-  timezone: America/Los_Angeles
+#- description: 'Remove old log entries from the Datastore'
+#  url: /cron/datastorelogtruncator
+#  schedule: every day 12:00
+# timezone: America/Los_Angeles
+#- description: 'Gets the forecast for the supplied zip code'
+#  url: /cron/getforecast?zipcode=95376
+#  schedule: every 1 hours
+#  timezone: America/Los_Angeles
+#- description: 'Check for expired Sensors and Controllers'
+#  url: /ExpirationCheck
+#  schedule: every 1 hours
+#  timezone: America/Los_Angeles
+#- description: 'Runs timers for automated controls'
+#  url: /HouseTimers
+#  schedule: every 5 minutes
+#  timezone: America/Los_Angeles
 #- description: 'Lights on in morning'
 #  url: /cron/controller/3960328784/1
 #  schedule: every day 05:59
@@ -31,14 +31,14 @@ cron:
 #  url: /cron/controller/91125605/0
 #  schedule: every day 08:00
 #  timezone: America/Los_Angeles
-- description: 'Den lights off at midnight'
-  url: /cron/controller/3640433672/0
-  schedule: every day 00:00
-  timezone: America/Los_Angeles
-- description: 'Den lights on at 6:30am'
-  url: /cron/controller/3640433672/1
-  schedule: every day 06:30
-  timezone: America/Los_Angeles
+#- description: 'Den lights off at midnight'
+#  url: /cron/controller/3640433672/0
+# schedule: every day 00:00
+#  timezone: America/Los_Angeles
+#- description: 'Den lights on at 6:30am'
+#  url: /cron/controller/3640433672/1
+#  schedule: every day 06:30
+#  timezone: America/Los_Angeles
 #- description: 'Nursery lights on at 6am'
 #  url: /cron/controller/1919502323/1
 #  schedule: every day 06:00
@@ -47,7 +47,7 @@ cron:
 #  url: /cron/controller/1919502323/0
 #  schedule: every day 23:59
 #  timezone: America/Los_Angeles
-- description: 'Lock the front door'
-  url: /cron/controller/763957272/0
-  schedule: every day 23:59
-  timezone: America/Los_Angeles
+#- description: 'Lock the front door'
+#  url: /cron/controller/763957272/0
+#  schedule: every day 23:59
+#  timezone: America/Los_Angeles
